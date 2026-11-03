@@ -79,6 +79,91 @@ const DEFAULT_HOMEPAGE = {
   ],
 }
 
+const DEFAULT_TEAM = [
+  {
+    id: 1,
+    name: 'President',
+    role: 'Club Founder & President',
+    graduationYear: '2026',
+    bio: 'Founded CLUSTER to build a student technology community. Passionate about open-source software, developer communities, and making compute accessible to everyone.',
+    github: 'https://github.com',
+    linkedin: 'https://linkedin.com',
+    initials: 'PR',
+  },
+  {
+    id: 2,
+    name: 'Vice President',
+    role: 'AI & Research Lead',
+    graduationYear: '2026',
+    bio: 'Leads the AI & ML study circle and research projects. Specializes in building machine learning pipelines and mentoring members from beginner to practitioner level.',
+    github: 'https://github.com',
+    linkedin: 'https://linkedin.com',
+    initials: 'VP',
+  },
+  {
+    id: 3,
+    name: 'Technical Secretary',
+    role: 'Engineering & Dev Lead',
+    graduationYear: '2027',
+    bio: 'Heads the Developer Circle — organizing hackathons, code sprints, and open-source contribution sessions. Expert in full-stack development and system design.',
+    github: 'https://github.com',
+    linkedin: 'https://linkedin.com',
+    initials: 'TS',
+  },
+  {
+    id: 4,
+    name: 'Events Director',
+    role: 'Events & Community Coordinator',
+    graduationYear: '2027',
+    bio: 'Organizes workshops, competitions, and community events that bring CLUSTER members together. Coordinates partnerships with external organizations and sponsors.',
+    github: 'https://github.com',
+    linkedin: 'https://linkedin.com',
+    initials: 'ED',
+  },
+]
+
+const DEFAULT_APPLICATIONS = [
+  {
+    id: 'app-1',
+    fullName: 'Aarav Sharma',
+    email: 'aarav.sharma@example.com',
+    rollNumber: '22SCSE101001',
+    branchYear: 'CSE / 3rd Year',
+    domain: 'AI & Machine Learning',
+    github: 'https://github.com/aaravs',
+    linkedin: 'https://linkedin.com/in/aaravs',
+    motivation: 'Passionate about distributed training and GPU accelerated inference. Want to build open source ML pipelines with the Compute circle.',
+    status: 'Under Review',
+    submittedAt: '2026-11-01T14:30:00Z',
+  },
+  {
+    id: 'app-2',
+    fullName: 'Diya Patel',
+    email: 'diya.patel@example.com',
+    rollNumber: '23SCSE102045',
+    branchYear: 'CSE / 2nd Year',
+    domain: 'Full-Stack Web Dev',
+    github: 'https://github.com/diyapatel',
+    linkedin: 'https://linkedin.com/in/diyap',
+    motivation: 'Built multiple React & Node.js projects. Eager to contribute to the CLUSTER web applications and organize full-stack sprints.',
+    status: 'Accepted',
+    submittedAt: '2026-10-28T09:15:00Z',
+  },
+  {
+    id: 'app-3',
+    fullName: 'Rohan Verma',
+    email: 'rohan.v@example.com',
+    rollNumber: '24SCSE103112',
+    branchYear: 'IT / 1st Year',
+    domain: 'Open Source & Dev Tools',
+    github: 'https://github.com/rohanverma',
+    linkedin: '',
+    motivation: 'Curious first-year student eager to learn from seniors, attend the hackathon, and collaborate on systems programming.',
+    status: 'Pending',
+    submittedAt: '2026-11-03T11:00:00Z',
+  },
+]
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function dispatchUpdate(eventType, data) {
@@ -191,6 +276,121 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(updated))
     dispatchUpdate('cluster_homepage_updated', updated)
     return updated
+  },
+
+  // ── Team Management ──
+  getTeamMembers() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.TEAM)
+      if (stored) return JSON.parse(stored)
+      localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(DEFAULT_TEAM))
+      return DEFAULT_TEAM
+    } catch {
+      return DEFAULT_TEAM
+    }
+  },
+
+  saveTeamMember(memberData) {
+    const current = this.getTeamMembers()
+    let updated
+    if (memberData.id) {
+      updated = current.map((m) => (m.id === memberData.id ? { ...m, ...memberData } : m))
+    } else {
+      const initials = memberData.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2) || 'CL'
+      const newMember = {
+        ...memberData,
+        id: Date.now(),
+        initials,
+      }
+      updated = [...current, newMember]
+    }
+    localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
+    dispatchUpdate('cluster_team_updated', updated)
+    return updated
+  },
+
+  deleteTeamMember(id) {
+    const current = this.getTeamMembers()
+    const updated = current.filter((m) => m.id !== id)
+    localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
+    dispatchUpdate('cluster_team_updated', updated)
+    return updated
+  },
+
+  // ── Membership Applications (Recruitment) ──
+  getApplications() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.APPLICATIONS)
+      if (stored) return JSON.parse(stored)
+      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(DEFAULT_APPLICATIONS))
+      return DEFAULT_APPLICATIONS
+    } catch {
+      return DEFAULT_APPLICATIONS
+    }
+  },
+
+  addApplication(appData) {
+    const current = this.getApplications()
+    const newApp = {
+      ...appData,
+      id: `app-${Date.now()}`,
+      status: 'Pending',
+      submittedAt: new Date().toISOString(),
+    }
+    const updated = [newApp, ...current]
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    dispatchUpdate('cluster_applications_updated', updated)
+    return newApp
+  },
+
+  updateApplicationStatus(id, newStatus) {
+    const current = this.getApplications()
+    const updated = current.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    dispatchUpdate('cluster_applications_updated', updated)
+    return updated
+  },
+
+  deleteApplication(id) {
+    const current = this.getApplications()
+    const updated = current.filter((app) => app.id !== id)
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    dispatchUpdate('cluster_applications_updated', updated)
+    return updated
+  },
+
+  exportApplicationsCSV() {
+    const apps = this.getApplications()
+    const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Branch & Year', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation']
+    const rows = apps.map((a) => [
+      a.id,
+      `"${(a.fullName || '').replace(/"/g, '""')}"`,
+      `"${(a.email || '').replace(/"/g, '""')}"`,
+      `"${(a.rollNumber || '').replace(/"/g, '""')}"`,
+      `"${(a.branchYear || '').replace(/"/g, '""')}"`,
+      `"${(a.domain || '').replace(/"/g, '""')}"`,
+      `"${(a.status || '').replace(/"/g, '""')}"`,
+      `"${a.submittedAt || ''}"`,
+      `"${(a.github || '').replace(/"/g, '""')}"`,
+      `"${(a.linkedin || '').replace(/"/g, '""')}"`,
+      `"${(a.motivation || '').replace(/"/g, '""')}"`,
+    ])
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `cluster_applications_${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   },
 }
 

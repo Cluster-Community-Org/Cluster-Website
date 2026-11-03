@@ -1,47 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, Users, Github, Linkedin, X, Search } from 'lucide-react'
-
-const INITIAL_TEAM = [
-  {
-    id: 1,
-    name: 'President',
-    role: 'Club Founder & President',
-    graduationYear: '2026',
-    bio: 'Founded CLUSTER to build a student technology community. Passionate about open-source software, developer communities, and making tech accessible to everyone.',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 2,
-    name: 'Vice President',
-    role: 'AI & Research Lead',
-    graduationYear: '2026',
-    bio: 'Leads the AI & ML study circle and research projects. Specializes in building machine learning pipelines and mentoring members from beginner to practitioner level.',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 3,
-    name: 'Technical Secretary',
-    role: 'Engineering & Dev Lead',
-    graduationYear: '2027',
-    bio: 'Heads the Developer Circle — organizing hackathons, code sprints, and open-source contribution sessions. Expert in full-stack development and system design.',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 4,
-    name: 'Events Director',
-    role: 'Events & Community Coordinator',
-    graduationYear: '2027',
-    bio: 'Organizes workshops, competitions, and community events that bring CLUSTER members together. Coordinates partnerships with external organizations and sponsors.',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-]
+import { clusterDataService } from '../../services/clusterDataService.js'
 
 export default function AdminTeam() {
-  const [team, setTeam] = useState(INITIAL_TEAM)
+  const [team, setTeam] = useState(() => clusterDataService.getTeamMembers())
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingMember, setEditingMember] = useState(null)
@@ -53,6 +15,14 @@ export default function AdminTeam() {
     github: '',
     linkedin: '',
   })
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setTeam(clusterDataService.getTeamMembers())
+    }
+    window.addEventListener('cluster_team_updated', handleUpdate)
+    return () => window.removeEventListener('cluster_team_updated', handleUpdate)
+  }, [])
 
   const filteredTeam = team.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,19 +48,20 @@ export default function AdminTeam() {
     setModalOpen(true)
   }
 
-  const handleDelete = (id) => {
-    if (confirm('Are you sure you want to remove this officer?')) {
-      setTeam(team.filter((m) => m.id !== id))
+  const handleDelete = (id, name) => {
+    if (confirm(`Are you sure you want to remove ${name || 'this team member'} from the roster?`)) {
+      const updated = clusterDataService.deleteTeamMember(id)
+      setTeam(updated)
     }
   }
 
   const handleSave = (e) => {
     e.preventDefault()
-    if (editingMember) {
-      setTeam(team.map((m) => (m.id === editingMember.id ? { ...m, ...formData } : m)))
-    } else {
-      setTeam([{ ...formData, id: Date.now() }, ...team])
-    }
+    const updated = clusterDataService.saveTeamMember({
+      ...(editingMember ? { id: editingMember.id } : {}),
+      ...formData,
+    })
+    setTeam(updated)
     setModalOpen(false)
   }
 
@@ -143,7 +114,7 @@ export default function AdminTeam() {
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(m.id)}
+                    onClick={() => handleDelete(m.id, m.name)}
                     className="p-1 rounded bg-obsidian-900 text-gray-400 hover:text-red-400"
                     title="Delete"
                   >

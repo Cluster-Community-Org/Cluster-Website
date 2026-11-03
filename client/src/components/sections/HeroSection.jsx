@@ -49,13 +49,13 @@ export default function HeroSection() {
 
         {/* CTA Button Group */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-3">
-          <Link
-            to="/events"
-            className="btn-cluster-primary w-full sm:w-auto px-8 py-3.5 text-xs sm:text-sm font-semibold group"
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open_join_modal'))}
+            className="btn-cluster-primary w-full sm:w-auto px-8 py-3.5 text-xs sm:text-sm font-semibold group cursor-pointer"
           >
             <span>Join the Community</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          </button>
 
           <Link
             to="/events"

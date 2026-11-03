@@ -1,49 +1,17 @@
+import { useState, useEffect } from 'react'
 import { Github, Linkedin, Users, Sparkles, Award } from 'lucide-react'
-
-const TEAM_MEMBERS = [
-  {
-    id: 1,
-    name: 'President',
-    role: 'Club Founder & President',
-    bio: 'Founded CLUSTER to build a student technology community. Passionate about open-source software, developer communities, and making tech accessible to everyone.',
-    graduationYear: '2026',
-    initials: 'P',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 2,
-    name: 'Vice President',
-    role: 'AI & Research Lead',
-    bio: 'Leads the AI & ML study circle and research projects. Specializes in building machine learning pipelines and mentoring members from beginner to practitioner level.',
-    graduationYear: '2026',
-    initials: 'VP',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 3,
-    name: 'Technical Secretary',
-    role: 'Engineering & Dev Lead',
-    bio: 'Heads the Developer Circle — organizing hackathons, code sprints, and open-source contribution sessions. Expert in full-stack development and system design.',
-    graduationYear: '2027',
-    initials: 'TS',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-  {
-    id: 4,
-    name: 'Events Director',
-    role: 'Events & Community Coordinator',
-    bio: 'Organizes workshops, competitions, and community events that bring CLUSTER members together. Coordinates partnerships with external organizations and sponsors.',
-    graduationYear: '2027',
-    initials: 'ED',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com',
-  },
-]
+import { clusterDataService } from '../services/clusterDataService.js'
 
 export default function TeamPage() {
+  const [teamMembers, setTeamMembers] = useState(() => clusterDataService.getTeamMembers())
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setTeamMembers(clusterDataService.getTeamMembers())
+    }
+    window.addEventListener('cluster_team_updated', handleUpdate)
+    return () => window.removeEventListener('cluster_team_updated', handleUpdate)
+  }, [])
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-20">
       {/* Page Header */}
@@ -97,7 +65,7 @@ export default function TeamPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TEAM_MEMBERS.map((member) => (
+          {teamMembers.map((member) => (
             <div key={member.id} className="nvidia-card rounded-2xl overflow-hidden p-5 space-y-4 flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="relative h-48 rounded-xl overflow-hidden bg-black flex items-center justify-center border border-white/10">

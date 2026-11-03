@@ -31,13 +31,13 @@ export default function JoinCTA() {
           </div>
         </div>
 
-        <Link
-          to="/events"
-          className="btn-cluster-primary shrink-0 relative z-10 px-8 py-4 text-sm font-semibold group active:scale-[0.98] transition-transform"
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('open_join_modal'))}
+          className="btn-cluster-primary shrink-0 relative z-10 px-8 py-4 text-sm font-semibold group active:scale-[0.98] transition-transform cursor-pointer"
         >
           <span>Join CLUSTER Community</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
+        </button>
       </div>
     </section>
   )
