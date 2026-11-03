@@ -40,14 +40,14 @@ export default function StatsSection() {
     <section className="py-20 bg-obsidian-900/40 border-y border-white/5 relative overflow-hidden" aria-labelledby="stats-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-green/10 border border-cluster-green/30 text-cluster-green text-xs font-mono">
-            <Users className="w-3.5 h-3.5" />
+          <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
             <span>CLUSTER METRICS</span>
           </div>
-          <h2 id="stats-heading" className="text-3xl sm:text-4xl font-display font-bold text-white">
+          <h2 id="stats-heading" className="text-3xl sm:text-5xl font-display font-black text-[#F8F7F3] tracking-tight">
             SOCIETY IMPACT & NUMBERS
           </h2>
-          <p className="text-gray-400 text-sm font-sans">
+          <p className="text-[#B5B5AE] text-sm sm:text-base font-sans">
             Empowering student builders, creators, and collaborators to build real-world technology.
           </p>
         </div>

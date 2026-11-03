@@ -48,18 +48,17 @@ export default function TeamPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-20">
       {/* Page Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono">
-          <Users className="w-3.5 h-3.5" />
-          <span>STUDENT TECH COMMUNITY · CLUSTER</span>
+        <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
+          <span>TEAM & LEADERSHIP</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-display font-extrabold text-white tracking-tight">
+        <h1 className="text-4xl sm:text-6xl font-display font-black text-[#F8F7F3] tracking-tight leading-tight">
           A COMMUNITY AROUND COMPUTE.<br />
           <span className="text-cluster-gradient">FIND YOUR PEOPLE.</span>
         </h1>
-        <p className="text-gray-200 text-base leading-relaxed">
+        <p className="text-[#B5B5AE] text-base leading-relaxed font-sans">
           Good things happen in clusters. Bringing together passionate student builders, designers, and researchers —
-          united by a shared drive to{' '}
-          <span className="text-cluster-acid font-semibold">build together</span>.
+          united by a shared drive to <span className="text-cluster-acid font-semibold">build together</span>.
         </p>
       </div>
 

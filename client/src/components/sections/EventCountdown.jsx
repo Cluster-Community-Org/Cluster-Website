@@ -52,29 +52,29 @@ export const EventCountdown = ({ event }) => {
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <div className="lg:col-span-7 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono font-semibold">
-            <Zap className="w-3.5 h-3.5 animate-bounce" />
-            <span>HOMEPAGE SPOTLIGHT // KICKSTART '26</span>
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-cluster-acid tracking-wider uppercase">
+            <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
+            <span>COMMUNITY SPOTLIGHT // KICKSTART '26</span>
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight leading-tight">
+          <h3 className="text-2xl sm:text-4xl font-display font-extrabold text-[#F8F7F3] tracking-tight leading-tight">
             {event.title}
           </h3>
 
-          <p className="text-gray-300 text-sm md:text-base line-clamp-2">
+          <p className="text-[#C2C2B8] text-sm md:text-base leading-relaxed line-clamp-2">
             {event.summary}
           </p>
 
-          <div className="flex flex-wrap gap-3 text-xs font-mono text-gray-300 pt-2">
-            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+          <div className="flex flex-wrap gap-3 text-xs font-mono text-[#D4D4CD] pt-2">
+            <div className="flex items-center gap-2 bg-[#080808] px-3.5 py-2 rounded-lg border border-white/[0.08]">
               <Calendar className="w-4 h-4 text-cluster-acid" />
               <span>{event.date}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+            <div className="flex items-center gap-2 bg-[#080808] px-3.5 py-2 rounded-lg border border-white/[0.08]">
               <Clock className="w-4 h-4 text-cluster-acid" />
               <span>{event.time}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+            <div className="flex items-center gap-2 bg-[#080808] px-3.5 py-2 rounded-lg border border-white/[0.08]">
               <MapPin className="w-4 h-4 text-cluster-acid" />
               <span>{event.location}</span>
             </div>

@@ -24,13 +24,14 @@ export default function Footer() {
               A community around compute. Bringing together passionate tech students to build real projects, explore emerging technology, and foster shared curiosity.
             </p>
 
-            {/* Core Values Badges */}
-            <div className="flex flex-wrap gap-2 pt-1">
+            {/* Core Values Minimalist List */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-[11px] font-mono text-[#8E8E88] uppercase tracking-wider">
               {['Community', 'Collaboration', 'Belonging', 'Shared Curiosity'].map((val) => (
                 <span
                   key={val}
-                  className="px-2.5 py-1 rounded-full text-[10px] font-mono font-medium bg-obsidian-900 border border-white/10 text-gray-300 hover:border-cluster-acid hover:text-cluster-acid transition-colors"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
+                  <span className="w-1 h-1 rounded-sm bg-cluster-acid/60" />
                   {val}
                 </span>
               ))}

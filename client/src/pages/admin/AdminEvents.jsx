@@ -150,8 +150,8 @@ export default function AdminEvents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-[11px] font-mono mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="text-[10px] font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center gap-1.5 mb-1.5">
+            <span className="w-1.5 h-1.5 rounded-sm bg-cluster-acid" />
             <span>EVENT SPOTLIGHT & CONTENT CMS</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">

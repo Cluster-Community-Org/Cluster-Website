@@ -33,17 +33,13 @@ const PILLARS = [
 
 export default function AboutSection() {
   return (
-    <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center space-y-3 mb-16">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>BRAND IDENTITY & CORE VALUES</span>
-        </div>
-        <h2 className="text-3xl sm:text-4xl font-display font-bold text-white">
-          GOOD THINGS HAPPEN IN CLUSTERS.
+    <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-white/[0.06]">
+      <div className="space-y-4 mb-16 text-center max-w-3xl mx-auto">
+        <h2 className="text-3xl sm:text-5xl font-display font-black text-[#F8F7F3] tracking-tight leading-tight">
+          GOOD THINGS HAPPEN IN CLUSTERS<span className="text-cluster-acid">.</span>
         </h2>
-        <p className="text-gray-300 text-sm max-w-xl mx-auto font-sans">
-          A community around compute. Built on four foundational values that guide how we learn, collaborate, and build.
+        <p className="text-[#B5B5AE] text-sm sm:text-base font-sans leading-relaxed">
+          A community around compute. Built on four foundational values that guide how we learn, collaborate, and ship software together.
         </p>
       </div>
 
@@ -53,25 +49,27 @@ export default function AboutSection() {
           return (
             <div
               key={idx}
-              className={`nvidia-card rounded-2xl p-6 space-y-4 flex flex-col justify-between border ${pillar.border} group`}
+              className="rounded-2xl p-7 flex flex-col justify-between bg-[#0F1012] border border-white/[0.08] hover:border-cluster-acid/40 transition-all duration-200 group"
             >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-obsidian-900 border border-white/10 text-cluster-acid flex items-center justify-center group-hover:scale-110 group-hover:border-cluster-acid transition-all">
-                  <Icon className="w-6 h-6" />
+              <div className="space-y-5">
+                <div className="w-12 h-12 rounded-xl bg-black border border-white/[0.1] text-cluster-acid flex items-center justify-center group-hover:scale-105 group-hover:border-cluster-acid/50 transition-all">
+                  <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded border border-cluster-acid/20 inline-block font-semibold">
-                  {pillar.tag}
-                </span>
-                <h3 className="text-xl font-display font-bold text-white group-hover:text-cluster-acid transition-colors">
-                  {pillar.title}
-                </h3>
-                <p className="text-gray-300 text-xs sm:text-sm font-sans leading-relaxed">
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-mono tracking-widest text-cluster-acid uppercase font-semibold">
+                    {pillar.tag}
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-[#F8F7F3] group-hover:text-cluster-acid transition-colors">
+                    {pillar.title}
+                  </h3>
+                </div>
+                <p className="text-[#9E9E98] text-xs sm:text-sm font-sans leading-relaxed">
                   {pillar.desc}
                 </p>
               </div>
 
-              <div className="pt-2 flex items-center gap-1.5 text-[10px] font-mono text-gray-400 group-hover:text-white transition-colors">
-                <span className="w-1.5 h-1.5 rounded-full bg-cluster-acid" />
+              <div className="pt-6 mt-4 border-t border-white/[0.06] flex items-center gap-2 text-[10px] font-mono text-[#666660] group-hover:text-white transition-colors">
+                <span className="w-1.5 h-1.5 rounded-sm bg-cluster-acid/70" />
                 <span>CLUSTER // {pillar.title.toUpperCase()}</span>
               </div>
             </div>
