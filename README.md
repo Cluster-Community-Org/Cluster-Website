@@ -1,85 +1,94 @@
-# NVIDIA Super Computing Club — Official Website
+# CLUSTER — A Student Technology Society
 
-> A visually immersive, award-worthy website for the NVIDIA Super Computing Club, featuring 3D experiences, smooth animations, and a full admin CMS.
+> **Official Website & Content Management System** for CLUSTER at Galgotias University.  
+> `BUILD` / `LEARN` / `COLLABORATE` / `CREATE` — Create Your Future in Tech.
+
+[![Repository](https://img.shields.io/badge/GitHub-alwin2134%2FCluster-00E5FF?style=flat-square&logo=github)](https://github.com/alwin2134/Cluster)
+[![Vite](https://img.shields.io/badge/Vite-6.4-A3FF6B?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-19-00E5FF?style=flat-square&logo=react)](https://react.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-A3FF6B?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 
 ---
 
 ## Overview
 
-This is the official website for the NVIDIA Super Computing Club. It serves as the public face of the club — showcasing events, team members, and the club's mission — while providing administrators with a powerful CMS to manage content in real time.
+**CLUSTER** is the premier student technology society at **Galgotias University**, built to empower students to build production-grade projects, explore emerging technologies (AI/ML, Web3, Full-Stack, Cloud Systems), and collaborate across disciplines.
 
-The landing page is designed to be an **Awwwards-caliber** experience with a 3D NVIDIA DGX H100 server model, WebGL particle effects, GSAP scroll-driven animations, and a responsive layout that adapts across desktop, tablet, and mobile.
+The official platform pairs an immersive, cybernetic front-end experience with a comprehensive **Admin CMS** for real-time society operations.
+
+### Key Highlights
+* **Cybernetic Visual Identity**: Tailored around the official CLUSTER Brand Kit with high-contrast dual-gradient branding (`#A3FF6B` Cluster Green to `#00E5FF` Cluster Cyan) on an obsidian dark surface (`#0B0F14`).
+* **Interactive 3D & Particle Canvas**: High-performance WebGL particle field and interactive circuit canvas.
+* **Interactive CLI Terminal**: Functional developer terminal emulator (`cluster@society:~$`) with custom command parser (`help`, `about`, `events`, `team`, `join`, `clear`).
+* **Live Event Spotlight System**: Real-time countdown timer on the homepage dynamically controlled from the Admin CMS.
+* **Integrated Admin CMS**: Full management portal for executive officers to curate events, spotlight competitions, and manage core team rosters.
+
+---
+
+## Visual Identity & Design System
+
+| Element | Specification | Hex / Value |
+|---------|---------------|-------------|
+| **Brand Gradient** | Cluster Green → Cluster Cyan | `linear-gradient(135deg, #A3FF6B 0%, #00E5FF 100%)` |
+| **Accent Colors** | Lime, Cyan, Violet, Pink, Amber | `#C6FF4D`, `#00FFC2`, `#A78BFA`, `#FF5CA8`, `#FFD166` |
+| **Dark Background** | Deep Obsidian | `#0B0F14` |
+| **Surfaces** | Surface 1 / Surface 2 | `#111827`, `#1F2937` |
+| **Text Colors** | Primary Text / Muted Text | `#E5E7EB` / `#94A3B8` |
+| **Headings Font** | Space Grotesk | Display & Hero typography |
+| **Body & UI Font** | Inter | Readable modern UI sans-serif |
+| **Monospace Font** | Fira Code | Terminals, dates, badges & metrics |
 
 ---
 
 ## Tech Stack
 
-| Layer            | Technology                                        |
-| ---------------- | ------------------------------------------------- |
-| **Frontend**     | React 19, Vite, Tailwind CSS, React Router DOM    |
-| **3D / Motion**  | Three.js, React Three Fiber, GSAP, WebGL          |
-| **Backend**      | Node.js, Express.js                               |
-| **Database**     | MongoDB (Mongoose ODM)                             |
-| **Storage**      | Cloudinary (images/media)                          |
-| **Auth**         | JWT + Passport.js, Google OAuth 2.0, GitHub OAuth 2.0 |
-| **API**          | REST API                                          |
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19, Vite, Tailwind CSS, React Router DOM, Lucide Icons |
+| **Canvas / Motion** | Canvas 2D / WebGL Particles, Lucide React, Framer-motion ready |
+| **State & Sync** | Reactive `clusterDataService` with `localStorage` fallback & live event dispatching |
+| **Backend (Ready)** | Node.js, Express.js |
+| **Database (Ready)** | MongoDB (Mongoose ODM) |
+| **Auth & Security** | JWT, Passport.js (Google & GitHub OAuth 2.0), Role-based Access Control |
 
 ---
 
 ## Project Structure
 
 ```
-website/
-├── client/                          # Frontend (React + Vite)
-│   ├── public/                      # Static assets (favicon, models, textures)
+Cluster/
+├── client/                          # Frontend application (React + Vite)
+│   ├── public/                      # Static assets (cluster-logo.jpg, cluster-banner.jpg, favicon.svg)
 │   ├── src/
-│   │   ├── assets/                  # Images, fonts, 3D model files
 │   │   ├── components/
-│   │   │   ├── 3d/                  # Three.js / R3F components (DGX model, particles)
-│   │   │   │   └── Terminal/        # Interactive CLI terminal component
-│   │   │   ├── sections/            # Landing page sections (Hero, About, Stats, etc.)
-│   │   │   ├── ui/                  # Reusable UI primitives (Button, Card, Modal)
-│   │   │   ├── layout/              # Navbar, Footer, PageWrapper
-│   │   │   └── admin/               # Admin dashboard components
-│   │   ├── context/                 # React Context providers (Auth, Theme)
-│   │   ├── hooks/                   # Custom hooks (useScrollAnimation, useAuth)
-│   │   ├── layouts/                 # Route layouts (PublicLayout, AdminLayout)
-│   │   ├── pages/                   # Route-level page components
-│   │   │   └── admin/               # Admin pages (Dashboard, EventsCMS, TeamCMS)
-│   │   ├── routes/                  # React Router route definitions
-│   │   ├── services/                # API client functions (fetchWrapper, endpoints)
-│   │   ├── styles/                  # Global styles, Tailwind config
-│   │   └── utils/                   # Utility functions (date formatting, validation)
-│   ├── config/                      # Vite config, env config
+│   │   │   ├── 3d/                  # Circuit Canvas, Particle Field, Interactive Terminal
+│   │   │   ├── layout/              # Navbar, Footer
+│   │   │   └── sections/            # Hero, About (4 Pillars), Stats, Spotlight, Communities, CTA
+│   │   ├── layouts/                 # PublicLayout, AdminLayout
+│   │   ├── pages/                   # HomePage, EventsPage, TeamPage
+│   │   │   └── admin/               # AdminDashboard, AdminEvents, AdminTeam, AdminLogin
+│   │   ├── routes/                  # React Router configuration
+│   │   ├── services/                # clusterDataService (live sync layer)
+│   │   └── styles/                  # Tailwind CSS, cluster glow variables
 │   ├── index.html
 │   ├── package.json
-│   ├── tailwind.config.js
-│   ├── vite.config.js
-│   └── .env.example
+│   └── vite.config.js
 │
-├── server/                          # Backend (Node.js + Express)
-│   ├── config/                      # MongoDB connection, env vars, CORS config, Passport
-│   ├── controllers/                 # Route handlers (events, team, auth, upload)
-│   ├── middleware/                   # Auth middleware, validation, error handling
-│   ├── routes/                      # Express route definitions
-│   ├── services/                    # Business logic (Mongoose queries, Cloudinary ops)
-│   ├── utils/                       # Helpers (response formatters, validators)
-│   ├── index.js                     # Server entry point
-│   ├── package.json
-│   └── .env.example
+├── server/                          # Backend API (Node.js + Express)
+│   ├── config/                      # Database & Passport configuration
+│   ├── controllers/                 # Events, Team, Applications controllers
+│   ├── middleware/                   # JWT & Admin role verification
+│   ├── routes/                      # REST endpoints
+│   ├── index.js                     # Server entrypoint
+│   └── package.json
 │
-├── docs/                            # Project documentation
-│   ├── ARCHITECTURE.md              # System architecture & data flow
-│   ├── API.md                       # REST API reference
-│   ├── ADMIN-CMS.md                 # Admin CMS documentation
-│   ├── CONTRIBUTING.md              # Contribution guidelines
-│   ├── DEPLOYMENT.md                # Deployment guide
-│   ├── SPRINTS.md                   # Sprint breakdown & issue tracking
-│   └── UI-DESIGN.md                 # Design system & 3D/motion specs
+├── docs/                            # Documentation & Architecture
+│   ├── ADMIN-CMS.md                 # Admin CMS operational guide
+│   ├── ARCHITECTURE.md              # System design
+│   ├── API.md                       # API reference
+│   └── SPRINTS.md                   # Development sprint backlog
 │
-├── README.md                        # This file
-├── .gitignore
-└── LICENSE
+└── README.md
 ```
 
 ---
@@ -87,148 +96,67 @@ website/
 ## Getting Started
 
 ### Prerequisites
-
-- **Node.js** v18+ (recommended: v20 LTS)
-- **npm** or **yarn**
-- **MongoDB** (local install or MongoDB Atlas account)
-- **Cloudinary** account (for image/media storage)
-- **Git**
+* **Node.js**: v18.0.0 or later (v20+ LTS recommended)
+* **npm** or **pnpm**
+* **Git**
 
 ### 1. Clone the Repository
-
 ```bash
-git clone https://github.com/your-org/nvidia-supercomputing-club-website.git
-cd nvidia-supercomputing-club-website
+git clone https://github.com/alwin2134/Cluster.git
+cd Cluster
 ```
 
-### 2. Setup Frontend
-
+### 2. Run the Client (Frontend)
 ```bash
 cd client
 npm install
-cp .env.example .env    # Fill in your API URL
-npm run dev             # Starts on http://localhost:5173
+npm run dev
 ```
+Open **`http://localhost:5173`** in your browser.
 
-### 3. Setup Backend
-
+### 3. Production Build
 ```bash
-cd server
-npm install
-cp .env.example .env    # Fill in MongoDB URI, JWT secret, and port
-node index.js           # Starts on http://localhost:5000
-```
-
-### 4. Environment Variables
-
-#### Client `.env`
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-#### Server `.env`
-
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/nvidia-sc-website
-JWT_SECRET=your-jwt-secret-key
-CORS_ORIGIN=http://localhost:5173
-GOOGLE_CLIENT_ID=your-google-oauth-client-id
-GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
-GITHUB_CLIENT_ID=your-github-oauth-client-id
-GITHUB_CLIENT_SECRET=your-github-oauth-client-secret
-CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
-CLOUDINARY_API_KEY=your-cloudinary-api-key
-CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+npm --prefix client run build
 ```
 
 ---
 
-## Scripts
+## Admin Portal Access
 
-### Frontend (`client/`)
+The website includes a built-in content management suite accessible by administrators:
 
-| Command             | Description                  |
-| ------------------- | ---------------------------- |
-| `npm run dev`       | Start Vite dev server        |
-| `npm run build`     | Production build             |
-| `npm run preview`   | Preview production build     |
-| `npm run lint`      | Run ESLint                   |
-| `npm run format`    | Format with Prettier         |
-
-### Backend (`server/`)
-
-| Command             | Description                  |
-| ------------------- | ---------------------------- |
-| `node index.js`     | Start Express server         |
-| `npm run dev`       | Start with nodemon (dev)     |
-| `npm run lint`      | Run ESLint                   |
+1. Navigate to **`/admin/login`** (or click **"Admin Portal"** in the footer).
+2. Sign in with administrator credentials (or click SSO demo access).
+3. **Features available:**
+   * **Dashboard (`/admin/dashboard`)**: Society metrics, active counts, and recent activity logs.
+   * **Events CMS (`/admin/events`)**: Create/edit events, filter categories, and toggle any event as the **Homepage Spotlight** (`⭐ Make Spotlight`) with a real-time countdown.
+   * **Team CMS (`/admin/team`)**: Manage core officers, executive board positions, and social profiles.
 
 ---
 
-## Development Workflow
+## Available Scripts
 
-```
-Figma → Issue → Assign Contributor → Feature Branch → Development → Pull Request → Review → Merge
-```
-
-1. **Design** — UI/UX designed in Figma
-2. **Issue** — Task created as a GitHub Issue with sprint label
-3. **Assign** — Contributor comments to get assigned
-4. **Branch** — Create feature branch: `feat/landing-hero` or `fix/events-card`
-5. **Develop** — Build the feature with tests
-6. **PR** — Open a Pull Request targeting `main`
-7. **Review** — At least one approval required
-8. **Merge** — Squash merge after CI passes
+### Client (`client/`)
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Starts Vite dev server with hot reload |
+| `npm run build` | Generates optimized production build in `dist/` |
+| `npm run preview` | Previews production build locally |
+| `npm run lint` | Runs ESLint check across client files |
 
 ---
 
-## Sprints
+## Contributing
 
-| Sprint  | Focus                         | Key Deliverables                                 |
-| ------- | ----------------------------- | ------------------------------------------------ |
-| Sprint 0| Setup                         | Figma, React+Tailwind, Express, MongoDB, OAuth |
-| Sprint 1| Landing Page                  | Navbar, Hero, About+Stats, Featured, Footer      |
-| Sprint 2| Pages                         | Events Page, Team Page                           |
-| Sprint 3| Admin CMS                     | Admin Login, Homepage/Events/Team CMS            |
-| Sprint 4| Final                         | Integration, Testing, Deployment                 |
-
-See [`docs/SPRINTS.md`](docs/SPRINTS.md) for the full issue breakdown.
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feat/membership-portal`).
+3. Commit your changes (`git commit -m 'feat: add applicant status pipeline'`).
+4. Push to the branch (`git push origin feat/membership-portal`).
+5. Open a Pull Request.
 
 ---
 
-## Design Goals
+## License & Credits
 
-- **Awwwards-quality** visual experience
-- 3D NVIDIA DGX H100 server model on the landing page (Three.js / React Three Fiber)
-- GSAP scroll-driven animations and transitions
-- WebGL particle effects for background ambiance
-- Responsive across **desktop**, **tablet**, and **mobile**
-- Dark theme with NVIDIA green (`#76B900`) accent
-
-See [`docs/UI-DESIGN.md`](docs/UI-DESIGN.md) for the full design specification.
-
----
-
-## Documentation
-
-| Document                  | Description                                |
-| ------------------------- | ------------------------------------------ |
-| [Architecture](docs/ARCHITECTURE.md)     | System architecture, data flow, tech decisions |
-| [API Reference](docs/API.md)             | REST API endpoints, request/response formats  |
-| [Admin CMS](docs/ADMIN-CMS.md)           | Admin dashboard features and workflows        |
-| [Contributing](docs/CONTRIBUTING.md)     | How to contribute, branch naming, PR process  |
-| [Deployment](docs/DEPLOYMENT.md)         | Production deployment guide                   |
-| [Sprints](docs/SPRINTS.md)               | Sprint breakdown with issue templates         |
-| [UI Design](docs/UI-DESIGN.md)           | Design system, 3D specs, animation patterns   |
-
----
-
-## License
-
-This project is for the NVIDIA Super Computing Club. All rights reserved.
-
----
-
-**Built with passion by the NVIDIA Super Computing Club team.**
+Built with ⚡ by the **CLUSTER Student Technology Society**  
+**Galgotias University** • Plot No. 2, Sector 17-A, Yamuna Expressway, Greater Noida, UP 203201.
