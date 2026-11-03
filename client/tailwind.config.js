@@ -5,18 +5,22 @@ export default {
     extend: {
       colors: {
         // CLUSTER Brand Identity v2.0
-        // Black #000000 | Off-White #F8F8F5 | Graphite #3A3A3A | Acid Green #C6FF4D
+        // Ink #080808 | Black #000000 | Off-White #F8F7F3 | Graphite #3A3A3A | Acid Lime #C6FF4D
         'cluster-green': '#C6FF4D',
         'cluster-acid':  '#C6FF4D',
+        'cluster-lime':  '#C6FF4D',
         'cluster-graphite': '#3A3A3A',
-        'cluster-offwhite': '#F8F8F5',
+        'cluster-offwhite': '#F8F7F3',
         'cluster-black': '#000000',
+        'cluster-ink':   '#080808',
         cluster: {
           green:    '#C6FF4D',
           acid:     '#C6FF4D',
+          lime:     '#C6FF4D',
           graphite: '#3A3A3A',
-          offwhite: '#F8F8F5',
+          offwhite: '#F8F7F3',
           black:    '#000000',
+          ink:      '#080808',
           DEFAULT:  '#C6FF4D',
         },
         obsidian: {
