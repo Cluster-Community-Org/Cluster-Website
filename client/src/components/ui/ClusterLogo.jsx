@@ -31,13 +31,15 @@ export default function ClusterLogo({
   size = 'md',
   showText = true,
   showTagline = false,
-  tagline = 'A community around compute.',
+  showDivider = true,
+  tagline = 'Good things happen in clusters.',
   theme = 'dark',
   className = '',
 }) {
   const isLight = theme === 'light'
   const markColor = isLight ? '#000000' : '#F8F8F5'
   const textColor = isLight ? 'text-black' : 'text-[#F8F8F5]'
+  const dividerColor = isLight ? 'bg-black/25' : 'bg-white/20'
 
   const sizeClasses = {
     sm: 'w-7 h-7',
@@ -49,7 +51,7 @@ export default function ClusterLogo({
   const markSize = sizeClasses[size] || sizeClasses.md
 
   const content = (
-    <div className={`inline-flex items-center gap-3 group select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 sm:gap-3 group select-none ${className}`}>
       {/* Logo Mark container */}
       <div className="relative shrink-0 flex items-center justify-center p-0.5">
         <ClusterMark
@@ -59,17 +61,22 @@ export default function ClusterLogo({
         />
       </div>
 
+      {/* Vertical Brand Lockup Divider (matches official brand lockup) */}
+      {showText && showDivider && (
+        <span className={`w-[1px] h-6 ${dividerColor} hidden sm:inline-block`} aria-hidden="true" />
+      )}
+
       {/* Brand Text */}
       {showText && (
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
-            <span className={`font-display font-extrabold text-lg tracking-wider ${textColor} leading-none`}>
+            <span className={`font-display font-black text-lg sm:text-xl tracking-wider ${textColor} leading-none`}>
               CLUSTER
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C6FF4D] inline-block animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-sm bg-[#C6FF4D] inline-block shadow-[0_0_8px_#C6FF4D]" />
           </div>
           {showTagline && (
-            <span className="text-[10px] font-mono text-gray-400 tracking-wider uppercase mt-1">
+            <span className="text-[10px] font-mono text-gray-400 tracking-wider mt-0.5">
               {tagline}
             </span>
           )}

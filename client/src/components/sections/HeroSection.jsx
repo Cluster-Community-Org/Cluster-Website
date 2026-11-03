@@ -46,12 +46,16 @@ export default function HeroSection() {
           <strong className="text-white">A community around compute.</strong> Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.
         </p>
 
-        {/* Value Pills */}
+        {/* Value Pills matching brand kit */}
         <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-          {['Community', 'Collaboration', 'Belonging', 'Shared Curiosity'].map((pill) => (
+          {['Community', 'Collaboration', 'Belonging', 'Shared Curiosity'].map((pill, idx) => (
             <span
               key={pill}
-              className="px-3 py-1 rounded-full text-[11px] font-mono text-gray-300 bg-obsidian-900 border border-white/10"
+              className={`px-3.5 py-1 rounded-full text-[11px] font-mono transition-all ${
+                idx === 0
+                  ? 'bg-cluster-acid text-black font-bold shadow-[0_0_15px_rgba(198,255,77,0.35)]'
+                  : 'text-gray-300 bg-obsidian-900 border border-white/10 hover:border-cluster-acid/40'
+              }`}
             >
               {pill}
             </span>
