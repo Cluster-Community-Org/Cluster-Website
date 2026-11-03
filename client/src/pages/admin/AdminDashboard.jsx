@@ -3,10 +3,10 @@ import { Calendar, Users, Layers, TrendingUp, Plus, ArrowUpRight, Clock, CheckCi
 
 export default function AdminDashboard() {
   const stats = [
-    { label: 'Total Events', value: '20+', change: '+4 this month', icon: Calendar, color: 'text-cluster-green', border: 'border-cluster-green/40' },
-    { label: 'Active Members', value: '150+', change: '+18 this week', icon: Users, color: 'text-cluster-cyan', border: 'border-cluster-cyan/40' },
-    { label: 'Live Projects', value: '10+', change: '+2 active sprints', icon: Layers, color: 'text-cluster-green', border: 'border-cluster-green/20' },
-    { label: 'Partner Orgs', value: '5+', change: 'All active', icon: TrendingUp, color: 'text-white', border: 'border-white/20' },
+    { label: 'Total Events', value: '20+', change: '+4 this month', icon: Calendar, color: 'text-cluster-acid', border: 'border-cluster-acid/40' },
+    { label: 'Active Members', value: '150+', change: '+18 this week', icon: Users, color: 'text-white', border: 'border-white/15' },
+    { label: 'Live Projects', value: '10+', change: '+2 active sprints', icon: Layers, color: 'text-cluster-acid', border: 'border-cluster-acid/20' },
+    { label: 'Partner Orgs', value: '5+', change: 'All active', icon: TrendingUp, color: 'text-white', border: 'border-white/10' },
   ]
 
   const recentActivity = [
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
             to="/admin/team"
             className="btn-cluster-secondary px-4 py-2.5 text-xs flex items-center gap-1.5"
           >
-            <Plus className="w-3.5 h-3.5 text-cluster-green" />
+            <Plus className="w-3.5 h-3.5 text-cluster-acid" />
             <span>Add Member</span>
           </Link>
         </div>
@@ -55,13 +55,13 @@ export default function AdminDashboard() {
             <div key={i} className={`nvidia-card rounded-2xl p-5 border ${s.border} space-y-3`}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">{s.label}</span>
-                <div className="w-8 h-8 rounded-lg bg-obsidian-950 border border-white/10 flex items-center justify-center text-cluster-green">
+                <div className="w-8 h-8 rounded-lg bg-obsidian-950 border border-white/10 flex items-center justify-center text-cluster-acid">
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
               <div className={`text-3xl font-bold font-mono ${s.color}`}>{s.value}</div>
               <div className="text-[11px] font-mono text-gray-400 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-cluster-green" />
+                <CheckCircle2 className="w-3 h-3 text-cluster-acid" />
                 <span>{s.change}</span>
               </div>
             </div>

@@ -4,44 +4,55 @@ export default {
   theme: {
     extend: {
       colors: {
-        // CLUSTER brand colours
-        'cluster-green': '#A3FF6B',
-        'cluster-cyan':  '#00E5FF',
+        // CLUSTER Brand Identity v2.0
+        // Black #000000 | Off-White #F8F8F5 | Graphite #3A3A3A | Acid Green #C6FF4D
+        'cluster-green': '#C6FF4D',
+        'cluster-acid':  '#C6FF4D',
+        'cluster-graphite': '#3A3A3A',
+        'cluster-offwhite': '#F8F8F5',
+        'cluster-black': '#000000',
         cluster: {
-          green:   '#A3FF6B',
-          cyan:    '#00E5FF',
-          DEFAULT: '#A3FF6B',
+          green:    '#C6FF4D',
+          acid:     '#C6FF4D',
+          graphite: '#3A3A3A',
+          offwhite: '#F8F8F5',
+          black:    '#000000',
+          DEFAULT:  '#C6FF4D',
         },
         obsidian: {
-          950: '#0B0F14',
-          900: '#111827',
-          850: '#161D2B',
-          800: '#1F2937',
+          950: '#000000', // Pure brand black
+          900: '#0C0D0E', // Surface 1
+          850: '#141517', // Surface 2
+          800: '#1F2023', // Surface 3
+          700: '#2C2D31',
+          graphite: '#3A3A3A',
         },
         surface: {
-          DEFAULT: '#111827',
-          2:       '#1F2937',
+          DEFAULT: '#0C0D0E',
+          2:       '#141517',
+          3:       '#1F2023',
         },
-        'text-muted': '#94A3B8',
+        'text-muted': '#9E9E98',
         bg: {
-          primary:   '#0B0F14',
-          secondary: '#111827',
-          tertiary:  '#1F2937',
-          glass:     'rgba(255,255,255,0.05)',
+          primary:   '#000000',
+          secondary: '#0C0D0E',
+          tertiary:  '#141517',
+          glass:     'rgba(255,255,255,0.04)',
         },
         text: {
-          primary:   '#E5E7EB',
-          secondary: '#94A3B8',
-          tertiary:  '#6B7280',
-          accent:    '#A3FF6B',
+          primary:   '#F8F8F5',
+          secondary: '#9E9E98',
+          tertiary:  '#666660',
+          accent:    '#C6FF4D',
         },
-        // keep legacy aliases so old className refs don't break
+        // Backward-compatible aliases
+        'cluster-cyan': '#C6FF4D',
         nvidia: {
-          DEFAULT: '#A3FF6B',
-          light:   '#C5FF4D',
-          dark:    '#7ACC44',
+          DEFAULT: '#C6FF4D',
+          light:   '#D4FF70',
+          dark:    '#9ECC26',
         },
-        'cyber-cyan': '#00E5FF',
+        'cyber-cyan': '#C6FF4D',
       },
       fontFamily: {
         sans:    ['Inter', 'system-ui', 'sans-serif'],
@@ -58,19 +69,22 @@ export default {
         label:   ['12px', { lineHeight: '16px',  fontWeight: '600' }],
       },
       boxShadow: {
-        'nvidia-glow':    '0 0 30px rgba(163,255,107,0.25)',
-        'nvidia-glow-lg': '0 0 60px rgba(163,255,107,0.35)',
-        'cluster-glow':   '0 0 30px rgba(163,255,107,0.25)',
-        'cyan-glow':      '0 0 30px rgba(0,229,255,0.20)',
+        'cluster-glow':   '0 0 30px rgba(198,255,77,0.28)',
+        'cluster-glow-lg':'0 0 60px rgba(198,255,77,0.45)',
+        'acid-glow':      '0 0 35px rgba(198,255,77,0.35)',
+        'nvidia-glow':    '0 0 30px rgba(198,255,77,0.28)',
+        'nvidia-glow-lg': '0 0 60px rgba(198,255,77,0.45)',
+        'cyan-glow':      '0 0 30px rgba(198,255,77,0.25)',
       },
       backgroundImage: {
-        'cluster-gradient': 'linear-gradient(135deg, #A3FF6B 0%, #00E5FF 100%)',
-        'hero-gradient':    'linear-gradient(135deg, #0B0F14 0%, #111827 50%, #0B0F14 100%)',
-        'cta-gradient':     'linear-gradient(135deg, #A3FF6B 0%, #00E5FF 100%)',
+        'cluster-gradient': 'linear-gradient(135deg, #C6FF4D 0%, #FFFFFF 100%)',
+        'acid-gradient':    'linear-gradient(135deg, #C6FF4D 0%, #9FE822 100%)',
+        'hero-gradient':    'radial-gradient(ellipse at 50% 0%, #16181B 0%, #000000 75%)',
+        'cta-gradient':     'linear-gradient(135deg, #0C0D0E 0%, #000000 100%)',
       },
       borderRadius: {
-        btn:  '8px',
-        card: '12px',
+        btn:  '10px',
+        card: '16px',
       },
     },
   },

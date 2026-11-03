@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Lock, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react'
+import { ClusterMark } from '../../components/ui/ClusterLogo.jsx'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('')
@@ -34,24 +35,23 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-obsidian-950 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
       {/* Background ambient orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cluster-green/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-cluster-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cluster-acid/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10 space-y-8">
         {/* Top Back Link */}
-        <Link to="/" className="inline-flex items-center gap-2 text-xs font-mono text-gray-400 hover:text-cluster-green transition-colors">
+        <Link to="/" className="inline-flex items-center gap-2 text-xs font-mono text-gray-400 hover:text-cluster-acid transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to public site</span>
         </Link>
 
         {/* Card */}
-        <div className="nvidia-card rounded-2xl p-8 border border-cluster-green/30 shadow-cluster-glow space-y-6">
+        <div className="nvidia-card rounded-2xl p-8 border border-white/10 shadow-cluster-glow space-y-6">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-xl bg-obsidian-900 border border-cluster-green/40 p-1 flex items-center justify-center mx-auto shadow-cluster-glow">
-              <img src="/cluster-logo.jpg" alt="CLUSTER" className="w-full h-full object-contain rounded-lg" />
+            <div className="w-14 h-14 rounded-2xl bg-black border border-white/15 p-1 flex items-center justify-center mx-auto shadow-cluster-glow">
+              <ClusterMark className="w-10 h-10" sparkColor="#C6FF4D" markColor="#F8F8F5" />
             </div>
             <h1 className="text-2xl font-display font-bold text-white tracking-tight">
               CLUSTER CMS Portal
@@ -75,7 +75,7 @@ export default function AdminLogin() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@galgotiasuniversity.edu.in"
+                placeholder="admin@cluster.society"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-sm focus:border-cluster-green focus:outline-none transition-colors"
                 required
               />

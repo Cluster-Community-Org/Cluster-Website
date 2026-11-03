@@ -1,6 +1,6 @@
 # CLUSTER — A Student Technology Society
 
-> **Official Website & Content Management System** for CLUSTER at Galgotias University.  
+> **Official Website & Content Management System** for CLUSTER.  
 > `BUILD` / `LEARN` / `COLLABORATE` / `CREATE` — Create Your Future in Tech.
 
 [![Repository](https://img.shields.io/badge/GitHub-alwin2134%2FCluster-00E5FF?style=flat-square&logo=github)](https://github.com/alwin2134/Cluster)
@@ -12,7 +12,7 @@
 
 ## Overview
 
-**CLUSTER** is the premier student technology society at **Galgotias University**, built to empower students to build production-grade projects, explore emerging technologies (AI/ML, Web3, Full-Stack, Cloud Systems), and collaborate across disciplines.
+**CLUSTER** is a premier student technology society built to empower students to build production-grade projects, explore emerging technologies (AI/ML, Web3, Full-Stack, Cloud Systems), and collaborate across disciplines.
 
 The official platform pairs an immersive, cybernetic front-end experience with a comprehensive **Admin CMS** for real-time society operations.
 

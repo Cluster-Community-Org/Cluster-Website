@@ -34,14 +34,27 @@ export const EventCountdown = ({ event }) => {
   }, [event.date])
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-obsidian-900 via-obsidian-850 to-obsidian-950 border border-cluster-green/30 p-6 md:p-8 shadow-cluster-glow">
-      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-cluster-green/8 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-obsidian-900 via-black to-obsidian-900 border border-white/10 p-6 md:p-8 shadow-cluster-glow">
+      {/* Ambient glow */}
+      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-cluster-acid/8 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Modular Pixel Cluster Graphic Accent (Brand Kit Element) */}
+      <div className="absolute bottom-4 right-4 hidden sm:grid grid-cols-4 gap-1 opacity-20 pointer-events-none">
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+        <span className="w-1.5 h-1.5 bg-transparent" />
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+        <span className="w-1.5 h-1.5 bg-transparent" />
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+        <span className="w-1.5 h-1.5 bg-cluster-acid" />
+      </div>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <div className="lg:col-span-7 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cluster-green/10 border border-cluster-green/30 text-cluster-green text-xs font-mono font-medium">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono font-semibold">
             <Zap className="w-3.5 h-3.5 animate-bounce" />
-            <span>SPOTLIGHT EVENT</span>
+            <span>HOMEPAGE SPOTLIGHT // KICKSTART '26</span>
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight leading-tight">
@@ -52,17 +65,17 @@ export const EventCountdown = ({ event }) => {
             {event.summary}
           </p>
 
-          <div className="flex flex-wrap gap-4 text-xs font-mono text-gray-400 pt-2">
-            <div className="flex items-center gap-1.5 bg-obsidian-800 px-3 py-1.5 rounded-md border border-white/5">
-              <Calendar className="w-4 h-4 text-cluster-green" />
+          <div className="flex flex-wrap gap-3 text-xs font-mono text-gray-300 pt-2">
+            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+              <Calendar className="w-4 h-4 text-cluster-acid" />
               <span>{event.date}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-obsidian-800 px-3 py-1.5 rounded-md border border-white/5">
-              <Clock className="w-4 h-4 text-cluster-green" />
+            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+              <Clock className="w-4 h-4 text-cluster-acid" />
               <span>{event.time}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-obsidian-800 px-3 py-1.5 rounded-md border border-white/5">
-              <MapPin className="w-4 h-4 text-cluster-green" />
+            <div className="flex items-center gap-1.5 bg-obsidian-900 px-3 py-1.5 rounded-lg border border-white/10">
+              <MapPin className="w-4 h-4 text-cluster-acid" />
               <span>{event.location}</span>
             </div>
           </div>
@@ -82,9 +95,9 @@ export const EventCountdown = ({ event }) => {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="flex flex-col items-center justify-center p-3 rounded-xl bg-obsidian-950 border border-white/10 shadow-inner group hover:border-cluster-green/50 transition-colors"
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-black border border-white/10 shadow-inner group hover:border-cluster-acid/50 transition-colors"
               >
-                <span className="font-mono font-bold text-xl sm:text-2xl text-cluster-green group-hover:scale-110 transition-transform">
+                <span className="font-mono font-bold text-xl sm:text-2xl text-cluster-acid group-hover:scale-110 transition-transform">
                   {String(item.value).padStart(2, '0')}
                 </span>
                 <span className="text-[9px] font-mono text-gray-400 mt-0.5 tracking-wider">
@@ -101,7 +114,7 @@ export const EventCountdown = ({ event }) => {
               rel="noopener noreferrer"
               className="btn-cluster-primary w-full sm:w-auto px-6 py-3 text-sm group"
             >
-              <span>Reserve Your Seat</span>
+              <span>RSVP / Register</span>
               <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </a>
           )}

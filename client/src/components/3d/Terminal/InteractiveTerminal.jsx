@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ─────────────────────────────────────────
-// Terminal commands — UI-DESIGN.md spec
+// CLUSTER Terminal commands
 // Core: help, about, events, team, stats, clear
-// Easter eggs: sudo, hack, nvidia-smi, matrix, ls, cd, cat, exit
+// Easter eggs: sudo, hack, matrix, ls, cd, cat, exit
 // ─────────────────────────────────────────
 
 const STATS = {
@@ -14,16 +14,16 @@ const STATS = {
 }
 
 const UPCOMING_EVENTS = [
-  { name: 'CUDA Workshop Series', date: '2026-08-15', type: 'workshop' },
-  { name: 'DGX H200 Hackathon', date: '2026-09-01', type: 'hackathon' },
-  { name: 'LLM Fine-Tuning Masterclass', date: '2026-09-20', type: 'workshop' },
+  { name: 'CLUSTER Hackathon Season 1', date: '2026-12-05', type: 'hackathon' },
+  { name: 'Full-Stack Web Dev Bootcamp', date: '2026-11-20', type: 'workshop' },
+  { name: 'AI & ML Weekly Study Circle', date: '2026-11-15', type: 'study' },
 ]
 
 const TEAM_MEMBERS = [
-  { name: 'Alwin Mathew', role: 'Club Founder & President' },
-  { name: 'Vice President', role: 'Research Lead' },
-  { name: 'Technical Secretary', role: 'CUDA Engineering' },
-  { name: 'Events Director', role: 'Hackathon & Workshops' },
+  { name: 'President', role: 'Club Founder & President' },
+  { name: 'Vice President', role: 'AI & Research Lead' },
+  { name: 'Technical Secretary', role: 'Engineering & Dev Lead' },
+  { name: 'Events Director', role: 'Events & Community' },
 ]
 
 function processCommand(cmd) {
@@ -37,18 +37,15 @@ function processCommand(cmd) {
         { text: '', type: 'output' },
         { text: 'Available commands:', type: 'output dim' },
         { text: '  help        Show this help message', type: 'output' },
-        { text: '  about       About the NVIDIA SC Club', type: 'output' },
+        { text: '  about       About CLUSTER Society', type: 'output' },
         { text: '  events      List upcoming events', type: 'output' },
-        { text: '  team        List team members', type: 'output' },
-        { text: '  stats       Show club statistics', type: 'output' },
+        { text: '  team        List team officers', type: 'output' },
+        { text: '  stats       Show society statistics', type: 'output' },
         { text: '  clear       Clear the terminal', type: 'output' },
-        { text: '', type: 'output' },
-        { text: 'Fun commands:', type: 'output dim' },
-        { text: '  nvidia-smi  GPU utilization report', type: 'output' },
-        { text: '  hack        Initiate hacking sequence', type: 'output' },
-        { text: '  matrix      Enter the matrix', type: 'output' },
-        { text: '  sudo        Try it ;)', type: 'output' },
-        { text: '  ls          List files', type: 'output' },
+        { text: '  matrix      Enter the matrix', type: 'output dim' },
+        { text: '  hack        Execute build sequence', type: 'output dim' },
+        { text: '  sudo        Try it ;)', type: 'output dim' },
+        { text: '  ls          List files', type: 'output dim' },
         { text: '', type: 'output' },
       ]
 
@@ -56,17 +53,17 @@ function processCommand(cmd) {
       return [
         { text: '', type: 'output' },
         { text: '╔══════════════════════════════════════════╗', type: 'output' },
-        { text: '║     NVIDIA SUPER COMPUTING CLUB          ║', type: 'output' },
-        { text: '║     Galgotias University                 ║', type: 'output' },
+        { text: '║     CLUSTER — STUDENT TECHNOLOGY SOCIETY ║', type: 'output' },
+        { text: '║     BUILD • LEARN • COLLABORATE • CREATE ║', type: 'output' },
         { text: '╚══════════════════════════════════════════╝', type: 'output' },
         { text: '', type: 'output' },
-        { text: 'The premier GPU computing student society at', type: 'output white' },
-        { text: 'Galgotias University powered by our flagship', type: 'output white' },
-        { text: 'NVIDIA DGX H200 supercomputer node.', type: 'output white' },
+        { text: 'A student technology society dedicated to building', type: 'output white' },
+        { text: 'production-grade projects, learning together,', type: 'output white' },
+        { text: 'and shaping the future of technology.', type: 'output white' },
         { text: '', type: 'output' },
-        { text: '  Hardware : NVIDIA DGX H200', type: 'output' },
-        { text: '  Memory   : 141GB HBM3e @ 4.8 TB/s', type: 'output' },
-        { text: '  Location : Galgotias University, Greater Noida', type: 'output' },
+        { text: '  Motto    : Build / Learn / Collaborate / Create', type: 'output' },
+        { text: '  Focus    : AI/ML, Full-Stack, Web3, Systems & Cloud', type: 'output' },
+        { text: '  Location : Greater Noida, UP', type: 'output' },
         { text: '', type: 'output' },
       ]
 
@@ -99,78 +96,52 @@ function processCommand(cmd) {
     case 'stats':
       return [
         { text: '', type: 'output' },
-        { text: '=== CLUB STATISTICS ===', type: 'output' },
+        { text: '=== CLUSTER STATISTICS ===', type: 'output' },
         { text: '', type: 'output' },
         { text: `  Members         ${STATS.members}+`, type: 'output' },
         { text: `  Events Hosted   ${STATS.events}+`, type: 'output' },
-        { text: `  Projects        ${STATS.projects}+`, type: 'output' },
+        { text: `  Projects Built  ${STATS.projects}+`, type: 'output' },
         { text: `  Partners        ${STATS.partners}+`, type: 'output' },
         { text: '', type: 'output' },
-        { text: '  [████████████████████] 100% Awesome', type: 'output' },
+        { text: '  [████████████████████] 100% Builder Energy', type: 'output' },
         { text: '', type: 'output' },
       ]
 
     case 'clear':
       return [{ text: '__CLEAR__', type: 'control' }]
 
-    case 'nvidia-smi':
-    case 'gpu':
+    case 'matrix':
       return [
         { text: '', type: 'output' },
-        { text: '+-----------------------------------------------------------------------------+', type: 'output' },
-        { text: '| NVIDIA-SMI 550.90.07    Driver Version: 550.90.07    CUDA Version: 12.4    |', type: 'output' },
-        { text: '|-------------------------------+----------------------+----------------------+', type: 'output' },
-        { text: '| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |', type: 'output' },
-        { text: '| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |', type: 'output' },
-        { text: '|===============================+======================+======================|', type: 'output' },
-        { text: '|   0  NVIDIA H200 SXM    On  | 00000000:00:1E.0 Off |                    0 |', type: 'output' },
-        { text: '| N/A   32C    P0    72W / 700W |  12288MiB / 141568MiB |      0%      Default |', type: 'output' },
-        { text: '+-----------------------------------------------------------------------------+', type: 'output' },
+        { text: '01000011 01001100 01010101 01010011', type: 'output' },
+        { text: '01010100 01000101 01010010 00100000', type: 'output' },
+        { text: '01010011 01001111 01000011 01001001', type: 'output' },
+        { text: '01000101 01010100 01011001 00001010', type: 'output' },
         { text: '', type: 'output' },
-        { text: '+-----------------------------------------------------------------------------+', type: 'output' },
-        { text: '| Processes:                                                                  |', type: 'output' },
-        { text: '|  GPU   GI   CI        PID   Type   Process name              GPU Memory    |', type: 'output' },
-        { text: '|        ID   ID                                                Usage         |', type: 'output' },
-        { text: '|=============================================================================|', type: 'output' },
-        { text: '|   0    N/A  N/A     12345    C   python train_llm.py          8192MiB      |', type: 'output' },
-        { text: '+-----------------------------------------------------------------------------+', type: 'output' },
+        { text: 'Wake up, builder. The Matrix has you...', type: 'output dim' },
+        { text: `Decoded: "CLUSTER TECH SOCIETY"`, type: 'output' },
         { text: '', type: 'output' },
       ]
 
     case 'hack':
       return [
         { text: '', type: 'output' },
-        { text: 'Initiating hacking sequence...', type: 'output' },
+        { text: 'Initiating builder deployment sequence...', type: 'output' },
         { text: '', type: 'output' },
-        { text: '> Bypassing BIOS security...      [DONE]', type: 'output' },
-        { text: '> Injecting CUDA kernels...        [DONE]', type: 'output' },
-        { text: '> Overclocking memory bus...       [DONE]', type: 'output' },
-        { text: '> Training rogue LLM...            [DONE]', type: 'output' },
-        { text: '> Achieving sentience...           [DONE]', type: 'output' },
+        { text: '> Initializing React client...     [DONE]', type: 'output' },
+        { text: '> Compiling Tailwind styles...     [DONE]', type: 'output' },
+        { text: '> Syncing clusterDataService...    [DONE]', type: 'output' },
+        { text: '> Launching Hackathon S1...       [DONE]', type: 'output' },
         { text: '', type: 'output' },
-        { text: 'Just kidding. We do real research here :)', type: 'output dim' },
-        { text: '', type: 'output' },
-      ]
-
-    case 'matrix':
-      return [
-        { text: '', type: 'output' },
-        { text: '01001110 01010110 01001001 01000100', type: 'output' },
-        { text: '01001001 01000001 00100000 01000111', type: 'output' },
-        { text: '01010000 01010101 00100000 01000011', type: 'output' },
-        { text: '01001100 01010101 01000010 00100000', type: 'output' },
-        { text: '', type: 'output' },
-        { text: 'Wake up, Neo. The Matrix has you...', type: 'output dim' },
-        { text: `Decoded: "NVIDIA GPU CLUB"`, type: 'output' },
+        { text: 'Society systems nominal. Keep building!', type: 'output dim' },
         { text: '', type: 'output' },
       ]
 
     case 'sudo':
       return [
         { text: '', type: 'output' },
-        { text: '[sudo] password for nvidia-sc:', type: 'output white' },
-        { text: 'Sorry, user nvidia-sc is not in the sudoers file.', type: 'output error' },
-        { text: 'This incident will be reported.', type: 'output error' },
+        { text: '[sudo] password for cluster:', type: 'output white' },
+        { text: 'Nice try! Visit /admin/login for CMS access.', type: 'output error' },
         { text: '', type: 'output' },
       ]
 
@@ -178,22 +149,22 @@ function processCommand(cmd) {
       return [
         { text: '', type: 'output' },
         { text: 'about.md    events/    projects/    team.json    README.md', type: 'output' },
-        { text: 'dgx-h200/   cuda-labs/  research/   hackathons/  .nvidia-secret', type: 'output' },
+        { text: 'hackathons/ study-circles/ cms/        .cluster-secret', type: 'output' },
         { text: '', type: 'output' },
       ]
 
     case 'cd':
       return [
         { text: '', type: 'output' },
-        { text: `bash: cd: ${args[1] || '~'}: Permission denied (join the club first!)`, type: 'output error' },
+        { text: `bash: cd: ${args[1] || '~'}: Access granted. Welcome home!`, type: 'output' },
         { text: '', type: 'output' },
       ]
 
     case 'cat':
-      if (args[1] === '.nvidia-secret') {
+      if (args[1] === '.cluster-secret' || args[1] === '.nvidia-secret') {
         return [
           { text: '', type: 'output' },
-          { text: '> The real DGX H200 was the friends we trained along the way.', type: 'output' },
+          { text: '> The true power of CLUSTER is the builders and projects we build together.', type: 'output' },
           { text: '', type: 'output' },
         ]
       }
@@ -206,7 +177,7 @@ function processCommand(cmd) {
     case 'exit':
       return [
         { text: '', type: 'output' },
-        { text: "There is no escape from GPU computing.", type: 'output' },
+        { text: 'Closing session. Stay inspired!', type: 'output' },
         { text: '', type: 'output' },
       ]
 
@@ -216,23 +187,23 @@ function processCommand(cmd) {
     default:
       return [
         { text: '', type: 'output' },
-        { text: `nvidia-sc: command not found: ${command}`, type: 'output error' },
+        { text: `cluster: command not found: ${command}`, type: 'output error' },
         { text: `Type 'help' to see available commands.`, type: 'output dim' },
         { text: '', type: 'output' },
       ]
   }
 }
 
-const PROMPT = 'nvidia-sc@website:~$ '
-const TYPING_SPEED = 30 // ms per character
+const PROMPT = 'cluster@society:~$ '
+const TYPING_SPEED = 25
 
 const INITIAL_OUTPUT = [
   { text: '╔══════════════════════════════════════════════════════════════╗', type: 'output' },
-  { text: '║   nvidia-sc@website                                         ║', type: 'output' },
+  { text: '║   cluster@society — Interactive Developer Terminal          ║', type: 'output' },
   { text: '╚══════════════════════════════════════════════════════════════╝', type: 'output' },
   { text: '', type: 'output' },
-  { text: "Welcome to the NVIDIA Super Computing Club terminal.", type: 'output white' },
-  { text: "Type 'help' to see all commands.", type: 'output dim' },
+  { text: 'Welcome to the CLUSTER Developer Shell.', type: 'output white' },
+  { text: "Type 'help' to see available commands.", type: 'output dim' },
   { text: '', type: 'output' },
 ]
 
@@ -248,179 +219,156 @@ export default function InteractiveTerminal() {
   const typingRef = useRef(null)
 
   // Auto-scroll to bottom
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (bodyRef.current) {
       bodyRef.current.scrollTop = bodyRef.current.scrollHeight
     }
-  }, [lines])
-
-  // Focus input when clicking anywhere in terminal
-  const focusInput = () => { if (inputRef.current && !isTyping) inputRef.current.focus() }
-
-  // Typing animation
-  const typeOutput = useCallback((outputLines) => {
-    setIsTyping(true)
-    let lineIdx = 0
-    let charIdx = 0
-
-    const type = () => {
-      if (lineIdx >= outputLines.length) {
-        setIsTyping(false)
-        if (inputRef.current) inputRef.current.focus()
-        return
-      }
-      const line = outputLines[lineIdx]
-      if (charIdx === 0) {
-        setLines((prev) => [...prev, { text: '', type: line.type }])
-      }
-      if (charIdx < line.text.length) {
-        setLines((prev) => {
-          const next = [...prev]
-          next[next.length - 1] = { text: line.text.slice(0, charIdx + 1), type: line.type }
-          return next
-        })
-        charIdx++
-        typingRef.current = setTimeout(type, TYPING_SPEED)
-      } else {
-        lineIdx++
-        charIdx = 0
-        typingRef.current = setTimeout(type, TYPING_SPEED)
-      }
-    }
-    type()
   }, [])
 
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault()
-    if (isTyping || !input.trim() && input !== '') return
+  useEffect(() => {
+    scrollToBottom()
+  }, [lines, scrollToBottom])
 
-    const cmd = input
-    setInput('')
-    setHistIdx(-1)
-
-    // Add command echo
-    setLines((prev) => [
-      ...prev,
-      { text: `${PROMPT}${cmd}`, type: 'prompt-echo' },
-    ])
-
-    // Save to history
-    if (cmd.trim()) {
-      setHistory((prev) => [cmd, ...prev].slice(0, 50))
-    }
-
-    const result = processCommand(cmd)
-
-    if (result.length === 1 && result[0]?.type === 'control' && result[0]?.text === '__CLEAR__') {
-      setLines([...INITIAL_OUTPUT])
-      return
-    }
-
-    // Short outputs: instant; long outputs: typing animation
-    if (result.length <= 3) {
-      setLines((prev) => [...prev, ...result])
-    } else {
-      typeOutput(result)
-    }
-  }, [input, isTyping, typeOutput])
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      const newIdx = Math.min(histIdx + 1, history.length - 1)
-      setHistIdx(newIdx)
-      setInput(history[newIdx] ?? '')
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      const newIdx = Math.max(histIdx - 1, -1)
-      setHistIdx(newIdx)
-      setInput(newIdx === -1 ? '' : history[newIdx] ?? '')
-    } else if (e.key === 'Tab') {
-      e.preventDefault()
-      // Tab completion
-      const cmds = ['help', 'about', 'events', 'team', 'stats', 'clear', 'nvidia-smi', 'hack', 'matrix', 'sudo', 'ls', 'cd', 'cat', 'exit']
-      const match = cmds.find((c) => c.startsWith(input))
-      if (match) setInput(match)
+  // Focus input on click anywhere in terminal
+  const handleTerminalClick = () => {
+    if (inputRef.current) {
+      inputRef.current.focus()
     }
   }
 
+  // Typewriter effect for output
+  const appendLines = useCallback(
+    (newLines) => {
+      if (newLines.length === 0) return
+
+      // Check for control commands
+      if (newLines[0].text === '__CLEAR__') {
+        setLines([])
+        return
+      }
+
+      setIsTyping(true)
+      let lineIdx = 0
+
+      const typeNextLine = () => {
+        if (lineIdx < newLines.length) {
+          const line = newLines[lineIdx]
+          setLines((prev) => [...prev, line])
+          lineIdx++
+          typingRef.current = setTimeout(typeNextLine, TYPING_SPEED)
+        } else {
+          setIsTyping(false)
+        }
+      }
+
+      typeNextLine()
+    },
+    []
+  )
+
+  // Cleanup typing timeout on unmount
   useEffect(() => {
-    return () => { if (typingRef.current) clearTimeout(typingRef.current) }
+    return () => {
+      if (typingRef.current) clearTimeout(typingRef.current)
+    }
   }, [])
+
+  // Handle command submission
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (isTyping) return
+
+    const trimmed = input.trim()
+
+    // Add prompt line to output
+    setLines((prev) => [
+      ...prev,
+      { text: `${PROMPT}${input}`, type: 'input' },
+    ])
+
+    // Update history
+    if (trimmed) {
+      setHistory((prev) => [...prev, trimmed])
+      setHistIdx(-1)
+    }
+
+    // Process and display output
+    const output = processCommand(trimmed)
+    appendLines(output)
+    setInput('')
+  }
+
+  // History navigation (Up / Down arrows)
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (history.length === 0) return
+      const nextIdx = histIdx === -1 ? history.length - 1 : Math.max(0, histIdx - 1)
+      setHistIdx(nextIdx)
+      setInput(history[nextIdx] || '')
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (histIdx === -1) return
+      const nextIdx = histIdx + 1
+      if (nextIdx >= history.length) {
+        setHistIdx(-1)
+        setInput('')
+      } else {
+        setHistIdx(nextIdx)
+        setInput(history[nextIdx] || '')
+      }
+    }
+  }
 
   return (
     <div
-      className="terminal-window w-full max-w-3xl mx-auto"
-      onClick={focusInput}
-      role="application"
-      aria-label="Interactive terminal — type 'help' for commands"
+      onClick={handleTerminalClick}
+      className="bg-obsidian-950 rounded-xl p-4 font-mono text-xs text-gray-300 h-96 flex flex-col cursor-text select-text overflow-hidden border border-white/5"
+      role="region"
+      aria-label="Interactive CLI Terminal"
     >
-      {/* CRT scanlines overlay */}
-      <div className="terminal-scanlines" aria-hidden="true" />
-
-      {/* macOS-style title bar — per UI-DESIGN.md spec */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-[#111111] border-b border-white/5">
-        <div className="flex items-center gap-1.5" aria-hidden="true">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-        </div>
-        <span className="ml-2 text-xs font-mono text-text-tertiary select-none">
-          nvidia-sc@website — bash
-        </span>
-      </div>
-
-      {/* Terminal body */}
+      {/* Terminal Output */}
       <div
         ref={bodyRef}
-        className="terminal-body"
-        aria-live="polite"
-        aria-atomic="false"
+        className="flex-1 overflow-y-auto space-y-1 pr-1 font-mono leading-relaxed"
       >
-        {lines.map((line, i) => {
-          if (line.type === 'prompt-echo') {
-            return (
-              <div key={i} className="leading-relaxed">
-                <span className="terminal-prompt select-none">{PROMPT}</span>
-                <span style={{ color: '#fff' }}>{line.text.replace(PROMPT, '')}</span>
-              </div>
-            )
-          }
-          const colorClass =
-            line.type === 'output error' ? 'text-red-400' :
-            line.type === 'output dim' ? 'text-text-secondary' :
-            line.type === 'output white' ? 'text-white' :
-            'text-nvidia'
+        {lines.map((line, idx) => {
+          let colorClass = 'text-gray-300'
+          if (line.type === 'input') colorClass = 'text-cluster-green font-semibold'
+          if (line.type === 'output white') colorClass = 'text-white font-medium'
+          if (line.type === 'output dim') colorClass = 'text-gray-500'
+          if (line.type === 'output error') colorClass = 'text-red-400'
 
           return (
-            <div key={i} className={`leading-relaxed ${colorClass}`}>
-              {line.text || '\u00A0'}
+            <div key={idx} className={`${colorClass} whitespace-pre-wrap break-all`}>
+              {line.text}
             </div>
           )
         })}
 
-        {/* Input line */}
-        <form onSubmit={handleSubmit} className="flex items-center gap-0 mt-1">
-          <span className="terminal-prompt select-none whitespace-nowrap">{PROMPT}</span>
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isTyping}
-            className="terminal-input bg-transparent border-none flex-1 text-white caret-nvidia font-mono text-sm"
-            style={{ minWidth: '0', outline: 'none', caretColor: '#76B900' }}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            aria-label="Terminal input"
-            id="terminal-input"
-          />
-          {isTyping && <span className="cursor-blink" aria-hidden="true" />}
-        </form>
+        {/* Typing indicator */}
+        {isTyping && (
+          <div className="text-cluster-green text-xs animate-pulse">▍</div>
+        )}
       </div>
+
+      {/* Input Line */}
+      <form onSubmit={handleSubmit} className="flex items-center gap-1.5 pt-2 border-t border-white/10 mt-2">
+        <span className="text-cluster-green font-bold shrink-0">{PROMPT}</span>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={isTyping}
+          className="flex-1 bg-transparent text-white font-mono text-xs focus:outline-none disabled:opacity-50"
+          placeholder={isTyping ? '' : "type 'help'..."}
+          autoComplete="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+      </form>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Calendar, Users, LogOut, ExternalLink, Menu, X, ShieldAlert } from 'lucide-react'
+import { ClusterMark } from '../components/ui/ClusterLogo.jsx'
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -26,20 +27,20 @@ export default function AdminLayout() {
   ]
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-white flex">
+    <div className="min-h-screen bg-black text-white flex">
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex w-64 bg-obsidian-900 border-r border-white/10 flex-col justify-between shrink-0">
         <div className="p-6 space-y-8">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-obsidian-950 border border-cluster-green/40 p-1 flex items-center justify-center shrink-0 shadow-cluster-glow">
-              <img src="/cluster-logo.jpg" alt="CLUSTER" className="w-full h-full object-contain rounded-lg" />
+            <div className="w-10 h-10 rounded-xl bg-black border border-white/10 p-1 flex items-center justify-center shrink-0 shadow-cluster-glow group-hover:border-cluster-acid transition-all">
+              <ClusterMark className="w-7 h-7" sparkColor="#C6FF4D" markColor="#F8F8F5" />
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-base text-white tracking-wider">
                 CLUSTER
               </span>
-              <span className="text-[9px] font-mono text-cluster-green uppercase tracking-widest">
+              <span className="text-[9px] font-mono text-cluster-acid uppercase tracking-widest font-semibold">
                 CMS DASHBOARD
               </span>
             </div>
@@ -101,16 +102,16 @@ export default function AdminLayout() {
               <Menu className="w-5 h-5" />
             </button>
             <span className="text-xs font-mono text-gray-400 hidden sm:inline">
-              Authenticated Role: <span className="text-cluster-green font-bold uppercase">{auth?.role || 'Admin'}</span>
+              Authenticated Role: <span className="text-cluster-acid font-bold uppercase">{auth?.role || 'Admin'}</span>
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <div className="text-xs font-mono font-semibold text-white">{auth?.email || 'admin@cluster.society'}</div>
-              <div className="text-[10px] font-mono text-cluster-cyan">Active Session</div>
+              <div className="text-[10px] font-mono text-cluster-acid">Active Session</div>
             </div>
-            <div className="w-9 h-9 rounded-xl bg-cluster-green/10 border border-cluster-green/30 text-cluster-green flex items-center justify-center font-bold text-xs font-mono">
+            <div className="w-9 h-9 rounded-xl bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid flex items-center justify-center font-bold text-xs font-mono">
               AD
             </div>
           </div>
@@ -130,7 +131,7 @@ export default function AdminLayout() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <img src="/cluster-logo.jpg" alt="CLUSTER" className="w-7 h-7 rounded-lg object-contain" />
+                  <ClusterMark className="w-7 h-7" sparkColor="#C6FF4D" markColor="#F8F8F5" />
                   <span className="font-display font-bold text-sm text-white">CLUSTER CMS</span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)} className="p-1.5 text-gray-400 hover:text-white">

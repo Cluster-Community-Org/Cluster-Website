@@ -31,10 +31,10 @@ export default function AdminEvents() {
     title: '',
     date: '',
     time: '10:00 AM IST',
-    location: 'C-Block Auditorium, Galgotias University',
+    location: 'C-Block Auditorium',
     type: 'workshop',
     summary: '',
-    registrationUrl: 'https://galgotiasuniversity.edu.in',
+    registrationUrl: 'https://github.com/alwin2134/Cluster',
     isSpotlight: false,
     featured: true,
   })
@@ -79,10 +79,10 @@ export default function AdminEvents() {
       title: '',
       date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
       time: '10:00 AM IST',
-      location: 'C-Block Auditorium, Galgotias University',
+      location: 'C-Block Auditorium',
       type: 'workshop',
       summary: '',
-      registrationUrl: 'https://galgotiasuniversity.edu.in',
+      registrationUrl: 'https://github.com/alwin2134/Cluster',
       isSpotlight: false,
       featured: true,
     })
@@ -98,7 +98,7 @@ export default function AdminEvents() {
       location: ev.location || '',
       type: ev.type || 'workshop',
       summary: ev.summary || '',
-      registrationUrl: ev.registrationUrl || 'https://galgotiasuniversity.edu.in',
+      registrationUrl: ev.registrationUrl || 'https://github.com/alwin2134/Cluster',
       isSpotlight: Boolean(ev.isSpotlight),
       featured: Boolean(ev.featured),
     })
@@ -141,8 +141,8 @@ export default function AdminEvents() {
     <div className="space-y-8 max-w-6xl mx-auto relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-obsidian-900 border border-cluster-green/60 text-white text-xs font-mono shadow-cluster-glow animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-cluster-green" />
+        <div className="fixed top-20 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-obsidian-900 border border-cluster-acid/60 text-white text-xs font-mono shadow-cluster-glow animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-cluster-acid" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -150,7 +150,7 @@ export default function AdminEvents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-green/10 border border-cluster-green/30 text-cluster-green text-[11px] font-mono mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-[11px] font-mono mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>EVENT SPOTLIGHT & CONTENT CMS</span>
           </div>
@@ -172,12 +172,12 @@ export default function AdminEvents() {
 
       {/* ── Active Spotlight Showcase Card ── */}
       {spotlightEvent && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-obsidian-900 via-obsidian-900 to-obsidian-950 border border-cluster-green/40 p-6 shadow-cluster-glow">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-cluster-green/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-obsidian-900 via-obsidian-900 to-obsidian-950 border border-cluster-acid/40 p-6 shadow-cluster-glow">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cluster-acid/10 rounded-full blur-[100px] pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cluster-green/20 border border-cluster-green/50 text-cluster-green text-[10px] font-mono font-bold tracking-wider">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cluster-acid/20 border border-cluster-acid/50 text-cluster-acid text-[10px] font-mono font-bold tracking-wider">
                 <Zap className="w-3.5 h-3.5 animate-bounce" />
                 <span>CURRENT HOMEPAGE SPOTLIGHT</span>
               </div>
@@ -188,16 +188,16 @@ export default function AdminEvents() {
                 {spotlightEvent.summary}
               </p>
               <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-gray-400 pt-1">
-                <span className="flex items-center gap-1 text-cluster-cyan">
+                <span className="flex items-center gap-1 text-cluster-acid font-semibold">
                   <Calendar className="w-3.5 h-3.5" />
                   {spotlightEvent.date}
                 </span>
                 <span className="flex items-center gap-1 text-gray-300">
-                  <Clock className="w-3.5 h-3.5 text-cluster-green" />
+                  <Clock className="w-3.5 h-3.5 text-cluster-acid" />
                   {spotlightEvent.time}
                 </span>
                 <span className="flex items-center gap-1 text-gray-300 truncate max-w-xs">
-                  <MapPin className="w-3.5 h-3.5 text-cluster-green" />
+                  <MapPin className="w-3.5 h-3.5 text-cluster-acid" />
                   {spotlightEvent.location}
                 </span>
               </div>
@@ -207,7 +207,7 @@ export default function AdminEvents() {
               <Link
                 to="/"
                 target="_blank"
-                className="px-4 py-2 rounded-xl bg-obsidian-950 border border-cluster-green/40 text-cluster-green hover:bg-cluster-green hover:text-black transition-all text-xs font-mono font-semibold text-center flex items-center justify-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-obsidian-950 border border-cluster-acid/40 text-cluster-acid hover:bg-cluster-acid hover:text-black transition-all text-xs font-mono font-semibold text-center flex items-center justify-center gap-1.5"
               >
                 <span>View on Public Home</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -281,7 +281,7 @@ export default function AdminEvents() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-md bg-obsidian-800 border border-white/10 text-cluster-cyan uppercase font-bold text-[10px]">
+                      <span className="px-2.5 py-1 rounded-md bg-obsidian-800 border border-white/10 text-cluster-acid uppercase font-bold text-[10px]">
                         {ev.type}
                       </span>
                     </td>
@@ -291,14 +291,14 @@ export default function AdminEvents() {
                     </td>
                     <td className="px-6 py-4">
                       {isCurrentSpotlight ? (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cluster-green/20 border border-cluster-green/50 text-cluster-green font-bold text-[10px]">
-                          <Star className="w-3.5 h-3.5 fill-cluster-green text-cluster-green" />
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cluster-acid/20 border border-cluster-acid/50 text-cluster-acid font-bold text-[10px]">
+                          <Star className="w-3.5 h-3.5 fill-cluster-acid text-cluster-acid" />
                           <span>HOMEPAGE SPOTLIGHT</span>
                         </div>
                       ) : (
                         <button
                           onClick={() => handleSetSpotlight(ev.id, ev.title)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-obsidian-800 border border-white/10 text-gray-400 hover:text-cluster-green hover:border-cluster-green/40 transition-colors text-[10px]"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-obsidian-800 border border-white/10 text-gray-400 hover:text-cluster-acid hover:border-cluster-acid/40 transition-colors text-[10px]"
                         >
                           <Star className="w-3.5 h-3.5" />
                           <span>Make Spotlight</span>
@@ -309,7 +309,7 @@ export default function AdminEvents() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleOpenEdit(ev)}
-                          className="p-1.5 rounded-lg bg-obsidian-900 text-gray-300 hover:text-cluster-green hover:border-cluster-green/40 border border-white/10 transition-colors"
+                          className="p-1.5 rounded-lg bg-obsidian-900 text-gray-300 hover:text-cluster-acid hover:border-cluster-acid/40 border border-white/10 transition-colors"
                           title="Edit Event"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -334,7 +334,7 @@ export default function AdminEvents() {
       {/* ── Modal (Create / Edit Event) ── */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg bg-obsidian-900 border border-cluster-green/40 rounded-2xl p-6 shadow-cluster-glow space-y-5">
+          <div className="relative w-full max-w-lg bg-obsidian-900 border border-cluster-acid/40 rounded-2xl p-6 shadow-cluster-glow space-y-5">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-display font-bold text-lg text-white">
                 {editingEvent ? 'Edit Event' : 'Create New Event'}
@@ -356,7 +356,7 @@ export default function AdminEvents() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g. CLUSTER Hackathon Season 1"
-                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export default function AdminEvents() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -379,7 +379,7 @@ export default function AdminEvents() {
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                     placeholder="10:00 AM IST"
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
               </div>
@@ -390,7 +390,7 @@ export default function AdminEvents() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   >
                     <option value="hackathon">Hackathon</option>
                     <option value="workshop">Workshop</option>
@@ -405,7 +405,7 @@ export default function AdminEvents() {
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="C-Block Auditorium"
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
               </div>
@@ -416,8 +416,8 @@ export default function AdminEvents() {
                   type="url"
                   value={formData.registrationUrl}
                   onChange={(e) => setFormData({ ...formData, registrationUrl: e.target.value })}
-                  placeholder="https://galgotiasuniversity.edu.in"
-                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none"
+                  placeholder="https://github.com/alwin2134/Cluster"
+                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                 />
               </div>
 
@@ -428,15 +428,15 @@ export default function AdminEvents() {
                   value={formData.summary}
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   placeholder="Describe the event, prize pool, or curriculum..."
-                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-green focus:outline-none resize-none font-sans"
+                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none resize-none font-sans"
                 />
               </div>
 
               {/* Spotlight Toggle */}
-              <div className="p-3 rounded-xl bg-obsidian-950 border border-cluster-green/30 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-obsidian-950 border border-cluster-acid/30 flex items-center justify-between">
                 <div>
                   <div className="text-white font-bold flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 text-cluster-green fill-cluster-green" />
+                    <Star className="w-3.5 h-3.5 text-cluster-acid fill-cluster-acid" />
                     <span>Set as Active Homepage Spotlight</span>
                   </div>
                   <p className="text-[10px] text-gray-400 font-sans mt-0.5">
@@ -447,7 +447,7 @@ export default function AdminEvents() {
                   type="checkbox"
                   checked={formData.isSpotlight}
                   onChange={(e) => setFormData({ ...formData, isSpotlight: e.target.checked })}
-                  className="w-4 h-4 accent-cluster-green rounded cursor-pointer"
+                  className="w-4 h-4 accent-cluster-acid rounded cursor-pointer"
                 />
               </div>
 

@@ -18,9 +18,9 @@ export default function ParticleField() {
     const colors = new Float32Array(PARTICLE_COUNT * 3)
     const velocities = new Float32Array(PARTICLE_COUNT * 3)
 
-    // NVIDIA green: rgb(0.463, 0.725, 0)  white: rgb(1,1,1)
-    const nvidiaColor = new THREE.Color('#76B900')
-    const whiteColor = new THREE.Color('#FFFFFF')
+    // CLUSTER palette: Acid Green #C6FF4D + Warm Off-White #F8F8F5
+    const acidGreen = new THREE.Color('#C6FF4D')
+    const offWhite = new THREE.Color('#F8F8F5')
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const i3 = i * 3
@@ -31,9 +31,9 @@ export default function ParticleField() {
 
       sizes[i] = 0.02 + Math.random() * 0.06 // 0.02–0.08
 
-      // Mix color between nvidia-green and white
+      // Mix color between acid green and off-white
       const t = Math.random()
-      const mixed = nvidiaColor.clone().lerp(whiteColor, t * 0.3)
+      const mixed = Math.random() > 0.4 ? offWhite : acidGreen.clone().lerp(offWhite, t * 0.2)
       colors[i3 + 0] = mixed.r
       colors[i3 + 1] = mixed.g
       colors[i3 + 2] = mixed.b

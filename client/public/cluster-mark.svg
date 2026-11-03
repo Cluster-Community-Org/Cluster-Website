@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%" fill="none">
+  <!-- 3 Radiant Accent Sparks (Acid Green #C6FF4D) -->
+  <g fill="#C6FF4D">
+    <!-- Top spark -->
+    <rect x="74" y="22" width="7" height="22" rx="3.5" transform="rotate(-15 77.5 33)" />
+    <!-- Middle spark -->
+    <rect x="58" y="32" width="7" height="20" rx="3.5" transform="rotate(-40 61.5 42)" />
+    <!-- Left spark -->
+    <rect x="46" y="48" width="7" height="17" rx="3.5" transform="rotate(-65 49.5 56.5)" />
+  </g>
+
+  <!-- Interlocking Geometric Chain Mark (Crisp Off-White / Light) -->
+  <g stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top-Right Loop -->
+    <path d="M 72 52 L 100 52 L 126 78 L 104 100 L 80 100 L 70 90 L 92 68 L 72 68" />
+    <!-- Bottom-Left Loop -->
+    <path d="M 88 108 L 60 108 L 34 82 L 56 60 L 80 60 L 90 70 L 68 92 L 88 92" />
+  </g>
+</svg>

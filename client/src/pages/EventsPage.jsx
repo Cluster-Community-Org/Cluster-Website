@@ -41,7 +41,7 @@ export default function EventsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-12">
       {/* Page Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cluster-green/10 border border-cluster-green/30 text-cluster-green text-xs font-mono">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono">
           <Calendar className="w-3.5 h-3.5" />
           <span>EVENTS & WORKSHOPS</span>
         </div>
@@ -84,14 +84,14 @@ export default function EventsPage() {
 
           {/* Type Category Filter */}
           <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-            <Filter className="w-4 h-4 text-cluster-green shrink-0 ml-2 hidden sm:block" />
+            <Filter className="w-4 h-4 text-cluster-acid shrink-0 ml-2 hidden sm:block" />
             {TYPE_FILTERS.map((t) => (
               <button
                 key={t}
                 onClick={() => setSelectedType(t)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono capitalize transition-all ${
                   selectedType === t
-                    ? 'bg-obsidian-800 border border-cluster-green text-cluster-green font-bold shadow-cluster-glow'
+                    ? 'bg-obsidian-800 border border-cluster-acid text-cluster-acid font-bold shadow-cluster-glow'
                     : 'bg-obsidian-950 text-gray-300 border border-white/10 hover:text-white'
                 }`}
               >
@@ -104,7 +104,7 @@ export default function EventsPage() {
         {/* Events Grid */}
         {filteredEvents.length === 0 ? (
           <div className="text-center py-16 bg-obsidian-900/40 rounded-2xl border border-dashed border-white/10">
-            <Calendar className="w-12 h-12 text-cluster-green mx-auto mb-3 opacity-40" />
+            <Calendar className="w-12 h-12 text-cluster-acid mx-auto mb-3 opacity-40" />
             <h4 className="text-lg font-display font-semibold text-white">No events in this category</h4>
             <p className="text-sm font-mono text-gray-400 mt-1">Check back soon or switch filters.</p>
           </div>
@@ -114,16 +114,16 @@ export default function EventsPage() {
               <div key={event.slug} className="nvidia-card rounded-2xl overflow-hidden p-6 flex flex-col justify-between space-y-4 group">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded bg-cluster-green/10 border border-cluster-green/25 text-cluster-green text-[11px] font-mono font-bold uppercase">
+                    <span className="px-2.5 py-1 rounded bg-cluster-acid/10 border border-cluster-acid/25 text-cluster-acid text-[11px] font-mono font-bold uppercase">
                       {event.type}
                     </span>
                     <div className="flex items-center gap-1 text-xs font-mono text-gray-400">
-                      <Calendar className="w-3.5 h-3.5 text-cluster-green" />
+                      <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
                       <span>{event.date}</span>
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-display font-bold text-white group-hover:text-cluster-green transition-colors">
+                  <h3 className="text-xl font-display font-bold text-white group-hover:text-cluster-acid transition-colors">
                     {event.title}
                   </h3>
 
@@ -134,7 +134,7 @@ export default function EventsPage() {
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-xs font-mono text-gray-400 truncate">
-                    <MapPin className="w-3.5 h-3.5 text-cluster-green shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-cluster-acid shrink-0" />
                     <span className="truncate max-w-[140px]">{event.location}</span>
                   </div>
 

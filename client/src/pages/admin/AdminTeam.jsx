@@ -7,7 +7,7 @@ const INITIAL_TEAM = [
     name: 'President',
     role: 'Club Founder & President',
     graduationYear: '2026',
-    bio: 'Founded CLUSTER to build a student technology community at Galgotias University. Passionate about open-source software, developer communities, and making tech accessible to everyone.',
+    bio: 'Founded CLUSTER to build a student technology community. Passionate about open-source software, developer communities, and making tech accessible to everyone.',
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -121,7 +121,7 @@ export default function AdminTeam() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search officers by name or role..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-xs font-mono focus:border-cluster-green focus:outline-none"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-xs font-mono focus:border-cluster-acid focus:outline-none"
         />
       </div>
 
@@ -131,13 +131,13 @@ export default function AdminTeam() {
           <div key={m.id} className="nvidia-card rounded-2xl p-5 border border-white/10 space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-cluster-green bg-cluster-green/10 px-2 py-0.5 rounded border border-cluster-green/30">
+                <span className="text-[10px] font-mono text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded border border-cluster-acid/30">
                   CLASS OF {m.graduationYear}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleOpenEdit(m)}
-                    className="p-1 rounded bg-obsidian-900 text-gray-400 hover:text-cluster-green"
+                    className="p-1 rounded bg-obsidian-900 text-gray-400 hover:text-cluster-acid"
                     title="Edit"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export default function AdminTeam() {
 
               <div>
                 <h3 className="font-display font-bold text-white text-base">{m.name}</h3>
-                <p className="text-xs font-mono text-cluster-green mt-0.5">{m.role}</p>
+                <p className="text-xs font-mono text-cluster-acid mt-0.5">{m.role}</p>
               </div>
 
               <p className="text-xs text-gray-300 font-sans line-clamp-3 leading-relaxed">
@@ -164,12 +164,12 @@ export default function AdminTeam() {
 
             <div className="pt-3 border-t border-white/10 flex items-center gap-2 text-gray-400 text-xs">
               {m.github && (
-                <a href={m.github} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-green">
+                <a href={m.github} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-acid">
                   <Github className="w-3.5 h-3.5" />
                 </a>
               )}
               {m.linkedin && (
-                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-green">
+                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-acid">
                   <Linkedin className="w-3.5 h-3.5" />
                 </a>
               )}
@@ -181,7 +181,7 @@ export default function AdminTeam() {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-obsidian-900 border border-cluster-cyan/40 rounded-2xl p-6 shadow-cluster-glow space-y-5">
+          <div className="relative w-full max-w-lg bg-obsidian-900 border border-cluster-acid/40 rounded-2xl p-6 shadow-cluster-glow space-y-5">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-display font-bold text-lg text-white">
                 {editingMember ? 'Edit Officer Profile' : 'Add New Officer'}
@@ -199,7 +199,7 @@ export default function AdminTeam() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                 />
               </div>
 
@@ -211,7 +211,7 @@ export default function AdminTeam() {
                     required
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -221,7 +221,7 @@ export default function AdminTeam() {
                     required
                     value={formData.graduationYear}
                     onChange={(e) => setFormData({ ...formData, graduationYear: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
               </div>
@@ -233,7 +233,7 @@ export default function AdminTeam() {
                   required
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none font-sans"
+                  className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none font-sans"
                 />
               </div>
 
@@ -244,7 +244,7 @@ export default function AdminTeam() {
                     type="url"
                     value={formData.github}
                     onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -253,7 +253,7 @@ export default function AdminTeam() {
                     type="url"
                     value={formData.linkedin}
                     onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-cyan focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-obsidian-950 border border-white/10 text-white focus:border-cluster-acid focus:outline-none"
                   />
                 </div>
               </div>

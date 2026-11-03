@@ -48,7 +48,7 @@ export default function StatsSection() {
             SOCIETY IMPACT & NUMBERS
           </h2>
           <p className="text-gray-400 text-sm font-sans">
-            Empowering student builders, creators, and collaborators across Galgotias University.
+            Empowering student builders, creators, and collaborators to build real-world technology.
           </p>
         </div>
 
