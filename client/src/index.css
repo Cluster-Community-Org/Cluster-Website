@@ -109,39 +109,6 @@
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-/* ─── Terminal ───────────────────────────────────────────── */
-.terminal-window {
-  background: #000000;
-  border: 1px solid rgba(198,255,77,0.25);
-  border-radius: 14px;
-  overflow: hidden;
-  position: relative;
-}
-.terminal-scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-.terminal-body {
-  font-family: 'Fira Code', 'JetBrains Mono', monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #C6FF4D;
-  padding: 20px 24px;
-  min-height: 420px;
-  max-height: 520px;
-  overflow-y: auto;
-  position: relative;
-  z-index: 2;
-}
-.terminal-body::-webkit-scrollbar { width: 4px; }
-.terminal-body::-webkit-scrollbar-track { background: transparent; }
-.terminal-body::-webkit-scrollbar-thumb { background: rgba(198,255,77,0.3); border-radius: 2px; }
 
 .cursor-blink {
   display: inline-block;

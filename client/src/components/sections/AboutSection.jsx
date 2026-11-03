@@ -1,4 +1,4 @@
-import { Users, Cpu, Compass, Flame, Terminal } from 'lucide-react'
+import { Users, Cpu, Compass, Flame, Sparkles } from 'lucide-react'
 
 const PILLARS = [
   {
@@ -36,7 +36,7 @@ export default function AboutSection() {
     <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center space-y-3 mb-16">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid text-xs font-mono">
-          <Terminal className="w-3.5 h-3.5" />
+          <Sparkles className="w-3.5 h-3.5" />
           <span>BRAND IDENTITY & CORE VALUES</span>
         </div>
         <h2 className="text-3xl sm:text-4xl font-display font-bold text-white">
