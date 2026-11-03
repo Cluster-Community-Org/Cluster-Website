@@ -71,11 +71,13 @@ const DEFAULT_HOMEPAGE = {
   bannerText: '⚡ Good things happen in clusters. Kickstart \'26 registrations are now open for tech students.',
   bannerLink: '/events',
   bannerLinkText: 'Join In →',
+  heroHeadline: 'Find your people.\nBuild together.',
+  heroSubtitle: 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
   stats: [
-    { label: 'MEMBERS', value: '150+' },
-    { label: 'EVENTS HOSTED', value: '20+' },
-    { label: 'PROJECTS BUILT', value: '10+' },
-    { label: 'COMMUNITY CIRCLES', value: '4+' },
+    { label: 'COMMUNITY MEMBERS', value: '150+' },
+    { label: 'EVENTS & SESSIONS', value: '20+' },
+    { label: 'SHIPPED PROJECTS', value: '10+' },
+    { label: 'OPEN COLLABORATION', value: '100%' },
   ],
 }
 

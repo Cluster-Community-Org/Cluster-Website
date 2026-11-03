@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Zap, Users } from 'lucide-react'
 import { CircuitCanvas } from '../3d/CircuitCanvas.jsx'
+import { clusterDataService } from '../../services/clusterDataService.js'
 
-const HERO_STATS = [
+const DEFAULT_HERO_STATS = [
   { value: '150+', label: 'COMMUNITY MEMBERS',  color: 'text-cluster-acid', border: 'border-cluster-acid/40 shadow-cluster-glow' },
   { value: '20+',  label: 'EVENTS & SESSIONS',  color: 'text-white',        border: 'border-white/10' },
   { value: '10+',  label: 'SHIPPED PROJECTS',   color: 'text-cluster-acid', border: 'border-cluster-acid/30' },
@@ -10,6 +12,18 @@ const HERO_STATS = [
 ]
 
 export default function HeroSection() {
+  const [config, setConfig] = useState(() => clusterDataService.getHomepageConfig())
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setConfig(clusterDataService.getHomepageConfig())
+    }
+    window.addEventListener('cluster_homepage_updated', handleUpdate)
+    return () => window.removeEventListener('cluster_homepage_updated', handleUpdate)
+  }, [])
+
+  const stats = (config.stats && config.stats.length > 0) ? config.stats : DEFAULT_HERO_STATS
+
   return (
     <section className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#080808] border-b border-white/[0.08] px-4 pt-28 pb-10">
       {/* Circuit Canvas Ambient Micro-animation */}
@@ -30,7 +44,11 @@ export default function HeroSection() {
 
         {/* Brand Concept Subtitle */}
         <p className="max-w-2xl mx-auto text-sm sm:text-base lg:text-lg text-[#C2C2B8] font-sans leading-relaxed">
-          <strong className="text-white font-semibold">A community around compute.</strong> Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.
+          {config.heroSubtitle || (
+            <>
+              <strong className="text-white font-semibold">A community around compute.</strong> Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.
+            </>
+          )}
         </p>
 
         {/* Editorial Value Anchors (Clean, Non-SaaS, Elegant) */}
@@ -68,13 +86,17 @@ export default function HeroSection() {
 
         {/* Metric Bar: High-contrast, Architectural, 1px Hairline Borders */}
         <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto text-left font-mono">
-          {HERO_STATS.map((stat, idx) => (
+          {stats.map((stat, idx) => (
             <div
               key={idx}
               className="p-4 rounded-xl bg-[#0F1012]/90 border border-white/[0.08] hover:border-cluster-acid/30 transition-colors backdrop-blur-md"
             >
-              <div className={`text-2xl sm:text-3xl font-bold tracking-tight ${stat.color}`}>{stat.value}</div>
-              <div className="text-[11px] text-[#8E8E88] font-medium tracking-wider mt-1 uppercase">{stat.label}</div>
+              <div className={`text-2xl sm:text-3xl font-bold tracking-tight ${idx % 2 === 0 ? 'text-cluster-acid' : 'text-white'}`}>
+                {stat.value}
+              </div>
+              <div className="text-[11px] text-[#8E8E88] font-medium tracking-wider mt-1 uppercase">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>

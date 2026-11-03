@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Users, Layers, TrendingUp, Plus, ArrowUpRight, Clock, CheckCircle2, UserCheck, Star } from 'lucide-react'
+import { Calendar, Users, Layers, TrendingUp, Plus, ArrowUpRight, Clock, CheckCircle2, UserCheck, Star, Monitor } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
 export default function AdminDashboard() {
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
             <span>Management Modules</span>
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link
               to="/admin/events"
               className="nvidia-card rounded-2xl p-5 border border-cluster-acid/30 hover:border-cluster-acid space-y-3 group transition-all"
@@ -192,6 +192,26 @@ export default function AdminDashboard() {
                 </h3>
                 <p className="text-xs text-[#8E8E88] mt-1 leading-relaxed">
                   Review student membership applications, advance candidates, and export CSVs.
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/homepage"
+              className="nvidia-card rounded-2xl p-5 border border-cluster-acid/30 hover:border-cluster-acid space-y-3 group transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid flex items-center justify-center">
+                  <Monitor className="w-4 h-4" />
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-cluster-acid transition-colors" />
+              </div>
+              <div>
+                <h3 className="text-base font-display font-bold text-white group-hover:text-cluster-acid transition-colors">
+                  Homepage & Alerts
+                </h3>
+                <p className="text-xs text-[#8E8E88] mt-1 leading-relaxed">
+                  Configure top announcement ticker, hero subtitle copy, and live metrics.
                 </p>
               </div>
             </Link>

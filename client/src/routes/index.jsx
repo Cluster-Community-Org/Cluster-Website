@@ -11,6 +11,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard.jsx'
 import AdminEvents from '../pages/admin/AdminEvents.jsx'
 import AdminTeam from '../pages/admin/AdminTeam.jsx'
 import AdminApplications from '../pages/admin/AdminApplications.jsx'
+import AdminHomepage from '../pages/admin/AdminHomepage.jsx'
 
 export default function AppRoutes() {
   return (
@@ -32,6 +33,7 @@ export default function AppRoutes() {
         <Route path="events" element={<AdminEvents />} />
         <Route path="team" element={<AdminTeam />} />
         <Route path="applications" element={<AdminApplications />} />
+        <Route path="homepage" element={<AdminHomepage />} />
       </Route>
 
       {/* Catch-all fallback */}

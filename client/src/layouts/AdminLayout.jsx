@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Calendar, Users, LogOut, ExternalLink, Menu, X, ShieldAlert, UserCheck } from 'lucide-react'
+import { LayoutDashboard, Calendar, Users, LogOut, ExternalLink, Menu, X, ShieldAlert, UserCheck, Monitor } from 'lucide-react'
 import { ClusterMark } from '../components/ui/ClusterLogo.jsx'
 
 export default function AdminLayout() {
@@ -25,6 +25,7 @@ export default function AdminLayout() {
     { name: 'Events CMS', href: '/admin/events', icon: Calendar },
     { name: 'Team CMS', href: '/admin/team', icon: Users },
     { name: 'Applications', href: '/admin/applications', icon: UserCheck },
+    { name: 'Homepage CMS', href: '/admin/homepage', icon: Monitor },
   ]
 
   return (
