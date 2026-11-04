@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, CheckCircle2, ArrowRight, Sparkles, User, Mail, Hash, BookOpen, Code, Github, Linkedin, MessageSquare } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
@@ -33,19 +33,6 @@ export default function JoinClusterModal({ isOpen, onClose }) {
   const [submittedApp, setSubmittedApp] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!isOpen) return null
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    setTimeout(() => {
-      const app = clusterDataService.addApplication(formData)
-      setSubmittedApp(app)
-      setIsSubmitting(false)
-    }, 400)
-  }
-
   const handleReset = () => {
     setSubmittedApp(null)
     setFormData({
@@ -61,8 +48,35 @@ export default function JoinClusterModal({ isOpen, onClose }) {
     onClose()
   }
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') handleReset()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
+
+  if (!isOpen) return null
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    setTimeout(() => {
+      const app = clusterDataService.addApplication(formData)
+      setSubmittedApp(app)
+      setIsSubmitting(false)
+    }, 400)
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleReset()
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
+    >
       <div
         className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0C0D0E] border border-white/[0.1] p-6 sm:p-8 shadow-2xl text-[#F8F7F3] space-y-6"
         role="dialog"

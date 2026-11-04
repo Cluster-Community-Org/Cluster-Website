@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   TEAM: 'cluster_cms_team',
   APPLICATIONS: 'cluster_cms_applications',
   HOMEPAGE: 'cluster_cms_homepage_config',
+  AUDIT_LOG: 'cluster_cms_audit_log',
 }
 
 // ── Default Seed Data ────────────────────────────────────────────────────────
@@ -176,6 +177,37 @@ function dispatchUpdate(eventType, data) {
 
 // ── Data API ─────────────────────────────────────────────────────────────────
 
+const DEFAULT_AUDIT_LOG = [
+  {
+    id: 'log-1',
+    action: 'SPOTLIGHT_UPDATED',
+    summary: 'Spotlight promoted to "Kickstart \'26 — Community Meetup"',
+    timestamp: '2026-11-03T18:00:00Z',
+    category: 'events',
+  },
+  {
+    id: 'log-2',
+    action: 'APPLICATION_RECEIVED',
+    summary: 'New applicant logged: Aarav Sharma (AI & Machine Learning)',
+    timestamp: '2026-11-03T16:45:00Z',
+    category: 'applications',
+  },
+  {
+    id: 'log-3',
+    action: 'HOMEPAGE_SYNC',
+    summary: 'Announcement ticker updated with Kickstart \'26 registration',
+    timestamp: '2026-11-03T14:15:00Z',
+    category: 'homepage',
+  },
+  {
+    id: 'log-4',
+    action: 'TEAM_ROSTER_SYNC',
+    summary: 'Executive board profiles verified for 2026-2027 session',
+    timestamp: '2026-11-02T11:00:00Z',
+    category: 'team',
+  },
+]
+
 export const clusterDataService = {
   // ── Events Management ──
   getEvents() {
@@ -203,12 +235,14 @@ export const clusterDataService = {
       updated = [newEvent, ...current]
     }
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updated))
+    this.logAudit(eventData.id ? 'EVENT_UPDATED' : 'EVENT_CREATED', `Event "${eventData.title}" ${eventData.id ? 'updated' : 'published'}`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
     return updated
   },
 
   deleteEvent(id) {
     const current = this.getEvents()
+    const target = current.find((e) => e.id === id)
     const updated = current.filter((e) => e.id !== id)
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updated))
 
@@ -223,6 +257,7 @@ export const clusterDataService = {
       }
     }
 
+    this.logAudit('EVENT_DELETED', `Event "${target?.title || id}" removed from schedule`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
     return updated
   },
@@ -255,6 +290,7 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.SPOTLIGHT_ID, String(id))
 
     const activeSpotlight = updated.find((e) => e.id === id) || null
+    this.logAudit('SPOTLIGHT_SET', `Spotlight promoted: "${activeSpotlight?.title || id}"`, 'events')
     dispatchUpdate('cluster_spotlight_updated', activeSpotlight)
     dispatchUpdate('cluster_events_updated', updated)
     return activeSpotlight
@@ -276,6 +312,7 @@ export const clusterDataService = {
     const current = this.getHomepageConfig()
     const updated = { ...current, ...partial }
     localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(updated))
+    this.logAudit('HOMEPAGE_SYNC', 'Homepage copy & announcement ticker updated', 'homepage')
     dispatchUpdate('cluster_homepage_updated', updated)
     return updated
   },
@@ -312,14 +349,17 @@ export const clusterDataService = {
       updated = [...current, newMember]
     }
     localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
+    this.logAudit(memberData.id ? 'TEAM_UPDATED' : 'TEAM_ADDED', `Officer profile "${memberData.name}" (${memberData.role}) saved`, 'team')
     dispatchUpdate('cluster_team_updated', updated)
     return updated
   },
 
   deleteTeamMember(id) {
     const current = this.getTeamMembers()
+    const target = current.find((m) => m.id === id)
     const updated = current.filter((m) => m.id !== id)
     localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
+    this.logAudit('TEAM_REMOVED', `Officer "${target?.name || id}" removed from roster`, 'team')
     dispatchUpdate('cluster_team_updated', updated)
     return updated
   },
@@ -346,22 +386,27 @@ export const clusterDataService = {
     }
     const updated = [newApp, ...current]
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    this.logAudit('APPLICATION_RECEIVED', `New applicant logged: ${appData.fullName} (${appData.domain})`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
     return newApp
   },
 
   updateApplicationStatus(id, newStatus) {
     const current = this.getApplications()
+    const target = current.find((a) => a.id === id)
     const updated = current.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    this.logAudit('STATUS_CHANGED', `Application for "${target?.fullName || id}" updated to ${newStatus}`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
     return updated
   },
 
   deleteApplication(id) {
     const current = this.getApplications()
+    const target = current.find((a) => a.id === id)
     const updated = current.filter((app) => app.id !== id)
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
+    this.logAudit('APPLICATION_DELETED', `Application for "${target?.fullName || id}" deleted`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
     return updated
   },
@@ -393,6 +438,151 @@ export const clusterDataService = {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+  },
+
+  // ── Audit Log & History ──
+  logAudit(action, summary, category = 'system') {
+    try {
+      const logs = this.getAuditLog()
+      const newEntry = {
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        action,
+        summary,
+        category,
+        timestamp: new Date().toISOString(),
+      }
+      const updated = [newEntry, ...logs.slice(0, 49)]
+      localStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(updated))
+      dispatchUpdate('cluster_audit_updated', updated)
+      return newEntry
+    } catch {
+      return null
+    }
+  },
+
+  getAuditLog() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.AUDIT_LOG)
+      if (stored) return JSON.parse(stored)
+      localStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(DEFAULT_AUDIT_LOG))
+      return DEFAULT_AUDIT_LOG
+    } catch {
+      return DEFAULT_AUDIT_LOG
+    }
+  },
+
+  // ── Analytics & Intelligence ──
+  getAnalytics() {
+    const apps = this.getApplications()
+    const events = this.getEvents()
+    const team = this.getTeamMembers()
+
+    // Domain distribution
+    const domainCounts = {}
+    apps.forEach((a) => {
+      const dom = a.domain || 'Unspecified'
+      domainCounts[dom] = (domainCounts[dom] || 0) + 1
+    })
+
+    const totalApps = apps.length || 1
+    const domainStats = Object.entries(domainCounts)
+      .map(([domain, count]) => ({
+        domain,
+        count,
+        percent: Math.round((count / totalApps) * 100),
+      }))
+      .sort((a, b) => b.count - a.count)
+
+    // Pipeline status counts
+    const statusCounts = {
+      Pending: 0,
+      'Under Review': 0,
+      Accepted: 0,
+      Waitlisted: 0,
+      Rejected: 0,
+    }
+    apps.forEach((a) => {
+      if (statusCounts[a.status] !== undefined) {
+        statusCounts[a.status]++
+      }
+    })
+
+    const acceptedCount = statusCounts.Accepted || 0
+    const acceptanceRate = apps.length > 0 ? Math.round((acceptedCount / apps.length) * 100) : 0
+
+    // Event category breakdown
+    const eventTypes = {}
+    events.forEach((e) => {
+      const t = e.type || 'other'
+      eventTypes[t] = (eventTypes[t] || 0) + 1
+    })
+
+    return {
+      totalApplications: apps.length,
+      statusCounts,
+      acceptanceRate,
+      domainStats,
+      totalEvents: events.length,
+      eventTypes,
+      totalTeam: team.length,
+    }
+  },
+
+  // ── Backup & Restore Utility ──
+  exportBackupJSON() {
+    const backup = {
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      events: this.getEvents(),
+      spotlightId: localStorage.getItem(STORAGE_KEYS.SPOTLIGHT_ID),
+      team: this.getTeamMembers(),
+      applications: this.getApplications(),
+      homepage: this.getHomepageConfig(),
+      auditLog: this.getAuditLog(),
+    }
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `cluster_cms_backup_${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  },
+
+  importBackupJSON(jsonStr) {
+    try {
+      const data = JSON.parse(jsonStr)
+      if (data.events) {
+        localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(data.events))
+        dispatchUpdate('cluster_events_updated', data.events)
+      }
+      if (data.spotlightId) {
+        localStorage.setItem(STORAGE_KEYS.SPOTLIGHT_ID, String(data.spotlightId))
+      }
+      if (data.team) {
+        localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(data.team))
+        dispatchUpdate('cluster_team_updated', data.team)
+      }
+      if (data.applications) {
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(data.applications))
+        dispatchUpdate('cluster_applications_updated', data.applications)
+      }
+      if (data.homepage) {
+        localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(data.homepage))
+        dispatchUpdate('cluster_homepage_updated', data.homepage)
+      }
+      if (data.auditLog) {
+        localStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(data.auditLog))
+        dispatchUpdate('cluster_audit_updated', data.auditLog)
+      }
+      this.logAudit('BACKUP_RESTORED', 'Full society database snapshot restored', 'system')
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
   },
 }
 

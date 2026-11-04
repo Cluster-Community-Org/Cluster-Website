@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { Menu, X, UserPlus } from 'lucide-react'
 import ClusterLogo from '../ui/ClusterLogo.jsx'
 import JoinClusterModal from '../modals/JoinClusterModal.jsx'
+import AnnouncementBanner from './AnnouncementBanner.jsx'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -33,11 +34,14 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? 'bg-black/95 backdrop-blur-md border-b border-white/10 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
-            : 'bg-transparent py-5 border-b border-white/5'
+            ? 'bg-black/95 backdrop-blur-md border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
+            : 'bg-black/60 backdrop-blur-sm border-b border-white/[0.06]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between relative">
+        {/* Top Ticker Alert Banner (if enabled) */}
+        <AnnouncementBanner />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between relative">
 
           {/* ── Brand Logo ── */}
           <ClusterLogo

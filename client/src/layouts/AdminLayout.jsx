@@ -77,7 +77,7 @@ export default function AdminLayout() {
           <Link
             to="/"
             target="_blank"
-            className="flex items-center justify-between px-3 py-2 rounded-lg bg-obsidian-950 border border-white/5 text-xs font-mono text-gray-300 hover:text-cluster-green transition-colors"
+            className="flex items-center justify-between px-3 py-2 rounded-lg bg-obsidian-950 border border-white/5 text-xs font-mono text-gray-300 hover:text-cluster-acid transition-colors"
           >
             <span>Live Website</span>
             <ExternalLink className="w-3.5 h-3.5" />

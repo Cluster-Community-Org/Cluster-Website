@@ -54,7 +54,7 @@ export const EventCountdown = ({ event }) => {
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center gap-2 text-xs font-mono font-bold text-cluster-acid tracking-wider uppercase">
             <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
-            <span>COMMUNITY SPOTLIGHT // KICKSTART '26</span>
+            <span>COMMUNITY SPOTLIGHT // {event.title ? event.title.toUpperCase() : "NEXT EVENT"}</span>
           </div>
 
           <h3 className="text-2xl sm:text-4xl font-display font-extrabold text-[#F8F7F3] tracking-tight leading-tight">
@@ -97,7 +97,7 @@ export const EventCountdown = ({ event }) => {
                 key={idx}
                 className="flex flex-col items-center justify-center p-3 rounded-xl bg-black border border-white/10 shadow-inner group hover:border-cluster-acid/50 transition-colors"
               >
-                <span className="font-mono font-bold text-xl sm:text-2xl text-cluster-acid group-hover:scale-110 transition-transform">
+                <span className="font-mono tabular-nums font-bold text-xl sm:text-3xl text-cluster-acid transition-transform">
                   {String(item.value).padStart(2, '0')}
                 </span>
                 <span className="text-[9px] font-mono text-gray-400 mt-0.5 tracking-wider">

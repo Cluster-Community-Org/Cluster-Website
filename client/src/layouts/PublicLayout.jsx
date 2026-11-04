@@ -1,12 +1,10 @@
 import { Outlet } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar.jsx'
 import Footer from '../components/layout/Footer.jsx'
-import AnnouncementBanner from '../components/layout/AnnouncementBanner.jsx'
 
 export default function PublicLayout() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <AnnouncementBanner />
+    <div className="min-h-screen flex flex-col bg-[#080808]">
       <Navbar />
       <main id="main-content" className="flex-1">
         <Outlet />

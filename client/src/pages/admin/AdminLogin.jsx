@@ -76,7 +76,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@cluster.society"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-sm focus:border-cluster-green focus:outline-none transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-sm focus:border-cluster-acid focus:outline-none transition-colors"
                 required
               />
             </div>
@@ -88,7 +88,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-sm focus:border-cluster-green focus:outline-none transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-sm focus:border-cluster-acid focus:outline-none transition-colors"
                 required
               />
             </div>
@@ -115,21 +115,21 @@ export default function AdminLogin() {
             <button
               type="button"
               onClick={() => handleOAuth('google')}
-              className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-xs font-mono text-gray-200 hover:text-white hover:border-cluster-green/40 transition-colors flex items-center justify-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-xs font-mono text-gray-200 hover:text-white hover:border-cluster-acid/40 transition-colors flex items-center justify-center gap-2"
             >
               <span>Google SSO</span>
             </button>
             <button
               type="button"
               onClick={() => handleOAuth('github')}
-              className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-xs font-mono text-gray-200 hover:text-white hover:border-cluster-cyan/40 transition-colors flex items-center justify-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-xs font-mono text-gray-200 hover:text-white hover:border-cluster-acid/40 transition-colors flex items-center justify-center gap-2"
             >
               <span>GitHub SSO</span>
             </button>
           </div>
 
           <div className="pt-2 border-t border-white/5 flex items-center justify-center gap-1.5 text-[11px] font-mono text-gray-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-cluster-green" />
+            <ShieldCheck className="w-3.5 h-3.5 text-cluster-acid" />
             <span>Authenticated via Role-Based Access Control</span>
           </div>
         </div>

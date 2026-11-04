@@ -177,8 +177,8 @@ export default function AdminEvents() {
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cluster-acid/20 border border-cluster-acid/50 text-cluster-acid text-[10px] font-mono font-bold tracking-wider">
-                <Zap className="w-3.5 h-3.5 animate-bounce" />
+              <div className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-cluster-acid uppercase">
+                <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
                 <span>CURRENT HOMEPAGE SPOTLIGHT</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-display font-bold text-white">
@@ -233,13 +233,13 @@ export default function AdminEvents() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search events by title, keywords or venue..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-xs font-mono focus:border-cluster-green focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white placeholder-gray-500 text-xs font-mono focus:border-cluster-acid focus:outline-none"
           />
         </div>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white text-xs font-mono focus:border-cluster-green focus:outline-none"
+          className="px-4 py-2.5 rounded-xl bg-obsidian-900 border border-white/10 text-white text-xs font-mono focus:border-cluster-acid focus:outline-none"
         >
           <option value="all">All Categories ({events.length})</option>
           <option value="workshop">Workshops</option>
@@ -269,7 +269,7 @@ export default function AdminEvents() {
                   <tr
                     key={ev.id}
                     className={`hover:bg-white/5 transition-colors ${
-                      isCurrentSpotlight ? 'bg-cluster-green/5' : ''
+                      isCurrentSpotlight ? 'bg-cluster-acid/5' : ''
                     }`}
                   >
                     <td className="px-6 py-4">

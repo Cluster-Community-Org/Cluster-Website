@@ -1,31 +1,19 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Calendar, ChevronRight } from 'lucide-react'
-
-const FEATURED_EVENTS = [
-  {
-    id: 1,
-    title: 'Kickstart \'26 — Community Meetup',
-    description: 'A community meetup for tech students who care about compute. Meet the community, explore project showcases, and discover what\'s next.',
-    date: 'Dec 05, 2026',
-    category: 'Community Meetup',
-  },
-  {
-    id: 2,
-    title: 'CLUSTER Hackathon Season 1',
-    description: '24-hour build competition — teams of 2–4 solve high-impact briefs across Web3, AI, and developer tools. Cash prizes and industry mentorship.',
-    date: 'Dec 15, 2026',
-    category: 'Hackathon',
-  },
-  {
-    id: 3,
-    title: 'Full-Stack Web Dev Bootcamp',
-    description: 'Hands-on full-stack workshop covering React, Tailwind, and Node.js. Ship real software from scratch in a guided collaborative sprint.',
-    date: 'Nov 20, 2026',
-    category: 'Workshop',
-  },
-]
+import { clusterDataService } from '../../services/clusterDataService.js'
 
 export default function FeaturedSection() {
+  const [events, setEvents] = useState(() => clusterDataService.getEvents().slice(0, 3))
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setEvents(clusterDataService.getEvents().slice(0, 3))
+    }
+    window.addEventListener('cluster_events_updated', handleUpdate)
+    return () => window.removeEventListener('cluster_events_updated', handleUpdate)
+  }, [])
+
   return (
     <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 border-b border-white/[0.06]" aria-label="Featured events">
       <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-white/[0.08] pb-6">
@@ -45,7 +33,7 @@ export default function FeaturedSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6" role="list">
-        {FEATURED_EVENTS.map((event) => (
+        {events.map((event) => (
           <article
             key={event.id}
             className="rounded-2xl p-7 space-y-5 flex flex-col justify-between bg-[#0F1012] border border-white/[0.08] hover:border-cluster-acid/40 transition-all duration-200 group"
@@ -54,7 +42,7 @@ export default function FeaturedSection() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono text-cluster-acid uppercase tracking-wider font-semibold">
-                  {event.category}
+                  {event.type || event.category || 'Session'}
                 </span>
                 <div className="flex items-center gap-1.5 text-xs text-[#8E8E88] font-mono">
                   <Calendar className="w-3.5 h-3.5" />
@@ -66,8 +54,8 @@ export default function FeaturedSection() {
                 {event.title}
               </h3>
 
-              <p className="text-sm text-[#B5B5AE] leading-relaxed font-sans">
-                {event.description}
+              <p className="text-sm text-[#B5B5AE] leading-relaxed font-sans line-clamp-3">
+                {event.summary || event.description}
               </p>
             </div>
 
