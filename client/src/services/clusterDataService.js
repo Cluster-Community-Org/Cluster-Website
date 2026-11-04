@@ -375,8 +375,7 @@ export const clusterDataService = {
 
     if (isSupabaseConfigured() && supabase) {
       const payload = eventToDB(eventData)
-      if (eventData.id && typeof eventData.id === 'number') payload.id = eventData.id
-      supabase.from('events').upsert(payload).then(({ error }) => {
+      supabase.from('events').upsert(payload, { onConflict: 'slug' }).then(({ error }) => {
         if (error) console.warn('[Supabase Sync Error] events.upsert:', error.message)
       })
     }
@@ -564,8 +563,27 @@ export const clusterDataService = {
     dispatchUpdate('cluster_applications_updated', updated)
 
     if (isSupabaseConfigured() && supabase) {
-      supabase.from('applications').insert(appToDB(newApp)).then(({ error }) => {
-        if (error) console.warn('[Supabase Sync Error] applications.insert:', error.message)
+      supabase.from('applications').insert(appToDB(newApp)).then(async ({ error }) => {
+        if (error) {
+          console.warn('[Supabase Sync Error] applications.insert:', error.message)
+          // If remote schema doesn't yet have course/branch/year columns, retry with legacy payload
+          if (error.code === 'PGRST204' || error.message?.includes('column')) {
+            const legacyPayload = {
+              id: newApp.id,
+              full_name: newApp.fullName,
+              email: newApp.email,
+              roll_number: newApp.rollNumber,
+              branch_year: newApp.branchYear || `${newApp.course || ''} · ${newApp.branch || ''} · ${newApp.year || ''}`,
+              domain: newApp.domain,
+              github: newApp.github || '',
+              linkedin: newApp.linkedin || '',
+              motivation: newApp.motivation || '',
+              status: newApp.status || 'Pending',
+            }
+            const { error: retryErr } = await supabase.from('applications').insert(legacyPayload)
+            if (retryErr) console.warn('[Supabase Fallback Insert Error]:', retryErr.message)
+          }
+        }
       })
     }
 

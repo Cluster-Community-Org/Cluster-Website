@@ -1,5 +1,5 @@
 -- ==============================================================================
--- CLUSTER Society — Supabase Production Database Schema
+-- CLUSTER Society — Supabase Production Database Schema & Migration
 -- Run this in the Supabase SQL Editor (Dashboard -> SQL Editor -> New Query)
 -- ==============================================================================
 
@@ -50,6 +50,11 @@ CREATE TABLE IF NOT EXISTS public.applications (
   submitted_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
+-- Ensure separate course, branch, and year columns exist if table was already created
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS course TEXT;
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS branch TEXT;
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS year TEXT;
+
 -- 4. Homepage & CMS Configuration Table (Singleton Row id=1)
 CREATE TABLE IF NOT EXISTS public.homepage_config (
   id INT PRIMARY KEY DEFAULT 1,
@@ -57,14 +62,15 @@ CREATE TABLE IF NOT EXISTS public.homepage_config (
   banner_text TEXT DEFAULT '⚡ Good things happen in clusters. Kickstart ''26 registrations are now open for tech students.',
   banner_link TEXT DEFAULT '/events',
   banner_link_text TEXT DEFAULT 'Join In →',
-  hero_headline TEXT DEFAULT 'Find your people.\nBuild together',
+  hero_headline TEXT DEFAULT 'Find your people.
+Build together',
   hero_subtitle TEXT DEFAULT 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
   stats JSONB DEFAULT '[
     {"label": "COMMUNITY MEMBERS", "value": "150+"},
     {"label": "EVENTS & SESSIONS", "value": "20+"},
     {"label": "SHIPPED PROJECTS", "value": "10+"},
     {"label": "OPEN COLLABORATION", "value": "100%"}
-  ]'::jsonb,
+  ]',
   updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
@@ -78,7 +84,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 );
 
 -- ==============================================================================
--- Row Level Security (RLS) Policies
+-- Row Level Security (RLS) Policies (Clean Drop & Recreate)
 -- ==============================================================================
 
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
@@ -87,35 +93,44 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.homepage_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Events Policies: Public can read, authenticated admins can write
+-- Events Policies: Public (anon + authenticated) can READ, admins can WRITE
+DROP POLICY IF EXISTS "Public events read access" ON public.events;
 CREATE POLICY "Public events read access" ON public.events
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated USING (true);
 
+DROP POLICY IF EXISTS "Admin events full access" ON public.events;
 CREATE POLICY "Admin events full access" ON public.events
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Team Members Policies: Public can read, authenticated admins can write
+-- Team Members Policies: Public can READ, admins can WRITE
+DROP POLICY IF EXISTS "Public team read access" ON public.team_members;
 CREATE POLICY "Public team read access" ON public.team_members
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated USING (true);
 
+DROP POLICY IF EXISTS "Admin team full access" ON public.team_members;
 CREATE POLICY "Admin team full access" ON public.team_members
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Applications Policies: Anyone can apply (INSERT), authenticated admins can manage
+-- Applications Policies: Anyone can SUBMIT (INSERT), authenticated admins can manage
+DROP POLICY IF EXISTS "Public application submit access" ON public.applications;
 CREATE POLICY "Public application submit access" ON public.applications
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT TO anon, authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin applications full access" ON public.applications;
 CREATE POLICY "Admin applications full access" ON public.applications
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Homepage Config Policies: Public can read, authenticated admins can write
+-- Homepage Config Policies: Public can READ, authenticated admins can write
+DROP POLICY IF EXISTS "Public homepage config read access" ON public.homepage_config;
 CREATE POLICY "Public homepage config read access" ON public.homepage_config
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated USING (true);
 
+DROP POLICY IF EXISTS "Admin homepage config update access" ON public.homepage_config;
 CREATE POLICY "Admin homepage config update access" ON public.homepage_config
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Audit Logs Policies: Authenticated admins can read and insert
+DROP POLICY IF EXISTS "Admin audit logs access" ON public.audit_logs;
 CREATE POLICY "Admin audit logs access" ON public.audit_logs
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
@@ -123,6 +138,7 @@ CREATE POLICY "Admin audit logs access" ON public.audit_logs
 -- Initial Seed Data
 -- ==============================================================================
 
+-- Seed Events
 INSERT INTO public.events (slug, title, date, time, location, type, summary, is_spotlight, featured)
 VALUES
   (
@@ -169,9 +185,25 @@ VALUES
     false,
     false
   )
-ON CONFLICT (slug) DO NOTHING;
+ON CONFLICT (slug) DO UPDATE SET
+  title = EXCLUDED.title,
+  date = EXCLUDED.date,
+  time = EXCLUDED.time,
+  location = EXCLUDED.location,
+  type = EXCLUDED.type,
+  summary = EXCLUDED.summary,
+  is_spotlight = EXCLUDED.is_spotlight,
+  featured = EXCLUDED.featured;
 
+-- Seed Team Members
+INSERT INTO public.team_members (name, role, graduation_year, bio, initials)
+VALUES
+  ('Aarav Mehta', 'President & Systems Architect', '2026', 'Passionate about high-performance compute, distributed networks, and hardware acceleration.', 'AM'),
+  ('Zara Chen', 'Vice President & Head of AI Circle', '2026', 'Building real-time neural interfaces and multimodal agent pipelines.', 'ZC'),
+  ('Kavya Nair', 'Technical Lead — Full-Stack & Cloud', '2027', 'Specializes in scalable microservices, edge computing, and reactive architectures.', 'KN'),
+  ('Ethan Davis', 'Community & Hackathon Director', '2027', 'Organizing build marathons, developer meetups, and fostering open collaboration.', 'ED');
+
+-- Seed Homepage Config
 INSERT INTO public.homepage_config (id, banner_enabled, banner_text)
 VALUES (1, true, '⚡ Good things happen in clusters. Kickstart ''26 registrations are now open for tech students.')
 ON CONFLICT (id) DO NOTHING;
-
