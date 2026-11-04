@@ -11,6 +11,7 @@ export default function EventsPage() {
   const [activeGalleryImages, setActiveGalleryImages] = useState(null)
 
   useEffect(() => {
+    setEventsList(clusterDataService.getEvents())
     const handleEventsUpdate = () => {
       setEventsList(clusterDataService.getEvents())
     }

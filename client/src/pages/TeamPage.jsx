@@ -6,6 +6,7 @@ export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState(() => clusterDataService.getTeamMembers())
 
   useEffect(() => {
+    setTeamMembers(clusterDataService.getTeamMembers())
     const handleUpdate = () => {
       setTeamMembers(clusterDataService.getTeamMembers())
     }

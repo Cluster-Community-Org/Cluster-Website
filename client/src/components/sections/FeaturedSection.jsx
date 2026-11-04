@@ -7,6 +7,7 @@ export default function FeaturedSection() {
   const [events, setEvents] = useState(() => clusterDataService.getEvents().slice(0, 3))
 
   useEffect(() => {
+    setEvents(clusterDataService.getEvents().slice(0, 3))
     const handleUpdate = () => {
       setEvents(clusterDataService.getEvents().slice(0, 3))
     }

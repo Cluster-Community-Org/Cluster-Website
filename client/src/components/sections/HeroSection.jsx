@@ -15,6 +15,7 @@ export default function HeroSection() {
   const [config, setConfig] = useState(() => clusterDataService.getHomepageConfig())
 
   useEffect(() => {
+    setConfig(clusterDataService.getHomepageConfig())
     const handleUpdate = () => {
       setConfig(clusterDataService.getHomepageConfig())
     }

@@ -11,6 +11,8 @@ export default function HomePage() {
   const [spotlightEvent, setSpotlightEvent] = useState(() => clusterDataService.getSpotlightEvent())
 
   useEffect(() => {
+    setSpotlightEvent(clusterDataService.getSpotlightEvent())
+
     const handleSpotlightUpdate = (e) => {
       if (e.detail) {
         setSpotlightEvent(e.detail)
