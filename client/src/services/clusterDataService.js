@@ -1,5 +1,6 @@
 // CLUSTER Society Data Service
-// Manages local state persistence, reactive event dispatching, and fallback mock data.
+// Manages local state persistence, reactive event dispatching, Supabase cloud sync, and fallback mock data.
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
 
 const STORAGE_KEYS = {
   EVENTS: 'cluster_cms_events',
@@ -175,6 +176,124 @@ function dispatchUpdate(eventType, data) {
   }
 }
 
+// ── Supabase Field Mappers ──
+function eventFromDB(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    date: row.date,
+    time: row.time,
+    location: row.location,
+    type: row.type,
+    summary: row.summary,
+    registrationUrl: row.registration_url,
+    isSpotlight: Boolean(row.is_spotlight),
+    featured: Boolean(row.featured),
+  }
+}
+
+function eventToDB(e) {
+  return {
+    slug: e.slug || e.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    title: e.title,
+    date: e.date,
+    time: e.time || '10:00 AM IST',
+    location: e.location,
+    type: e.type || 'workshop',
+    summary: e.summary || '',
+    registration_url: e.registrationUrl || 'https://github.com/alwin2134/Cluster',
+    is_spotlight: Boolean(e.isSpotlight),
+    featured: Boolean(e.featured),
+  }
+}
+
+function appFromDB(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    fullName: row.full_name,
+    email: row.email,
+    rollNumber: row.roll_number,
+    branchYear: row.branch_year,
+    domain: row.domain,
+    github: row.github,
+    linkedin: row.linkedin,
+    motivation: row.motivation,
+    status: row.status,
+    submittedAt: row.submitted_at,
+  }
+}
+
+function appToDB(a) {
+  return {
+    id: a.id,
+    full_name: a.fullName,
+    email: a.email,
+    roll_number: a.rollNumber,
+    branch_year: a.branchYear,
+    domain: a.domain,
+    github: a.github || '',
+    linkedin: a.linkedin || '',
+    motivation: a.motivation || '',
+    status: a.status || 'Pending',
+  }
+}
+
+function memberFromDB(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    graduationYear: row.graduation_year,
+    bio: row.bio,
+    github: row.github,
+    linkedin: row.linkedin,
+    initials: row.initials,
+  }
+}
+
+function memberToDB(m) {
+  return {
+    name: m.name,
+    role: m.role,
+    graduation_year: m.graduationYear || '2026',
+    bio: m.bio || '',
+    github: m.github || '',
+    linkedin: m.linkedin || '',
+    initials: m.initials,
+  }
+}
+
+function configFromDB(row) {
+  if (!row) return null
+  return {
+    bannerEnabled: Boolean(row.banner_enabled),
+    bannerText: row.banner_text,
+    bannerLink: row.banner_link,
+    bannerLinkText: row.banner_link_text,
+    heroHeadline: row.hero_headline,
+    heroSubtitle: row.hero_subtitle,
+    stats: row.stats || [],
+  }
+}
+
+function configToDB(c) {
+  return {
+    id: 1,
+    banner_enabled: Boolean(c.bannerEnabled),
+    banner_text: c.bannerText,
+    banner_link: c.bannerLink,
+    banner_link_text: c.bannerLinkText,
+    hero_headline: c.heroHeadline,
+    hero_subtitle: c.heroSubtitle,
+    stats: c.stats,
+    updated_at: new Date().toISOString(),
+  }
+}
+
 // ── Data API ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_AUDIT_LOG = [
@@ -237,6 +356,15 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updated))
     this.logAudit(eventData.id ? 'EVENT_UPDATED' : 'EVENT_CREATED', `Event "${eventData.title}" ${eventData.id ? 'updated' : 'published'}`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      const payload = eventToDB(eventData)
+      if (eventData.id && typeof eventData.id === 'number') payload.id = eventData.id
+      supabase.from('events').upsert(payload).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] events.upsert:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -259,6 +387,13 @@ export const clusterDataService = {
 
     this.logAudit('EVENT_DELETED', `Event "${target?.title || id}" removed from schedule`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('events').delete().eq('id', id).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] events.delete:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -314,6 +449,13 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(updated))
     this.logAudit('HOMEPAGE_SYNC', 'Homepage copy & announcement ticker updated', 'homepage')
     dispatchUpdate('cluster_homepage_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('homepage_config').upsert(configToDB(updated)).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] homepage_config.upsert:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -351,6 +493,15 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
     this.logAudit(memberData.id ? 'TEAM_UPDATED' : 'TEAM_ADDED', `Officer profile "${memberData.name}" (${memberData.role}) saved`, 'team')
     dispatchUpdate('cluster_team_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      const payload = memberToDB(memberData)
+      if (memberData.id) payload.id = memberData.id
+      supabase.from('team_members').upsert(payload).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] team_members.upsert:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -361,6 +512,13 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(updated))
     this.logAudit('TEAM_REMOVED', `Officer "${target?.name || id}" removed from roster`, 'team')
     dispatchUpdate('cluster_team_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('team_members').delete().eq('id', id).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] team_members.delete:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -388,6 +546,13 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
     this.logAudit('APPLICATION_RECEIVED', `New applicant logged: ${appData.fullName} (${appData.domain})`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('applications').insert(appToDB(newApp)).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] applications.insert:', error.message)
+      })
+    }
+
     return newApp
   },
 
@@ -398,6 +563,13 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
     this.logAudit('STATUS_CHANGED', `Application for "${target?.fullName || id}" updated to ${newStatus}`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('applications').update({ status: newStatus }).eq('id', id).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] applications.update:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -408,6 +580,13 @@ export const clusterDataService = {
     localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated))
     this.logAudit('APPLICATION_DELETED', `Application for "${target?.fullName || id}" deleted`, 'applications')
     dispatchUpdate('cluster_applications_updated', updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('applications').delete().eq('id', id).then(({ error }) => {
+        if (error) console.warn('[Supabase Sync Error] applications.delete:', error.message)
+      })
+    }
+
     return updated
   },
 
@@ -584,5 +763,80 @@ export const clusterDataService = {
       return { success: false, error: err.message }
     }
   },
+
+  // ── Supabase Realtime & Remote Hydration ──
+  async initSupabaseSync() {
+    if (!isSupabaseConfigured() || !supabase) return
+
+    try {
+      // 1. Fetch remote Events
+      const { data: remoteEvents } = await supabase.from('events').select('*').order('id', { ascending: true })
+      if (remoteEvents && remoteEvents.length > 0) {
+        const mapped = remoteEvents.map(eventFromDB)
+        localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(mapped))
+        dispatchUpdate('cluster_events_updated', mapped)
+      }
+
+      // 2. Fetch remote Team Members
+      const { data: remoteTeam } = await supabase.from('team_members').select('*').order('id', { ascending: true })
+      if (remoteTeam && remoteTeam.length > 0) {
+        const mapped = remoteTeam.map(memberFromDB)
+        localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(mapped))
+        dispatchUpdate('cluster_team_updated', mapped)
+      }
+
+      // 3. Fetch remote Applications
+      const { data: remoteApps } = await supabase.from('applications').select('*').order('submitted_at', { ascending: false })
+      if (remoteApps && remoteApps.length > 0) {
+        const mapped = remoteApps.map(appFromDB)
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(mapped))
+        dispatchUpdate('cluster_applications_updated', mapped)
+      }
+
+      // 4. Fetch remote Homepage Config
+      const { data: remoteConfig } = await supabase.from('homepage_config').select('*').eq('id', 1).maybeSingle()
+      if (remoteConfig) {
+        const mapped = configFromDB(remoteConfig)
+        localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(mapped))
+        dispatchUpdate('cluster_homepage_updated', mapped)
+      }
+
+      // 5. Subscribe to Realtime Postgres changes
+      supabase
+        .channel('cluster-cms-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, async () => {
+          const { data } = await supabase.from('events').select('*')
+          if (data) {
+            const mapped = data.map(eventFromDB)
+            localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(mapped))
+            dispatchUpdate('cluster_events_updated', mapped)
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'applications' }, async () => {
+          const { data } = await supabase.from('applications').select('*')
+          if (data) {
+            const mapped = data.map(appFromDB)
+            localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(mapped))
+            dispatchUpdate('cluster_applications_updated', mapped)
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'homepage_config' }, async () => {
+          const { data } = await supabase.from('homepage_config').select('*').eq('id', 1).maybeSingle()
+          if (data) {
+            const mapped = configFromDB(data)
+            localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(mapped))
+            dispatchUpdate('cluster_homepage_updated', mapped)
+          }
+        })
+        .subscribe()
+    } catch (err) {
+      console.warn('[Supabase Sync Initialization]', err)
+    }
+  },
+}
+
+// Automatically trigger Supabase synchronization on app startup
+if (typeof window !== 'undefined') {
+  clusterDataService.initSupabaseSync()
 }
 
