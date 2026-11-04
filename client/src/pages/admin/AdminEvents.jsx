@@ -17,15 +17,16 @@ import {
   X
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useToast } from '../../context/ToastContext.jsx'
 
 export default function AdminEvents() {
+  const { showToast } = useToast()
   const [events, setEvents] = useState(() => clusterDataService.getEvents())
   const [spotlightEvent, setSpotlightEvent] = useState(() => clusterDataService.getSpotlightEvent())
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
-  const [toastMessage, setToastMessage] = useState('')
 
   const [formData, setFormData] = useState({
     title: '',
@@ -58,11 +59,6 @@ export default function AdminEvents() {
       window.removeEventListener('cluster_spotlight_updated', handleSpotlightUpdate)
     }
   }, [])
-
-  const showToast = (msg) => {
-    setToastMessage(msg)
-    setTimeout(() => setToastMessage(''), 3500)
-  }
 
   const filteredEvents = events.filter((ev) => {
     const matchesSearch =
@@ -139,14 +135,6 @@ export default function AdminEvents() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto relative">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-obsidian-900 border border-cluster-acid/60 text-white text-xs font-mono shadow-cluster-glow animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-cluster-acid" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>

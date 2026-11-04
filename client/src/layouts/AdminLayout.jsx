@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Calendar, Users, LogOut, ExternalLink, Menu, X, ShieldAlert, UserCheck, Monitor } from 'lucide-react'
+import { LayoutDashboard, Calendar, Users, LogOut, ExternalLink, Menu, X, UserCheck, Monitor, Search } from 'lucide-react'
 import { ClusterMark } from '../components/ui/ClusterLogo.jsx'
+import CommandPalette from '../components/admin/CommandPalette.jsx'
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const navigate = useNavigate()
   const auth = JSON.parse(localStorage.getItem('cluster_admin_auth') || 'null')
 
@@ -14,6 +16,19 @@ export default function AdminLayout() {
       navigate('/admin/login')
     }
   }, [auth, navigate])
+
+  // Global Ctrl+K / Cmd+K keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCommandPaletteOpen((prev) => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('cluster_admin_auth')
@@ -30,6 +45,12 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-black text-white flex">
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
+
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex w-64 bg-obsidian-900 border-r border-white/10 flex-col justify-between shrink-0">
         <div className="p-6 space-y-8">
@@ -74,6 +95,19 @@ export default function AdminLayout() {
 
         {/* Sidebar Footer */}
         <div className="p-6 border-t border-white/10 space-y-3">
+          <button
+            onClick={() => setCommandPaletteOpen(true)}
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-black/50 border border-white/10 hover:border-cluster-acid/40 text-xs font-mono text-[#8E8E88] hover:text-white transition-colors cursor-pointer group"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="w-3.5 h-3.5 text-gray-500 group-hover:text-cluster-acid" />
+              <span>Quick Command</span>
+            </span>
+            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-gray-400 font-mono">
+              ⌘K
+            </kbd>
+          </button>
+
           <Link
             to="/"
             target="_blank"
@@ -84,7 +118,7 @@ export default function AdminLayout() {
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono text-red-400 hover:bg-red-500/10 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -107,6 +141,18 @@ export default function AdminLayout() {
               Authenticated Role: <span className="text-cluster-acid font-bold uppercase">{auth?.role || 'Admin'}</span>
             </span>
           </div>
+
+          {/* Center Search / Command Trigger Bar */}
+          <button
+            onClick={() => setCommandPaletteOpen(true)}
+            className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-xl bg-black/60 hover:bg-black border border-white/10 hover:border-cluster-acid/50 text-xs font-mono text-[#8E8E88] hover:text-white transition-all cursor-pointer group"
+          >
+            <Search className="w-3.5 h-3.5 text-gray-500 group-hover:text-cluster-acid transition-colors" />
+            <span>Search commands, events, applicants...</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-gray-400 font-mono">
+              ⌘K
+            </kbd>
+          </button>
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
@@ -165,6 +211,16 @@ export default function AdminLayout() {
 
             <div className="pt-4 border-t border-white/10 space-y-2">
               <button
+                onClick={() => {
+                  setSidebarOpen(false)
+                  setCommandPaletteOpen(true)
+                }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 text-xs font-mono text-gray-300"
+              >
+                <span>Command Palette</span>
+                <kbd className="px-1 py-0.5 rounded bg-white/10 text-[9px]">⌘K</kbd>
+              </button>
+              <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2 px-3 py-2 text-xs font-mono text-red-400 hover:bg-red-500/10 rounded-lg"
               >
@@ -178,4 +234,3 @@ export default function AdminLayout() {
     </div>
   )
 }
-

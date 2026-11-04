@@ -13,8 +13,10 @@ import {
   Link as LinkIcon,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useToast } from '../../context/ToastContext.jsx'
 
 export default function AdminHomepage() {
+  const { showToast } = useToast()
   const [config, setConfig] = useState(() => clusterDataService.getHomepageConfig())
   const [events, setEvents] = useState(() => clusterDataService.getEvents())
   const [spotlight, setSpotlight] = useState(() => clusterDataService.getSpotlightEvent())
@@ -44,12 +46,16 @@ export default function AdminHomepage() {
     e.preventDefault()
     clusterDataService.updateHomepageConfig(config)
     setSavedSuccess(true)
+    showToast('Homepage settings & banner copy updated successfully')
     setTimeout(() => setSavedSuccess(false), 2500)
   }
 
   const handleSpotlightSelect = (eventId) => {
     const active = clusterDataService.setSpotlightEvent(Number(eventId))
     setSpotlight(active)
+    if (active) {
+      showToast(`Spotlight event switched to "${active.title}"`)
+    }
   }
 
   const handleStatChange = (index, field, value) => {

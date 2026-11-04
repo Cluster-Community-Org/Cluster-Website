@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, Users, Github, Linkedin, X, Search } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useToast } from '../../context/ToastContext.jsx'
 
 export default function AdminTeam() {
+  const { showToast } = useToast()
   const [team, setTeam] = useState(() => clusterDataService.getTeamMembers())
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -52,6 +54,7 @@ export default function AdminTeam() {
     if (confirm(`Are you sure you want to remove ${name || 'this team member'} from the roster?`)) {
       const updated = clusterDataService.deleteTeamMember(id)
       setTeam(updated)
+      showToast(`Removed "${name}" from executive roster`, 'info')
     }
   }
 
@@ -63,6 +66,7 @@ export default function AdminTeam() {
     })
     setTeam(updated)
     setModalOpen(false)
+    showToast(`Officer "${formData.name}" profile saved successfully`)
   }
 
   return (

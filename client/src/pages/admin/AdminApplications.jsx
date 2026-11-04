@@ -19,6 +19,7 @@ import {
   BookOpen,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useToast } from '../../context/ToastContext.jsx'
 
 const STATUS_CONFIG = {
   Pending: {
@@ -56,6 +57,7 @@ const DOMAINS = [
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
 
 export default function AdminApplications() {
+  const { showToast } = useToast()
   const [applications, setApplications] = useState(() => clusterDataService.getApplications())
   const [search, setSearch] = useState('')
   const [selectedStatusTab, setSelectedStatusTab] = useState('All')
@@ -99,6 +101,7 @@ export default function AdminApplications() {
     if (selectedApp && selectedApp.id === id) {
       setSelectedApp({ ...selectedApp, status: newStatus })
     }
+    showToast(`Status updated to "${newStatus}"`)
   }
 
   const handleDelete = (id, name) => {
@@ -108,11 +111,13 @@ export default function AdminApplications() {
       if (selectedApp && selectedApp.id === id) {
         setSelectedApp(null)
       }
+      showToast(`Application deleted`, 'info')
     }
   }
 
   const handleExportCSV = () => {
     clusterDataService.exportApplicationsCSV()
+    showToast(`Applications exported to CSV`)
   }
 
   return (

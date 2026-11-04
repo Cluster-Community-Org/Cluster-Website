@@ -22,6 +22,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useToast } from '../../context/ToastContext.jsx'
 
 // Domain palette tokens for accessible, high-contrast SVG visualization
 const DOMAIN_COLORS = [
@@ -34,6 +35,7 @@ const DOMAIN_COLORS = [
 ]
 
 export default function AdminDashboard() {
+  const { showToast } = useToast()
   const [data, setData] = useState({
     events: clusterDataService.getEvents(),
     spotlight: clusterDataService.getSpotlightEvent(),
@@ -44,13 +46,7 @@ export default function AdminDashboard() {
   })
 
   const [activeSegment, setActiveSegment] = useState(null)
-  const [notification, setNotification] = useState(null)
   const fileInputRef = useRef(null)
-
-  const showNotification = (msg) => {
-    setNotification(msg)
-    setTimeout(() => setNotification(null), 3000)
-  }
 
   const refreshData = () => {
     setData({
@@ -110,7 +106,7 @@ export default function AdminDashboard() {
 
   const handleBackup = () => {
     clusterDataService.exportBackupJSON()
-    showNotification('System database snapshot downloaded.')
+    showToast('System database snapshot downloaded')
   }
 
   const handleRestoreClick = () => {
@@ -129,9 +125,9 @@ export default function AdminDashboard() {
       if (typeof content === 'string') {
         const result = clusterDataService.importBackupJSON(content)
         if (result.success) {
-          showNotification('Database backup restored successfully.')
+          showToast('Database backup restored successfully')
         } else {
-          showNotification(`Restore failed: ${result.error}`)
+          showToast(`Restore failed: ${result.error}`, 'error')
         }
       }
     }
@@ -141,14 +137,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Toast Notification */}
-      {notification && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-[#0F1012] border border-cluster-acid/50 text-[#F8F7F3] text-xs font-mono flex items-center gap-2.5 shadow-2xl animate-fadeIn">
-          <span className="w-2 h-2 rounded-full bg-cluster-acid animate-ping" />
-          <span>{notification}</span>
-        </div>
-      )}
-
       {/* Hidden file input for restore */}
       <input
         type="file"
