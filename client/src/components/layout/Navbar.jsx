@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, X, UserPlus } from 'lucide-react'
+import { Menu, X, UserPlus, Home, Calendar, Users, Shield, ArrowRight } from 'lucide-react'
 import ClusterLogo from '../ui/ClusterLogo.jsx'
 import JoinClusterModal from '../modals/JoinClusterModal.jsx'
 import AnnouncementBanner from './AnnouncementBanner.jsx'
@@ -23,10 +23,27 @@ export default function Navbar() {
     }
   }, [])
 
+  // Lock body scroll and listen for Escape key when mobile sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') setIsOpen(false)
+      }
+      window.addEventListener('keydown', handleKeyDown)
+      return () => {
+        document.body.style.overflow = ''
+        window.removeEventListener('keydown', handleKeyDown)
+      }
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   const navLinks = [
-    { name: 'Home',   href: '/' },
-    { name: 'Events', href: '/events' },
-    { name: 'Team',   href: '/team' },
+    { name: 'Home',   href: '/',       icon: Home },
+    { name: 'Events', href: '/events', icon: Calendar },
+    { name: 'Team',   href: '/team',   icon: Users },
   ]
 
   return (
@@ -53,7 +70,7 @@ export default function Navbar() {
           />
 
           {/* ── Desktop Nav pill (Perfect Horizontal and Vertical Center) ── */}
-          <nav className="hidden md:flex items-center gap-1 bg-obsidian-900/90 p-1.5 rounded-full border border-white/10 backdrop-blur-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <nav className="hidden md:flex items-center gap-1 bg-[#0C0D0E]/90 p-1.5 rounded-full border border-white/10 backdrop-blur-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
@@ -61,7 +78,7 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `px-5 py-1.5 rounded-full text-xs font-mono transition-all duration-200 ${
                     isActive
-                      ? 'nav-pill-active'
+                      ? 'bg-cluster-acid text-black font-bold shadow-[0_0_20px_rgba(198,255,77,0.35)]'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`
                 }
@@ -86,7 +103,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg bg-obsidian-900 text-gray-300 hover:text-white border border-white/10"
+              className="p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] text-gray-300 hover:text-white border border-white/10 transition-colors"
               aria-label="Toggle navigation menu"
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -94,39 +111,80 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* ── Mobile Nav Dropdown ── */}
+        {/* ── Mobile Slide-Over Sidebar Drawer ── */}
         {isOpen && (
-          <div className="md:hidden bg-black/98 border-b border-white/10 px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
-            <div className="flex flex-col space-y-1">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.name}
-                  to={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={({ isActive }) =>
-                    `px-4 py-2.5 rounded-xl text-xs font-mono transition-colors ${
-                      isActive
-                        ? 'nav-pill-active'
-                        : 'text-gray-300 hover:text-white hover:bg-white/5'
-                    }`
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
-            </div>
+          <div className="fixed inset-0 z-50 md:hidden flex justify-end">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
+              onClick={() => setIsOpen(false)}
+            />
 
-            <div className="pt-2 border-t border-white/10">
-              <button
-                onClick={() => {
-                  setIsOpen(false)
-                  setIsJoinModalOpen(true)
-                }}
-                className="btn-cluster-primary w-full py-2.5 text-xs"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Join CLUSTER Community</span>
-              </button>
+            {/* Sidebar Content */}
+            <div className="relative w-72 max-w-[85vw] h-full bg-[#0C0D0E] border-l border-white/10 flex flex-col justify-between p-6 z-10 shadow-2xl animate-fadeIn">
+              <div className="space-y-6">
+                {/* Header with Close */}
+                <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+                  <ClusterLogo to="/" size="sm" showTagline={false} />
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Nav Links */}
+                <nav className="flex flex-col space-y-2">
+                  {navLinks.map((link) => {
+                    const Icon = link.icon
+                    return (
+                      <NavLink
+                        key={link.name}
+                        to={link.href}
+                        onClick={() => setIsOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-mono font-medium transition-all ${
+                            isActive
+                              ? 'bg-cluster-acid text-black font-bold shadow-[0_0_20px_rgba(198,255,77,0.3)]'
+                              : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{link.name}</span>
+                      </NavLink>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <button
+                  onClick={() => {
+                    setIsOpen(false)
+                    setIsJoinModalOpen(true)
+                  }}
+                  className="btn-cluster-primary w-full py-3 text-xs"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Join CLUSTER Community</span>
+                </button>
+
+                <Link
+                  to="/admin/login"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 text-[11px] font-mono text-gray-400 hover:text-cluster-acid transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>Admin Access</span>
+                  </span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -140,3 +198,4 @@ export default function Navbar() {
     </>
   )
 }
+
