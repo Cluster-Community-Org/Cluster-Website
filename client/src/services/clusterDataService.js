@@ -132,7 +132,10 @@ const DEFAULT_APPLICATIONS = [
     fullName: 'Aarav Sharma',
     email: 'aarav.sharma@example.com',
     rollNumber: '22SCSE101001',
-    branchYear: 'CSE / 3rd Year',
+    course: 'B.Tech',
+    branch: 'Computer Science & Engineering (CSE)',
+    year: '3rd Year',
+    branchYear: 'B.Tech · CSE · 3rd Year',
     domain: 'AI & Machine Learning',
     github: 'https://github.com/aaravs',
     linkedin: 'https://linkedin.com/in/aaravs',
@@ -145,7 +148,10 @@ const DEFAULT_APPLICATIONS = [
     fullName: 'Diya Patel',
     email: 'diya.patel@example.com',
     rollNumber: '23SCSE102045',
-    branchYear: 'CSE / 2nd Year',
+    course: 'B.Tech',
+    branch: 'Computer Science & Engineering (CSE)',
+    year: '2nd Year',
+    branchYear: 'B.Tech · CSE · 2nd Year',
     domain: 'Full-Stack Web Dev',
     github: 'https://github.com/diyapatel',
     linkedin: 'https://linkedin.com/in/diyap',
@@ -158,7 +164,10 @@ const DEFAULT_APPLICATIONS = [
     fullName: 'Rohan Verma',
     email: 'rohan.v@example.com',
     rollNumber: '24SCSE103112',
-    branchYear: 'IT / 1st Year',
+    course: 'B.Tech',
+    branch: 'Information Technology (IT)',
+    year: '1st Year',
+    branchYear: 'B.Tech · IT · 1st Year',
     domain: 'Open Source & Dev Tools',
     github: 'https://github.com/rohanverma',
     linkedin: '',
@@ -216,7 +225,10 @@ function appFromDB(row) {
     fullName: row.full_name,
     email: row.email,
     rollNumber: row.roll_number,
-    branchYear: row.branch_year,
+    course: row.course || '',
+    branch: row.branch || '',
+    year: row.year || '',
+    branchYear: row.branch_year || [row.course, row.branch, row.year].filter(Boolean).join(' · '),
     domain: row.domain,
     github: row.github,
     linkedin: row.linkedin,
@@ -227,12 +239,16 @@ function appFromDB(row) {
 }
 
 function appToDB(a) {
+  const branchYear = a.branchYear || [a.course, a.branch, a.year].filter(Boolean).join(' · ')
   return {
     id: a.id,
     full_name: a.fullName,
     email: a.email,
     roll_number: a.rollNumber,
-    branch_year: a.branchYear,
+    course: a.course || '',
+    branch: a.branch || '',
+    year: a.year || '',
+    branch_year: branchYear,
     domain: a.domain,
     github: a.github || '',
     linkedin: a.linkedin || '',
@@ -592,12 +608,15 @@ export const clusterDataService = {
 
   exportApplicationsCSV() {
     const apps = this.getApplications()
-    const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Branch & Year', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation']
+    const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Course', 'Branch', 'Year', 'Combined Info', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation']
     const rows = apps.map((a) => [
       a.id,
       `"${(a.fullName || '').replace(/"/g, '""')}"`,
       `"${(a.email || '').replace(/"/g, '""')}"`,
       `"${(a.rollNumber || '').replace(/"/g, '""')}"`,
+      `"${(a.course || '').replace(/"/g, '""')}"`,
+      `"${(a.branch || '').replace(/"/g, '""')}"`,
+      `"${(a.year || '').replace(/"/g, '""')}"`,
       `"${(a.branchYear || '').replace(/"/g, '""')}"`,
       `"${(a.domain || '').replace(/"/g, '""')}"`,
       `"${(a.status || '').replace(/"/g, '""')}"`,

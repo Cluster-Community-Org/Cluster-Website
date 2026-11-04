@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react'
-import { X, CheckCircle2, ArrowRight, Sparkles, User, Mail, Hash, BookOpen, Code, Github, Linkedin, MessageSquare } from 'lucide-react'
+import {
+  X,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  User,
+  Mail,
+  Hash,
+  GraduationCap,
+  GitBranch,
+  Calendar,
+  Code,
+  Github,
+  Linkedin,
+  MessageSquare,
+} from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
 const DOMAINS = [
@@ -11,12 +26,33 @@ const DOMAINS = [
   'Open Source & Dev Tools',
 ]
 
+const COURSES = [
+  'B.Tech',
+  'BCA',
+  'MCA',
+  'M.Tech',
+  'B.Sc Computer Science',
+  'Dual Degree (B.Tech + M.Tech)',
+  'Other Degree',
+]
+
+const BRANCHES = [
+  'Computer Science & Engineering (CSE)',
+  'Information Technology (IT)',
+  'AI & Data Science (AIDS)',
+  'AI & Machine Learning (AIML)',
+  'Electronics & Communication (ECE)',
+  'Electrical & Electronics (EEE)',
+  'Mechanical Engineering',
+  'Other Branch',
+]
+
 const YEARS = [
-  '1st Year (2028)',
-  '2nd Year (2027)',
-  '3rd Year (2026)',
-  '4th Year (2025)',
-  'Postgraduate / Other',
+  '1st Year',
+  '2nd Year',
+  '3rd Year',
+  '4th Year',
+  'Postgraduate / Research',
 ]
 
 export default function JoinClusterModal({ isOpen, onClose }) {
@@ -24,7 +60,9 @@ export default function JoinClusterModal({ isOpen, onClose }) {
     fullName: '',
     email: '',
     rollNumber: '',
-    branchYear: 'CSE / 2nd Year',
+    course: 'B.Tech',
+    branch: 'Computer Science & Engineering (CSE)',
+    year: '2nd Year',
     domain: DOMAINS[0],
     github: '',
     linkedin: '',
@@ -39,7 +77,9 @@ export default function JoinClusterModal({ isOpen, onClose }) {
       fullName: '',
       email: '',
       rollNumber: '',
-      branchYear: 'CSE / 2nd Year',
+      course: 'B.Tech',
+      branch: 'Computer Science & Engineering (CSE)',
+      year: '2nd Year',
       domain: DOMAINS[0],
       github: '',
       linkedin: '',
@@ -63,8 +103,14 @@ export default function JoinClusterModal({ isOpen, onClose }) {
     e.preventDefault()
     setIsSubmitting(true)
 
+    const branchYear = `${formData.course} · ${formData.branch} · ${formData.year}`
+    const payload = {
+      ...formData,
+      branchYear,
+    }
+
     setTimeout(() => {
-      const app = clusterDataService.addApplication(formData)
+      const app = clusterDataService.addApplication(payload)
       setSubmittedApp(app)
       setIsSubmitting(false)
     }, 400)
@@ -115,6 +161,16 @@ export default function JoinClusterModal({ isOpen, onClose }) {
               <div className="flex justify-between text-[#8E8E88]">
                 <span>Reference ID:</span>
                 <span className="text-white font-bold">{submittedApp.id}</span>
+              </div>
+              <div className="flex justify-between text-[#8E8E88]">
+                <span>Course & Branch:</span>
+                <span className="text-white font-medium">
+                  {submittedApp.course} · {submittedApp.branch}
+                </span>
+              </div>
+              <div className="flex justify-between text-[#8E8E88]">
+                <span>Academic Year:</span>
+                <span className="text-white font-medium">{submittedApp.year}</span>
               </div>
               <div className="flex justify-between text-[#8E8E88]">
                 <span>Primary Domain:</span>
@@ -201,20 +257,61 @@ export default function JoinClusterModal({ isOpen, onClose }) {
                   />
                 </div>
 
-                {/* Branch & Year */}
+                {/* Course Degree */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-cluster-acid" />
-                    <span>Branch & Year *</span>
+                    <GraduationCap className="w-3.5 h-3.5 text-cluster-acid" />
+                    <span>Course *</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.branchYear}
-                    onChange={(e) => setFormData({ ...formData, branchYear: e.target.value })}
-                    placeholder="e.g. CSE / 2nd Year"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                  />
+                  <select
+                    value={formData.course}
+                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                  >
+                    {COURSES.map((c) => (
+                      <option key={c} value={c} className="bg-[#141517] text-white">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Branch / Specialization */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                    <GitBranch className="w-3.5 h-3.5 text-cluster-acid" />
+                    <span>Branch *</span>
+                  </label>
+                  <select
+                    value={formData.branch}
+                    onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                  >
+                    {BRANCHES.map((b) => (
+                      <option key={b} value={b} className="bg-[#141517] text-white">
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Academic Year */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
+                    <span>Year *</span>
+                  </label>
+                  <select
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                  >
+                    {YEARS.map((y) => (
+                      <option key={y} value={y} className="bg-[#141517] text-white">
+                        {y}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

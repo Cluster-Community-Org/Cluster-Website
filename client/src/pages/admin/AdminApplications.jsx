@@ -78,6 +78,10 @@ export default function AdminApplications() {
       (app.fullName || '').toLowerCase().includes(search.toLowerCase()) ||
       (app.email || '').toLowerCase().includes(search.toLowerCase()) ||
       (app.rollNumber || '').toLowerCase().includes(search.toLowerCase()) ||
+      (app.course || '').toLowerCase().includes(search.toLowerCase()) ||
+      (app.branch || '').toLowerCase().includes(search.toLowerCase()) ||
+      (app.year || '').toLowerCase().includes(search.toLowerCase()) ||
+      (app.branchYear || '').toLowerCase().includes(search.toLowerCase()) ||
       (app.domain || '').toLowerCase().includes(search.toLowerCase())
 
     const matchesStatus =
@@ -269,11 +273,13 @@ export default function AdminApplications() {
                         </div>
                       </td>
 
-                      {/* Domain Column */}
+                      {/* Domain & Academic Info */}
                       <td className="py-3.5 px-4">
                         <div className="text-white font-medium">{app.domain}</div>
                         <div className="text-[11px] text-[#8E8E88] font-mono mt-0.5">
-                          {app.branchYear}
+                          {app.course && app.branch
+                            ? `${app.course} · ${app.branch} (${app.year || ''})`
+                            : app.branchYear || 'N/A'}
                         </div>
                       </td>
 
@@ -365,7 +371,7 @@ export default function AdminApplications() {
             </div>
 
             {/* Quick Info Grid */}
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#141517] border border-white/[0.08] text-xs font-mono">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#141517] border border-white/[0.08] text-xs font-mono">
               <div>
                 <div className="text-[10px] text-[#8E8E88]">Email Address</div>
                 <div className="text-white mt-0.5 truncate">{selectedApp.email}</div>
@@ -375,12 +381,20 @@ export default function AdminApplications() {
                 <div className="text-white mt-0.5">{selectedApp.rollNumber}</div>
               </div>
               <div>
-                <div className="text-[10px] text-[#8E8E88]">Branch & Year</div>
-                <div className="text-white mt-0.5">{selectedApp.branchYear}</div>
+                <div className="text-[10px] text-[#8E8E88]">Course Degree</div>
+                <div className="text-white mt-0.5">{selectedApp.course || 'B.Tech'}</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-[#8E8E88]">Branch / Major</div>
+                <div className="text-white mt-0.5 truncate">{selectedApp.branch || 'CSE'}</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-[#8E8E88]">Academic Year</div>
+                <div className="text-white mt-0.5">{selectedApp.year || '2nd Year'}</div>
               </div>
               <div>
                 <div className="text-[10px] text-[#8E8E88]">Primary Domain</div>
-                <div className="text-cluster-acid mt-0.5">{selectedApp.domain}</div>
+                <div className="text-cluster-acid mt-0.5 truncate">{selectedApp.domain}</div>
               </div>
             </div>
 
