@@ -13,7 +13,7 @@ export default function TeamPage() {
     return () => window.removeEventListener('cluster_team_updated', handleUpdate)
   }, [])
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 space-y-16">
       {/* Page Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center justify-center gap-2">

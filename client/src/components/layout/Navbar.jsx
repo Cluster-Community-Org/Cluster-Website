@@ -32,16 +32,17 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`sticky top-0 z-40 w-full transition-colors duration-200 ${
           scrolled
             ? 'bg-black/95 backdrop-blur-md border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
-            : 'bg-black/60 backdrop-blur-sm border-b border-white/[0.06]'
+            : 'bg-black/85 backdrop-blur-md border-b border-white/[0.08]'
         }`}
       >
         {/* Top Ticker Alert Banner (if enabled) */}
         <AnnouncementBanner />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between relative">
+        {/* Main Navbar Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
 
           {/* ── Brand Logo ── */}
           <ClusterLogo
@@ -51,8 +52,8 @@ export default function Navbar() {
             tagline="Community Around Compute"
           />
 
-          {/* ── Desktop Nav pill ── */}
-          <nav className="hidden md:flex items-center gap-1 bg-obsidian-900/90 p-1.5 rounded-full border border-white/10 backdrop-blur-md absolute left-1/2 -translate-x-1/2">
+          {/* ── Desktop Nav pill (Perfect Horizontal and Vertical Center) ── */}
+          <nav className="hidden md:flex items-center gap-1 bg-obsidian-900/90 p-1.5 rounded-full border border-white/10 backdrop-blur-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
@@ -103,7 +104,7 @@ export default function Navbar() {
                   to={link.href}
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
-                    `px-4 py-2.5 rounded-lg text-sm font-mono transition-colors ${
+                    `px-4 py-2.5 rounded-xl text-xs font-mono transition-colors ${
                       isActive
                         ? 'nav-pill-active'
                         : 'text-gray-300 hover:text-white hover:bg-white/5'
@@ -115,15 +116,15 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+            <div className="pt-2 border-t border-white/10">
               <button
                 onClick={() => {
                   setIsOpen(false)
                   setIsJoinModalOpen(true)
                 }}
-                className="btn-cluster-primary w-full py-3 text-xs flex items-center justify-center gap-2"
+                className="btn-cluster-primary w-full py-2.5 text-xs"
               >
-                <UserPlus className="w-4 h-4" />
+                <UserPlus className="w-3.5 h-3.5" />
                 <span>Join CLUSTER Community</span>
               </button>
             </div>
@@ -131,7 +132,7 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* Join Society Modal */}
+      {/* Join Community Modal */}
       <JoinClusterModal
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
