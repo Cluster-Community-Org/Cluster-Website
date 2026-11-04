@@ -13,7 +13,7 @@ export function ToastProvider({ children }) {
   }, [])
 
   const showToast = useCallback((message, type = 'success', duration = 3500) => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`
+    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     const newToast = { id, message, type }
 
     setToasts((prev) => [...prev, newToast])
@@ -74,5 +74,17 @@ export function ToastProvider({ children }) {
   )
 }
 
-export const useToast = () => useContext(ToastContext)
+export const useToast = () => {
+  const context = useContext(ToastContext)
+  if (!context || !context.showToast) {
+    return {
+      showToast: (message, type = 'success', duration = 3500) => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('cluster_toast', { detail: { message, type, duration } }))
+        }
+      },
+    }
+  }
+  return context
+}
 

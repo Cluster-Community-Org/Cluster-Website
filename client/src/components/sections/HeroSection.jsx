@@ -51,20 +51,6 @@ export default function HeroSection() {
           )}
         </p>
 
-        {/* Editorial Value Anchors (Clean, Non-SaaS, Elegant) */}
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs font-mono text-[#8E8E88] tracking-wider uppercase">
-          <span className="text-[#F8F7F3] font-semibold flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-cluster-acid" />
-            Community
-          </span>
-          <span className="text-gray-600">/</span>
-          <span className="hover:text-white transition-colors">Collaboration</span>
-          <span className="text-gray-600">/</span>
-          <span className="hover:text-white transition-colors">Belonging</span>
-          <span className="text-gray-600">/</span>
-          <span className="hover:text-white transition-colors">Shared Curiosity</span>
-        </div>
-
         {/* CTA Button Group */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 w-full sm:w-auto">
           <button

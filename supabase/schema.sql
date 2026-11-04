@@ -171,3 +171,4 @@ ON CONFLICT (slug) DO NOTHING;
 INSERT INTO public.homepage_config (id, banner_enabled, banner_text)
 VALUES (1, true, '⚡ Good things happen in clusters. Kickstart ''26 registrations are now open for tech students.')
 ON CONFLICT (id) DO NOTHING;
+
