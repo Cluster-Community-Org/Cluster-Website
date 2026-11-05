@@ -62,37 +62,58 @@ const DOMAINS = [
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
 
 const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  
-  // Create headers on row 1 if sheet is brand new
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
-      "Timestamp", "Full Name", "Email", "Roll Number", 
-      "Course", "Branch", "Year", "Domain", 
-      "GitHub", "LinkedIn", "Motivation", "Status"
-    ]);
-    sheet.getRange(1, 1, 1, 12).setFontWeight("bold").setBackground("#C6FF4D");
-  }
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Auto-create header row on row 1 if sheet is empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp", "Full Name", "Email", "Roll Number", 
+        "Course", "Branch", "Year", "Domain", 
+        "GitHub", "LinkedIn", "Motivation", "Status"
+      ]);
+      sheet.getRange(1, 1, 1, 12).setFontWeight("bold").setBackground("#C6FF4D").setFontColor("#000000");
+    }
 
-  var data = JSON.parse(e.postData.contents);
-  
-  sheet.appendRow([
-    new Date(),
-    data.fullName || '',
-    data.email || '',
-    data.rollNumber || '',
-    data.course || '',
-    data.branch || '',
-    data.year || '',
-    data.domain || '',
-    data.github || '',
-    data.linkedin || '',
-    data.motivation || '',
-    data.status || 'Pending'
-  ]);
-  
-  return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
-    .setMimeType(ContentService.MimeType.JSON);
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err) {
+        data = e.parameter || {};
+      }
+    } else if (e && e.parameter) {
+      data = e.parameter;
+    }
+
+    sheet.appendRow([
+      new Date(),
+      data.fullName || data.full_name || '',
+      data.email || '',
+      data.rollNumber || data.roll_number || '',
+      data.course || '',
+      data.branch || '',
+      data.year || '',
+      data.domain || '',
+      data.github || '',
+      data.linkedin || '',
+      data.motivation || '',
+      data.status || 'Pending'
+    ]);
+
+    return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    sheet.appendRow([new Date(), "ERROR: " + error.toString()]);
+    return ContentService.createTextOutput(JSON.stringify({ result: "error", error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Open your Web App URL in browser to test if it's reachable!
+function doGet(e) {
+  return ContentService.createTextOutput("CLUSTER Google Sheet Webhook is active and reachable!");
 }`
 
 export default function AdminApplications() {
@@ -674,10 +695,17 @@ export default function AdminApplications() {
                 <pre className="whitespace-pre">{GOOGLE_APPS_SCRIPT_TEMPLATE}</pre>
               </div>
 
-              <div className="text-[11px] text-[#8E8E88] font-sans space-y-1">
-                <div><strong>1.</strong> In your Google Sheet, open <em>Extensions → Apps Script</em> and paste this code.</div>
-                <div><strong>2.</strong> Click <em>Deploy → New deployment → Web app</em> (Who has access: <strong>Anyone</strong>).</div>
-                <div><strong>3.</strong> Paste the resulting Web app URL into the box above and click <em>Save Webhook URL</em>.</div>
+              <div className="text-[11px] text-[#8E8E88] font-sans space-y-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div><strong className="text-white">Step 1:</strong> In your Google Sheet, open <em>Extensions → Apps Script</em> and paste this code.</div>
+                <div><strong className="text-white">Step 2:</strong> Click <em>Deploy → New deployment → Web app</em>.</div>
+                <div className="pl-4 text-amber-300">
+                  ⚠️ Set <strong>Execute as:</strong> <em>Me</em> &amp; <strong>Who has access:</strong> <strong className="underline">Anyone</strong> (If not set to "Anyone", Google blocks external web requests!).
+                </div>
+                <div><strong className="text-white">Step 3:</strong> Grant permissions ("Advanced → Go to project (unsafe) → Allow").</div>
+                <div><strong className="text-white">Step 4:</strong> Paste the resulting Web app URL into the box above and click <em>Send Test Ping</em>.</div>
+                <div className="text-[10px] text-gray-400 pt-1 border-t border-white/5">
+                  💡 <strong>Verification test:</strong> Paste your Web App URL into any browser tab. If configured correctly, it will say: <em>"CLUSTER Google Sheet Webhook is active and reachable!"</em>. If it asks you to log in, "Who has access" was not set to "Anyone".
+                </div>
               </div>
             </div>
           </div>

@@ -617,7 +617,7 @@ export const clusterDataService = {
         fetch(sheetWebhookUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             id: newApp.id,
             fullName: newApp.fullName,
@@ -671,7 +671,7 @@ export const clusterDataService = {
       await fetch(url, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           id: `test-${Date.now()}`,
           fullName: 'Test Candidate (CLUSTER Admin)',
