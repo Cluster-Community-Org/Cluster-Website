@@ -34,6 +34,13 @@ export default function AdminLayout() {
 
   const navigate = useNavigate()
   const location = useLocation()
+  const [auth, setAuth] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('cluster_admin_auth') || 'null')
+    } catch {
+      return null
+    }
+  })
 
   // Cryptographic Auth guard & active session verification
   useEffect(() => {
@@ -45,6 +52,7 @@ export default function AdminLayout() {
         if (isMounted) navigate('/admin/login')
         return
       }
+      if (isMounted) setAuth(localAuth)
 
       // If Supabase is configured, verify the server-side JWT session token
       if (isSupabaseConfigured() && supabase) {
@@ -53,7 +61,10 @@ export default function AdminLayout() {
           if (error || !session) {
             console.warn('[Admin Security] Invalid or expired Supabase session. Redirecting to login.')
             localStorage.removeItem('cluster_admin_auth')
-            if (isMounted) navigate('/admin/login')
+            if (isMounted) {
+              setAuth(null)
+              navigate('/admin/login')
+            }
           }
         } catch {
           // If network check fails, maintain local state
@@ -69,7 +80,10 @@ export default function AdminLayout() {
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
           localStorage.removeItem('cluster_admin_auth')
-          if (isMounted) navigate('/admin/login')
+          if (isMounted) {
+            setAuth(null)
+            navigate('/admin/login')
+          }
         }
       })
       authListener = data?.subscription
