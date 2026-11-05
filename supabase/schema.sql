@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.homepage_config (
   banner_link_text TEXT DEFAULT 'See events',
   hero_headline TEXT DEFAULT 'Find your people.
 Build together',
-  hero_subtitle TEXT DEFAULT 'A community around compute. Join a circle and ship something with people who care.',
+  hero_subtitle TEXT DEFAULT 'A student community around compute.',
   stats_enabled BOOLEAN DEFAULT FALSE,
   stats JSONB DEFAULT '[
     {"label": "COMMUNITY MEMBERS", "value": "150+"},

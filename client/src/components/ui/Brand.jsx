@@ -41,6 +41,11 @@ export function Square({ className = 'w-3 h-3', pulse = false }) {
   return <span aria-hidden="true" className={`inline-block bg-lime ${pulse ? 'sq-pulse' : ''} ${className}`} />
 }
 
+// Lime square standing in for a heading's final period. Sized in em so it fits any heading.
+export function FullStop() {
+  return <Square className="w-[.16em] h-[.16em] ml-[.06em]" pulse />
+}
+
 export function Eyebrow({ children, className = 'text-graphite', square = 'bg-lime' }) {
   return (
     <p className={`caption-3 flex items-center gap-3 ${className}`}>

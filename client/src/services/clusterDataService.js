@@ -74,7 +74,7 @@ const DEFAULT_HOMEPAGE = {
   bannerLink: '/events',
   bannerLinkText: 'See events',
   heroHeadline: 'Find your people.\nBuild together.',
-  heroSubtitle: 'A community around compute. Join a circle and ship something with people who care.',
+  heroSubtitle: 'A student community around compute.',
   statsEnabled: false,
   applicationsSheetUrl: '',
   applicationsOpen: true,
