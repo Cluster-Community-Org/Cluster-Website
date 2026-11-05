@@ -1,525 +1,133 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  Sparkles,
-  CheckCircle2,
-  ArrowRight,
-  User,
-  Mail,
-  Hash,
-  GraduationCap,
-  GitBranch,
-  Calendar,
-  Code,
-  Github,
-  Linkedin,
-  MessageSquare,
-  Zap,
-  ShieldCheck,
-  Users,
-  Terminal,
-  Lock,
-} from 'lucide-react'
+import { ArrowRight, Check, Lock } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useToast } from '../context/ToastContext.jsx'
+import { useLive } from '../hooks/useLive.js'
+import { Corners, DotWave, PageHeader } from '../components/ui/Brand.jsx'
+import { LiveChip } from '../components/sections/HeroSection.jsx'
+import { STEPS } from '../components/sections/HowItWorksSection.jsx'
 
-const DOMAINS = [
-  'AI & Machine Learning',
-  'Full-Stack Web Dev',
-  'Mobile & Systems',
-  'Design & Creative Tech',
-  'Cloud & DevOps',
-  'Open Source & Dev Tools',
-]
+const DOMAINS = ['AI & Machine Learning', 'Full-Stack Web Dev', 'Mobile & Systems', 'Design & Creative Tech', 'Cloud & DevOps', 'Open Source & Dev Tools']
+const COURSES = ['B.Tech', 'BCA', 'MCA', 'M.Tech', 'B.Sc Computer Science', 'Dual Degree (B.Tech + M.Tech)', 'Other Degree']
+const BRANCHES = ['Computer Science & Engineering (CSE)', 'Information Technology (IT)', 'AI & Data Science (AIDS)', 'AI & Machine Learning (AIML)', 'Electronics & Communication (ECE)', 'Electrical & Electronics (EEE)', 'Mechanical Engineering', 'Other Branch']
+const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Postgraduate / Research']
 
-const COURSES = [
-  'B.Tech',
-  'BCA',
-  'MCA',
-  'M.Tech',
-  'B.Sc Computer Science',
-  'Dual Degree (B.Tech + M.Tech)',
-  'Other Degree',
-]
+const EMPTY = { fullName: '', email: '', rollNumber: '', course: COURSES[0], branch: BRANCHES[0], year: YEARS[0], domain: DOMAINS[0], github: '', projects: '', linkedin: '', motivation: '' }
+const field = 'w-full rounded-lg border border-line bg-white px-3 py-2 body-3 text-black placeholder:text-mute'
 
-const BRANCHES = [
-  'Computer Science & Engineering (CSE)',
-  'Information Technology (IT)',
-  'AI & Data Science (AIDS)',
-  'AI & Machine Learning (AIML)',
-  'Electronics & Communication (ECE)',
-  'Electrical & Electronics (EEE)',
-  'Mechanical Engineering',
-  'Other Branch',
-]
-
-const YEARS = [
-  '1st Year',
-  '2nd Year',
-  '3rd Year',
-  '4th Year',
-  'Postgraduate / Research',
-]
+function Field({ label, hint, children }) {
+  return (
+    <label className="flex flex-col gap-2">
+      <span className="caption-3 text-graphite">{label}</span>
+      {children}
+      {hint && <span className="caption-5 text-graphite">{hint}</span>}
+    </label>
+  )
+}
 
 export default function JoinPage() {
   const { showToast } = useToast()
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    rollNumber: '',
-    course: 'B.Tech',
-    branch: 'Computer Science & Engineering (CSE)',
-    year: '1st Year',
-    domain: DOMAINS[0],
-    github: '',
-    linkedin: '',
-    motivation: '',
-  })
+  const open = useLive('cluster_homepage_updated', () => clusterDataService.isApplicationsOpen())
+  const [form, setForm] = useState(EMPTY)
+  const [sent, setSent] = useState(null)
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submittedApp, setSubmittedApp] = useState(null)
-  const [isApplicationsOpen, setIsApplicationsOpen] = useState(() => clusterDataService.isApplicationsOpen())
-
-  useEffect(() => {
-    const handleConfigUpdate = () => {
-      setIsApplicationsOpen(clusterDataService.isApplicationsOpen())
-    }
-    window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
-    return () => window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
-  }, [])
-
-  const handleSubmit = (e) => {
+  const submit = (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
-
-    const branchYear = `${formData.course} · ${formData.branch} · ${formData.year}`
-    const payload = {
-      ...formData,
-      branchYear,
-    }
-
-    setTimeout(() => {
-      const app = clusterDataService.addApplication(payload)
-      setSubmittedApp(app)
-      setIsSubmitting(false)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      showToast('Application submitted successfully!', 'success')
-    }, 400)
+    const app = clusterDataService.addApplication({ ...form, branchYear: `${form.course} · ${form.branch} · ${form.year}` })
+    setSent(app)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    showToast(`Application sent. We will email ${app.email}.`, 'success')
   }
 
   return (
-    <div className="min-h-screen bg-[#080808] text-[#F8F7F3] pt-10 sm:pt-14 pb-20 px-4 sm:px-6 lg:px-8">
-      {/* Background Ambient Glow */}
-      <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-cluster-acid/[0.04] rounded-full blur-[140px] pointer-events-none" />
+    <div className="px-4 sm:px-8 lg:px-20 pb-32">
+      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+        <PageHeader eyebrow="Apply to join" title={<>Show us what<br />you&apos;ve built</>}>
+          Selection is on what you have done and where you want to go, not on grades, branch or year. Rough is fine.
+        </PageHeader>
 
-      <div className="max-w-6xl mx-auto space-y-12 relative z-10">
-        {/* Top Header Banner */}
-        <div className="pb-8 border-b border-white/[0.08]">
-          <div className="space-y-2 max-w-3xl">
-            <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center gap-2">
-              <span className="w-2 h-2 rounded-sm bg-cluster-acid shadow-[0_0_8px_rgba(198,255,77,0.8)]" />
-              <span>CLUSTER SOCIETY // STUDENT RECRUITMENT 2026</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-display font-black text-white tracking-tight leading-[1.08]">
-              Find your people.<br />
-              <span className="text-cluster-gradient">Build what's next.</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-[#C2C2B8] font-sans leading-relaxed pt-1">
-              A community around compute, engineering, and shared curiosity. Apply below to join our focused developer circles, build production software, and access mentorship.
+        {sent ? (
+          <section aria-labelledby="sent-heading" className="relative overflow-hidden rounded-3xl bg-black text-white px-6 py-16 sm:p-16 flex flex-col items-center text-center gap-6">
+            <DotWave className="bottom-0 h-56 opacity-50" single />
+            <Corners inset="top-6 left-6 right-6 bottom-6" />
+            <span className="relative w-16 h-16 rounded-2xl bg-lime text-black flex items-center justify-center rise"><Check className="w-8 h-8" /></span>
+            <h2 id="sent-heading" className="relative heading-2 text-grad-dark rise" style={{ animationDelay: '100ms' }}>Application received</h2>
+            <p className="relative title-2 text-soft max-w-lg rise" style={{ animationDelay: '200ms' }}>
+              Thanks, {sent.fullName}. Circle leads read every application. You will hear back at {sent.email} once the round closes.
             </p>
-          </div>
-        </div>
-
-        {submittedApp ? (
-          /* Application Submitted Success View */
-          <div className="max-w-2xl mx-auto py-12 px-6 sm:px-10 rounded-3xl bg-[#0F1012] border border-cluster-acid/30 shadow-[0_0_50px_rgba(198,255,77,0.06)] text-center space-y-6 animate-fadeIn">
-            <div className="w-20 h-20 rounded-3xl bg-cluster-acid/15 border border-cluster-acid/40 text-cluster-acid flex items-center justify-center mx-auto shadow-cluster-glow">
-              <CheckCircle2 className="w-10 h-10" />
+            <dl className="relative w-full max-w-md rounded-2xl border border-char-2 bg-char-1 p-6 text-left grid grid-cols-2 gap-4 rise" style={{ animationDelay: '300ms' }}>
+              <dt className="caption-3 text-mute">Reference</dt><dd className="title-4 font-mono text-lime text-right break-all">{sent.id}</dd>
+              <dt className="caption-3 text-mute">Interest</dt><dd className="title-4 text-right">{sent.domain}</dd>
+              <dt className="caption-3 text-mute">Status</dt><dd className="title-4 text-right">Received</dd>
+            </dl>
+            <div className="relative flex flex-wrap justify-center gap-3 pt-2">
+              <Link to="/events" className="btn btn-lime">See upcoming events <ArrowRight className="w-5 h-5" /></Link>
+              <Link to="/" className="btn btn-ghost-dark">Back to home</Link>
             </div>
-
-            <div className="space-y-2">
-              <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase">
-                APPLICATION RECEIVED
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-display font-black text-white">
-                Welcome to the Queue, {submittedApp.fullName}!
-              </h2>
-              <p className="text-xs sm:text-sm text-[#8E8E88] font-sans max-w-md mx-auto leading-relaxed">
-                Your application has been registered for <strong className="text-white">{submittedApp.domain}</strong>.
-                Our core leads will review your profile and reach out via email.
-              </p>
-            </div>
-
-            {/* Candidate Receipt Card */}
-            <div className="p-4 rounded-2xl bg-black border border-white/[0.08] text-left text-xs font-mono space-y-2.5 max-w-md mx-auto">
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-[#8E8E88]">Application Ref:</span>
-                <span className="text-cluster-acid font-bold">{submittedApp.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8E8E88]">Roll / Student ID:</span>
-                <span className="text-white">{submittedApp.rollNumber}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8E8E88]">Academic Standing:</span>
-                <span className="text-white truncate max-w-[220px]">{submittedApp.branchYear}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8E8E88]">Pipeline Status:</span>
-                <span className="text-amber-400 font-bold">Pending Review</span>
-              </div>
-            </div>
-
-            {/* Next Steps Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-              <Link
-                to="/events"
-                className="btn-cluster-primary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
-              >
-                <span>Explore Upcoming Events</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/"
-                className="btn-cluster-secondary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold"
-              >
-                Return to Homepage
-              </Link>
-            </div>
-          </div>
+          </section>
         ) : (
-          /* Main Layout: Perks/Culture Left + Application Form Right */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Why Join & Pipeline Process (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              {/* Society Pillars */}
-              <div className="rounded-3xl p-6 sm:p-7 bg-[#0F1012] border border-white/[0.08] space-y-5">
-                <div className="text-xs font-mono font-bold text-cluster-acid uppercase tracking-wider flex items-center gap-2">
-                  <Terminal className="w-4 h-4" />
-                  <span>WHAT AWAITS YOU AT CLUSTER</span>
-                </div>
+          <div className="grid gap-12 lg:grid-cols-12 items-start">
+            <ol className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
+              {STEPS.map(({ title, body }, i) => (
+                <li key={title} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i]} rounded-2xl border p-6 flex gap-4 ${i === 0 ? 'border-black bg-white' : 'border-line'}`}>
+                  <span className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center title-4 tabular-nums ${i === 0 ? 'bg-lime' : 'bg-black text-white'}`}>0{i + 1}</span>
+                  <div className="flex flex-col gap-1">
+                    <h2 className="title-2">{title}</h2>
+                    <p className="body-6 text-graphite">{body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
 
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-8 h-8 rounded-xl bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid flex items-center justify-center shrink-0 text-xs font-mono font-bold">
-                      01
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-display font-bold text-white">Focused Build Circles</h4>
-                      <p className="text-xs text-[#8E8E88] font-sans mt-0.5 leading-relaxed">
-                        Join dedicated tracks in AI/ML, full-stack systems, systems programming, and cloud infrastructure.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-8 h-8 rounded-xl bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid flex items-center justify-center shrink-0 text-xs font-mono font-bold">
-                      02
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-display font-bold text-white">Hackathons & High-Stakes Sprints</h4>
-                      <p className="text-xs text-[#8E8E88] font-sans mt-0.5 leading-relaxed">
-                        Multidisciplinary teams competing in national hackathons with compute sponsorships and hardware support.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-8 h-8 rounded-xl bg-cluster-acid/10 border border-cluster-acid/30 text-cluster-acid flex items-center justify-center shrink-0 text-xs font-mono font-bold">
-                      03
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-display font-bold text-white">Peer Leadership & Mentorship</h4>
-                      <p className="text-xs text-[#8E8E88] font-sans mt-0.5 leading-relaxed">
-                        Direct code reviews, system design sessions, and open collaboration. No gatekeeping.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recruitment Timeline Card */}
-              <div className="rounded-3xl p-6 bg-[#0F1012] border border-white/[0.08] space-y-4">
-                <div className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <ClockIcon className="w-4 h-4 text-cluster-acid" />
-                  <span>INDUCTION TIMELINE</span>
-                </div>
-
-                <div className="space-y-3 font-mono text-xs">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
-                    <span className="text-gray-400">1. Online Application</span>
-                    <span className={isApplicationsOpen ? 'text-cluster-acid font-bold' : 'text-amber-400 font-bold'}>
-                      {isApplicationsOpen ? 'Open Now' : 'Closed / Paused'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
-                    <span className="text-gray-400">2. Portfolio / Shortlisting</span>
-                    <span className="text-white">Within 48h</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
-                    <span className="text-gray-400">3. Informal 1:1 Chat</span>
-                    <span className="text-white">On Campus / Meet</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
-                    <span className="text-gray-400">4. Circle Onboarding</span>
-                    <span className="text-cluster-acid font-bold">Cohort '26</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: The Application Form or Paused Notice (7 cols) */}
             <div className="lg:col-span-7">
-              {!isApplicationsOpen ? (
-                <div className="rounded-3xl p-8 sm:p-10 bg-[#0F1012] border border-amber-500/30 text-center space-y-6 shadow-2xl animate-fadeIn">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
-                    <Lock className="w-8 h-8" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-[11px] font-mono font-bold tracking-widest text-amber-400 uppercase">
-                      RECRUITMENT PAUSED // APPLICATIONS CLOSED
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl font-display font-black text-white">
-                      Not Accepting Applications Anymore
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[#A8A8A0] font-sans leading-relaxed max-w-md mx-auto">
-                      Membership applications for this cohort are currently closed. Thank you to everyone who applied!
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-black border border-white/[0.08] text-left text-xs font-mono space-y-2 max-w-md mx-auto">
-                    <div className="text-cluster-acid font-bold flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-cluster-acid" />
-                      <span>STAY CONNECTED UNTIL NEXT CYCLE:</span>
-                    </div>
-                    <p className="text-gray-400 font-sans text-xs leading-relaxed">
-                      All our hackathons, open workshops, tech study circles, and community meetups remain open to all students year-round.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                    <Link
-                      to="/events"
-                      className="btn-cluster-primary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
-                    >
-                      <Zap className="w-4 h-4" />
-                      <span>Explore Public Events</span>
-                    </Link>
-                    <a
-                      href="https://discord.gg/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-cluster-secondary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                      <span>Join Discord Community</span>
-                    </a>
-                  </div>
-                </div>
+              {!open ? (
+                <section aria-labelledby="closed-heading" className="rounded-3xl border border-line bg-white p-8 sm:p-12 flex flex-col items-start gap-6">
+                  <span className="w-12 h-12 rounded-lg bg-black text-lime flex items-center justify-center"><Lock className="w-6 h-6" /></span>
+                  <h2 id="closed-heading" className="heading-3">Applications are closed for this round</h2>
+                  <p className="title-2 text-graphite">Hackathons, open workshops, study circles and meetups stay open to every student all year. Come build with us there, and apply when the next round opens.</p>
+                  <Link to="/events" className="btn btn-black">See upcoming events <ArrowRight className="w-5 h-5" /></Link>
+                </section>
               ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className="rounded-3xl p-6 sm:p-8 bg-[#0F1012] border border-white/[0.08] space-y-6 shadow-xl"
-                >
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white tracking-tight">
-                      Submit Candidate Profile
-                    </h3>
-                    <p className="text-xs text-[#8E8E88] font-sans mt-0.5">
-                      All tech students are welcome regardless of branch or graduation year.
-                    </p>
+                <form onSubmit={submit} className="rounded-3xl border border-line bg-white p-6 sm:p-10 flex flex-col gap-8">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <h2 className="heading-5">Your application</h2>
+                    <span className="bg-black rounded-full"><LiveChip open /></span>
                   </div>
 
-                  {/* Full Name & Email */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Full Name *</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        placeholder="e.g. Diya Patel"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                      />
+                  <fieldset className="flex flex-col gap-6">
+                    <legend className="title-3 pb-4">Start with the work</legend>
+                    <Field label="What have you built, broken or shipped?" hint="Links welcome. Hackathon entries, class projects you took further, scripts, bots, PRs. A line on what each one was is enough.">
+                      <textarea required rows={6} value={form.projects} onChange={set('projects')} className={`${field} resize-y`} placeholder="A Discord bot for the hostel mess menu. Broke twice, fixed both. github.com/you/mess-bot" />
+                    </Field>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <Field label="GitHub or portfolio (optional)"><input type="url" value={form.github} onChange={set('github')} className={field} placeholder="https://github.com/you" /></Field>
+                      <Field label="LinkedIn (optional)"><input type="url" value={form.linkedin} onChange={set('linkedin')} className={field} placeholder="https://linkedin.com/in/you" /></Field>
                     </div>
+                    <Field label="What do you want to build next? (optional)">
+                      <textarea rows={3} value={form.motivation} onChange={set('motivation')} className={`${field} resize-y`} placeholder="The thing you would start this semester if you had a team." />
+                    </Field>
+                    <Field label="Circle you're most interested in">
+                      <select value={form.domain} onChange={set('domain')} className={field}>{DOMAINS.map((d) => <option key={d}>{d}</option>)}</select>
+                    </Field>
+                  </fieldset>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Email Address *</span>
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="e.g. diya.p@example.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                      />
+                  <fieldset className="flex flex-col gap-6 pt-8 border-t border-line">
+                    <legend className="title-3 pb-4">Then a bit about you</legend>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <Field label="Full name"><input required autoComplete="name" value={form.fullName} onChange={set('fullName')} className={field} placeholder="Diya Patel" /></Field>
+                      <Field label="Email"><input required type="email" autoComplete="email" value={form.email} onChange={set('email')} className={field} placeholder="diya@example.com" /></Field>
+                      <Field label="Roll or student ID"><input required value={form.rollNumber} onChange={set('rollNumber')} className={`${field} font-mono`} placeholder="23SCSE102045" /></Field>
+                      <Field label="Course"><select value={form.course} onChange={set('course')} className={field}>{COURSES.map((c) => <option key={c}>{c}</option>)}</select></Field>
+                      <Field label="Branch"><select value={form.branch} onChange={set('branch')} className={field}>{BRANCHES.map((b) => <option key={b}>{b}</option>)}</select></Field>
+                      <Field label="Year"><select value={form.year} onChange={set('year')} className={field}>{YEARS.map((y) => <option key={y}>{y}</option>)}</select></Field>
                     </div>
-                  </div>
+                  </fieldset>
 
-                  {/* Roll Number & Course */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <Hash className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>University Roll / Student ID *</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.rollNumber}
-                        onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
-                        placeholder="e.g. 23SCSE102045"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <GraduationCap className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Degree Program / Course *</span>
-                      </label>
-                      <select
-                        value={formData.course}
-                        onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                      >
-                        {COURSES.map((c) => (
-                          <option key={c} value={c} className="bg-[#141517] text-white">
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Branch & Year */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <GitBranch className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Branch / Specialization *</span>
-                      </label>
-                      <select
-                        value={formData.branch}
-                        onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                      >
-                        {BRANCHES.map((b) => (
-                          <option key={b} value={b} className="bg-[#141517] text-white">
-                            {b}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Current Academic Year *</span>
-                      </label>
-                      <select
-                        value={formData.year}
-                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                      >
-                        {YEARS.map((y) => (
-                          <option key={y} value={y} className="bg-[#141517] text-white">
-                            {y}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Preferred Domain */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Code className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Primary Domain Interest *</span>
-                    </label>
-                    <select
-                      value={formData.domain}
-                      onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                    >
-                      {DOMAINS.map((d) => (
-                        <option key={d} value={d} className="bg-[#141517] text-white">
-                          {d}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* GitHub & LinkedIn Profiles */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <Github className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>GitHub Profile (Optional)</span>
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.github}
-                        onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                        placeholder="https://github.com/yourhandle"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                        <Linkedin className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>LinkedIn Profile (Optional)</span>
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.linkedin}
-                        onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                        placeholder="https://linkedin.com/in/yourhandle"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Motivation / SOP */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <MessageSquare className="w-3.5 h-3.5 text-cluster-acid" />
-                        <span>Why CLUSTER? What do you want to build?</span>
-                      </span>
-                      <span className="text-[11px] text-[#8E8E88] font-normal">Optional but valued</span>
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={formData.motivation}
-                      onChange={(e) => setFormData({ ...formData, motivation: e.target.value })}
-                      placeholder="Tell us about a project you worked on, a tech stack you love, or what you want to build alongside peers..."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none resize-none leading-relaxed"
-                    />
-                  </div>
-
-                  {/* Submit Action Bar */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/[0.08]">
-                    <p className="text-[11px] text-[#8E8E88] font-sans">
-                      Submissions are synced to the live review pipeline.
-                    </p>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="btn-cluster-primary w-full sm:w-auto px-7 py-3 text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] transition-transform"
-                    >
-                      <span>{isSubmitting ? 'Transmitting...' : 'Submit Membership Application'}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-8 border-t border-line">
+                    <p className="body-6 text-graphite">Circle leads read every application.</p>
+                    <button type="submit" className="btn btn-lime">Send application <ArrowRight className="w-5 h-5" /></button>
                   </div>
                 </form>
               )}
@@ -530,18 +138,3 @@ export default function JoinPage() {
     </div>
   )
 }
-
-function ClockIcon(props) {
-  return (
-    <svg
-      {...props}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <circle cx="12" cy="12" r="10" strokeWidth="2" />
-      <polyline points="12 6 12 12 16 14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-

@@ -1,95 +1,68 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Zap } from 'lucide-react'
-import { CircuitCanvas } from '../3d/CircuitCanvas.jsx'
+import { ArrowRight } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { useLive } from '../../hooks/useLive.js'
+import { Corners, DotWave, Eyebrow, Square } from '../ui/Brand.jsx'
 
-const DEFAULT_HERO_STATS = [
-  { value: '150+', label: 'COMMUNITY MEMBERS',  color: 'text-cluster-acid', border: 'border-cluster-acid/40 shadow-cluster-glow' },
-  { value: '20+',  label: 'EVENTS & SESSIONS',  color: 'text-white',        border: 'border-white/10' },
-  { value: '10+',  label: 'SHIPPED PROJECTS',   color: 'text-cluster-acid', border: 'border-cluster-acid/30' },
-  { value: '100%', label: 'OPEN COLLABORATION', color: 'text-white',        border: 'border-white/10' },
-]
+export function LiveChip({ open }) {
+  return (
+    <span className="caption-3 inline-flex items-center gap-2 rounded-full border border-char-2 px-3 py-2 text-soft">
+      <span aria-hidden="true" className={`w-2 h-2 rounded-full ${open ? 'bg-lime blip' : 'bg-mute'}`} />
+      {open ? 'Applications open' : 'Applications closed'}
+    </span>
+  )
+}
 
 export default function HeroSection() {
-  const [config, setConfig] = useState(() => clusterDataService.getHomepageConfig())
-
-  useEffect(() => {
-    setConfig(clusterDataService.getHomepageConfig())
-    const handleUpdate = () => {
-      setConfig(clusterDataService.getHomepageConfig())
-    }
-    window.addEventListener('cluster_homepage_updated', handleUpdate)
-    return () => window.removeEventListener('cluster_homepage_updated', handleUpdate)
-  }, [])
-
-  const stats = (config.stats && config.stats.length > 0) ? config.stats : DEFAULT_HERO_STATS
-  const showStats = Boolean(config.statsEnabled)
+  const config = useLive('cluster_homepage_updated', () => clusterDataService.getHomepageConfig())
+  const lines = (config.heroHeadline || 'Find your people.\nBuild together.').split('\n')
+  const words = (config.heroSubtitle || '').split(/\s+/).filter(Boolean)
 
   return (
-    <section className="relative min-h-[calc(100dvh-4rem)] flex flex-col justify-center overflow-hidden bg-[#080808] border-b border-white/[0.08] px-4 py-6 sm:py-8 lg:py-10">
-      {/* Circuit Canvas Ambient Micro-animation */}
-      <CircuitCanvas />
+    <section aria-labelledby="hero-heading" className="-mt-20 px-2 pt-2 sm:px-4 sm:pt-4">
+      <div className="relative overflow-hidden rounded-3xl bg-black text-white min-h-[calc(100svh-2rem)] flex flex-col justify-end px-6 pt-32 pb-16 sm:px-12 lg:px-20 lg:pb-24">
+        <DotWave />
+        <Corners inset="top-6 left-6 right-6 bottom-6" />
 
-      {/* Subtle Restrained Ambient Lighting */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-cluster-acid/[0.05] rounded-full blur-[140px] pointer-events-none" />
+        <div className="relative flex flex-col gap-8 max-w-[680px]">
+          <Eyebrow className="text-lime rise" square="bg-lime">Student tech community · Galgotias University</Eyebrow>
 
-      {/* Main Content (Vertically centered and tuned to fit single screen without scroll) */}
-      <div className={`relative z-10 max-w-5xl mx-auto my-auto text-center flex flex-col justify-center items-center w-full ${showStats ? 'space-y-4 sm:space-y-5 lg:space-y-6' : 'space-y-6 sm:space-y-8 lg:space-y-9'}`}>
-
-        {/* Hero Headline (Pure Editorial Brand Board Direction, No awkward double period) */}
-        <h1 className={`${showStats ? 'text-4xl sm:text-6xl lg:text-7xl' : 'text-4xl sm:text-6xl lg:text-7xl xl:text-8xl'} font-display font-black tracking-tight text-[#F8F7F3] leading-[1.06]`}>
-          Find your people.<br />
-          <span className="text-cluster-gradient">Build together</span>
-          <span className="inline-block w-3 sm:w-3.5 h-3 sm:h-3.5 bg-cluster-acid ml-2 rounded-sm align-baseline shadow-[0_0_10px_rgba(198,255,77,0.5)]" />
-        </h1>
-
-        {/* Brand Concept Subtitle */}
-        <p className="max-w-2xl mx-auto text-xs sm:text-sm lg:text-base text-[#C2C2B8] font-sans leading-relaxed">
-          {config.heroSubtitle || (
-            <>
-              <strong className="text-white font-semibold">A community around compute.</strong> Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.
-            </>
-          )}
-        </p>
-
-        {/* CTA Button Group */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 w-full sm:w-auto">
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open_join_modal'))}
-            className="btn-cluster-primary w-full sm:w-auto px-7 py-3 text-xs sm:text-sm font-semibold group cursor-pointer active:scale-[0.98] transition-transform"
-          >
-            <span>Join the Community</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-
-          <Link
-            to="/events"
-            className="btn-cluster-secondary w-full sm:w-auto px-7 py-3 text-xs sm:text-sm font-semibold group active:scale-[0.98] transition-transform"
-          >
-            <Zap className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
-            <span>Explore Events & Meetups</span>
-          </Link>
-        </div>
-
-        {/* Metric Bar: High-contrast, Architectural, 1px Hairline Borders */}
-        {showStats && (
-          <div className="pt-2 sm:pt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5 w-full max-w-4xl text-left font-mono animate-fadeIn">
-            {stats.map((stat, idx) => (
-              <div
-                key={idx}
-                className="py-3 px-4 rounded-xl bg-[#0F1012]/90 border border-white/[0.08] hover:border-cluster-acid/30 transition-colors backdrop-blur-md"
-              >
-                <div className={`text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight tabular-nums font-mono ${idx % 2 === 0 ? 'text-cluster-acid' : 'text-white'}`}>
-                  {stat.value}
-                </div>
-                <div className="text-[10px] sm:text-[11px] text-[#8E8E88] font-medium tracking-wider mt-0.5 uppercase truncate">
-                  {stat.label}
-                </div>
-              </div>
+          <h1 id="hero-heading" className="heading-1 lg:text-7xl text-grad-dark rise" style={{ animationDelay: '100ms' }}>
+            {lines.map((l, i) => (
+              <span key={i} className="block">
+                {l}
+                {i === lines.length - 1 && <Square className="w-3 h-3 sm:w-4 sm:h-4 ml-4" pulse />}
+              </span>
             ))}
+          </h1>
+
+          {words.length > 0 && (
+            <p className="title-2 text-soft max-w-xl">
+              {words.map((w, i) => (
+                <span key={i} className="rise inline-block" style={{ animationDelay: `${350 + i * 45}ms` }}>
+                  {w}&nbsp;
+                </span>
+              ))}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3 rise" style={{ animationDelay: `${450 + words.length * 45}ms` }}>
+            <Link to="/join" className="btn btn-lime">Apply to join Cluster <ArrowRight className="w-5 h-5" /></Link>
+            <Link to="/events" className="btn btn-ghost-dark">See upcoming events</Link>
+            <LiveChip open={config.applicationsOpen !== false} />
           </div>
-        )}
+
+          {config.statsEnabled && config.stats?.length > 0 && (
+            <dl className="flex flex-wrap gap-8 pt-6 border-t border-char-2 rise" style={{ animationDelay: '900ms' }}>
+              {config.stats.map((s) => (
+                <div key={s.label} className="flex flex-col-reverse gap-1">
+                  <dt className="caption-3 text-mute">{s.label}</dt>
+                  <dd className="heading-5 tabular-nums">{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
       </div>
     </section>
   )

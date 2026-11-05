@@ -16,7 +16,7 @@ import {
   Shield,
   Activity,
 } from 'lucide-react'
-import { ClusterMark } from '../components/ui/ClusterLogo.jsx'
+import { ClusterMark } from '../components/ui/Brand.jsx'
 import CommandPalette from '../components/admin/CommandPalette.jsx'
 import { clusterDataService } from '../services/clusterDataService.js'
 

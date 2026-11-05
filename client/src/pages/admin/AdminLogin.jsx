@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Lock, ArrowRight, ShieldCheck, ArrowLeft, Loader2, Sparkles } from 'lucide-react'
-import { ClusterMark } from '../../components/ui/ClusterLogo.jsx'
+import { ClusterMark } from '../../components/ui/Brand.jsx'
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient.js'
 import { useToast } from '../../context/ToastContext.jsx'
 

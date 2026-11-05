@@ -1,198 +1,106 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Calendar, MapPin, ExternalLink, Image as ImageIcon, X, Filter } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowRight, Calendar, Image as ImageIcon, MapPin, X } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
+import { useLive } from '../hooks/useLive.js'
+import { PageHeader } from '../components/ui/Brand.jsx'
 
-const TYPE_FILTERS = ['all', 'hackathon', 'workshop', 'talk', 'study']
+const today = new Date().toISOString().slice(0, 10)
+const isoDate = (d) => {
+  if (!d || /^\d{4}-\d{2}-\d{2}$/.test(d)) return d || ''
+  const p = new Date(d)
+  return isNaN(p) ? d : p.toISOString().slice(0, 10)
+}
+const pill = (on) =>
+  `title-4 capitalize rounded-full px-4 py-2 transition-colors duration-300 ${on ? 'bg-black text-white' : 'text-graphite hover:text-black'}`
 
 export default function EventsPage() {
-  const [eventsList, setEventsList] = useState(() => clusterDataService.getEvents())
-  const [selectedType, setSelectedType] = useState('all')
-  const [selectedTab, setSelectedTab] = useState('upcoming')
-  const [activeGalleryImages, setActiveGalleryImages] = useState(null)
+  const events = useLive('cluster_events_updated', () => clusterDataService.getEvents())
+  const [tab, setTab] = useState('upcoming')
+  const [type, setType] = useState('all')
+  const [gallery, setGallery] = useState(null)
 
-  useEffect(() => {
-    setEventsList(clusterDataService.getEvents())
-    const handleEventsUpdate = () => {
-      setEventsList(clusterDataService.getEvents())
-    }
-    window.addEventListener('cluster_events_updated', handleEventsUpdate)
-    return () => window.removeEventListener('cluster_events_updated', handleEventsUpdate)
-  }, [])
-
-  const todayStr = new Date().toISOString().split('T')[0]
-
-  const normDate = (d) => {
-    if (!d) return ''
-    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d
-    const parsed = new Date(d)
-    return isNaN(parsed.getTime()) ? d : parsed.toISOString().split('T')[0]
-  }
-
-  const filteredEvents = useMemo(() => {
-    return eventsList.filter((ev) => {
-      const evDate = normDate(ev.date)
-      const isPast = evDate < todayStr
-      const matchesTab = selectedTab === 'past' ? isPast : !isPast
-      const matchesType = selectedType === 'all' || ev.type === selectedType
-      return matchesTab && matchesType
-    })
-  }, [eventsList, selectedTab, selectedType, todayStr])
+  const types = ['all', ...new Set(events.map((e) => e.type).filter(Boolean))]
+  const shown = useMemo(
+    () => events.filter((e) => (isoDate(e.date) < today) === (tab === 'past') && (type === 'all' || e.type === type)),
+    [events, tab, type],
+  )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 space-y-12">
-      {/* Page Header */}
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
-          <span>SCHEDULE & ARCHIVES</span>
-        </div>
-        <h1 className="text-4xl sm:text-6xl font-display font-black text-[#F8F7F3] tracking-tight leading-tight">
-          HACKATHONS, WORKSHOPS &<br />
-          <span className="text-cluster-gradient">COMMUNITY EVENTS</span>
-        </h1>
-        <p className="text-[#B5B5AE] text-sm sm:text-base leading-relaxed font-sans">
-          From 24-hour build competitions to weekly study circles — there's always something happening at CLUSTER.
-        </p>
-      </div>
+    <div className="px-4 sm:px-8 lg:px-20 pb-32">
+      <div className="max-w-7xl mx-auto flex flex-col gap-12">
+        <PageHeader eyebrow="Events" title={<>Hackathons, workshops<br />and meetups</>}>
+          From 24 hour build sprints to weekly study circles. Most of them are open to every student.
+        </PageHeader>
 
-      {/* Filterable Event Schedule */}
-      <div className="space-y-8">
-        {/* Tab Switcher & Filter Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-obsidian-900/90 p-4 rounded-2xl border border-white/10">
-          {/* Upcoming vs Past Tabs */}
-          <div className="flex bg-obsidian-950 p-1 rounded-xl border border-white/10 w-full sm:w-auto">
-            <button
-              onClick={() => setSelectedTab('upcoming')}
-              className={`flex-1 sm:px-6 py-2 rounded-lg text-xs font-mono font-bold transition-all ${
-                selectedTab === 'upcoming'
-                  ? 'nav-pill-active'
-                  : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              Upcoming Schedule
-            </button>
-            <button
-              onClick={() => setSelectedTab('past')}
-              className={`flex-1 sm:px-6 py-2 rounded-lg text-xs font-mono font-bold transition-all ${
-                selectedTab === 'past'
-                  ? 'nav-pill-active'
-                  : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              Past Archives
-            </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div aria-label="When" className="inline-flex self-start rounded-full border border-line bg-white p-1">
+            {['upcoming', 'past'].map((t) => (
+              <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)} className={pill(tab === t)}>
+                {t}
+              </button>
+            ))}
           </div>
-
-          {/* Type Category Filter */}
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-            <Filter className="w-4 h-4 text-cluster-acid shrink-0 ml-2 hidden sm:block" />
-            {TYPE_FILTERS.map((t) => (
-              <button
-                key={t}
-                onClick={() => setSelectedType(t)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono capitalize transition-all ${
-                  selectedType === t
-                    ? 'bg-obsidian-800 border border-cluster-acid text-cluster-acid font-bold shadow-cluster-glow'
-                    : 'bg-obsidian-950 text-gray-300 border border-white/10 hover:text-white'
-                }`}
-              >
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0" aria-label="Filter by type">
+            {types.map((t) => (
+              <button key={t} type="button" aria-pressed={type === t} onClick={() => setType(t)} className={`${pill(type === t)} border ${type === t ? 'border-black' : 'border-line bg-white'}`}>
                 {t}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Events Grid */}
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-16 bg-obsidian-900/40 rounded-2xl border border-dashed border-white/10">
-            <Calendar className="w-12 h-12 text-cluster-acid mx-auto mb-3 opacity-40" />
-            <h4 className="text-lg font-display font-semibold text-white">No events in this category</h4>
-            <p className="text-sm font-mono text-gray-400 mt-1">Check back soon or switch filters.</p>
+        {shown.length === 0 ? (
+          <div className="rounded-3xl border border-line bg-white px-6 py-16 flex flex-col items-center text-center gap-4">
+            <Calendar className="w-10 h-10" />
+            <h2 className="heading-5">Nothing {tab === 'past' ? 'in the archive' : 'scheduled'} here yet</h2>
+            <p className="body-3 text-graphite max-w-sm">
+              {tab === 'past' ? 'Past events show up here once they are done.' : 'New sessions get announced here first. Try another filter or apply to join so you hear about them.'}
+            </p>
+            <Link to="/join" className="btn btn-black">Apply to join <ArrowRight className="w-5 h-5" /></Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredEvents.map((event) => (
-              <div key={event.slug} className="nvidia-card rounded-2xl overflow-hidden p-6 flex flex-col justify-between space-y-4 group">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded bg-cluster-acid/10 border border-cluster-acid/25 text-cluster-acid text-[11px] font-mono font-bold uppercase">
-                      {event.type}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs font-mono text-gray-400">
-                      <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>{event.date}</span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-display font-bold text-white group-hover:text-cluster-acid transition-colors">
-                    {event.title}
-                  </h3>
-
-                  <p className="text-xs text-gray-300 line-clamp-3 leading-relaxed">
-                    {event.summary}
-                  </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {shown.map((e, i) => (
+              <article key={e.slug || e.id} className={`reveal ${i % 2 ? 'reveal-2' : ''} lift rounded-2xl border border-line hover:border-black bg-white p-6 sm:p-8 flex flex-col gap-6`}>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="caption-3 rounded-full bg-black text-lime px-3 py-2">{e.type}</span>
+                  <span className="title-4 text-graphite flex items-center gap-2"><Calendar className="w-4 h-4" />{e.date}</span>
                 </div>
-
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-xs font-mono text-gray-400 truncate">
-                    <MapPin className="w-3.5 h-3.5 text-cluster-acid shrink-0" />
-                    <span className="truncate max-w-[140px]">{event.location}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {selectedTab === 'upcoming' && event.registrationUrl && (
-                      <a
-                        href={event.registrationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-cluster-primary px-4 py-2 text-xs"
-                      >
-                        <span>RSVP</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-
-                    {selectedTab === 'past' && event.gallery && event.gallery.length > 0 && (
-                      <button
-                        onClick={() => setActiveGalleryImages(event.gallery)}
-                        className="px-3 py-1.5 rounded-lg bg-obsidian-800 border border-white/10 text-cluster-green text-xs font-mono hover:border-cluster-green transition-colors flex items-center gap-1.5"
-                      >
-                        <ImageIcon className="w-3.5 h-3.5" />
-                        <span>Photos ({event.gallery.length})</span>
-                      </button>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-2">
+                  <h2 className="heading-6">{e.title}</h2>
+                  <p className="body-6 text-graphite line-clamp-3">{e.summary}</p>
                 </div>
-              </div>
+                <div className="mt-auto pt-6 border-t border-line flex items-center justify-between gap-4">
+                  <span className="title-4 text-graphite flex items-center gap-2 min-w-0"><MapPin className="w-4 h-4 shrink-0" /><span className="truncate">{e.location}</span></span>
+                  {tab === 'upcoming' && e.registrationUrl && (
+                    <a href={e.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-black btn-sm shrink-0">RSVP <ArrowRight className="w-4 h-4" /></a>
+                  )}
+                  {tab === 'past' && e.gallery?.length > 0 && (
+                    <button type="button" onClick={() => setGallery(e.gallery)} className="btn btn-ghost btn-sm shrink-0"><ImageIcon className="w-4 h-4" />Photos ({e.gallery.length})</button>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
         )}
+      </div>
 
-        {/* Gallery Modal */}
-        {activeGalleryImages && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-            <div className="relative w-full max-w-4xl bg-obsidian-900 border border-cluster-green/35 rounded-2xl p-6 shadow-cluster-glow flex flex-col space-y-4">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-cluster-green" />
-                  <span>Event Gallery</span>
-                </h3>
-                <button onClick={() => setActiveGalleryImages(null)} className="p-1.5 rounded-lg bg-obsidian-800 text-gray-300 hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto p-1">
-                {activeGalleryImages.map((imgUrl, idx) => (
-                  <div key={idx} className="rounded-xl overflow-hidden border border-white/10 bg-obsidian-950 aspect-video">
-                    <img src={imgUrl} alt={`Gallery ${idx}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
-                  </div>
-                ))}
-              </div>
+      {gallery && (
+        <div role="dialog" aria-modal="true" aria-label="Event photos" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md" onClick={() => setGallery(null)}>
+          <div className="w-full max-w-4xl rounded-3xl bg-paper p-6 flex flex-col gap-4" onClick={(ev) => ev.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="heading-6">Event photos</h2>
+              <button type="button" onClick={() => setGallery(null)} aria-label="Close photos" className="p-2 rounded-full hover:bg-black/5"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3 max-h-[70vh] overflow-y-auto">
+              {gallery.map((src, i) => (
+                <img key={src} src={src} alt={`Event photo ${i + 1}`} className="w-full aspect-video object-cover rounded-xl" />
+              ))}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

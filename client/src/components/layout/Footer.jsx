@@ -1,113 +1,50 @@
 import { Link } from 'react-router-dom'
-import { Github, Linkedin, Instagram, Disc as Discord, ShieldCheck, MapPin, Mail, Sparkles } from 'lucide-react'
-import ClusterLogo from '../ui/ClusterLogo.jsx'
+import { Github } from 'lucide-react'
+import { ClusterLogo, Square } from '../ui/Brand.jsx'
+
+const link = 'body-6 text-graphite hover:text-black transition-colors duration-300'
 
 export default function Footer() {
   return (
-    <footer className="relative bg-black border-t border-white/10 pt-16 pb-12 overflow-hidden">
-      {/* Ambient subtle glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-cluster-acid/5 blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
-          {/* ── Brand Column ── */}
-          <div className="md:col-span-2 space-y-4">
-            <ClusterLogo
-              to="/"
-              size="lg"
-              showTagline={true}
-              tagline="Good things happen in clusters."
-            />
-
-            <p className="text-xs text-gray-300 font-sans max-w-md leading-relaxed">
-              A community around compute. Bringing together passionate tech students to build real projects, explore emerging technology, and foster shared curiosity.
+    <footer className="px-4 sm:px-8 lg:px-20 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] reveal">
+          <div className="flex flex-col gap-6 max-w-sm">
+            <ClusterLogo markClass="w-10 h-10" textClass="text-xl" />
+            <p className="body-6 text-graphite">
+              A community around compute. Student tech community at Galgotias University, Greater Noida.
             </p>
-
-            {/* Core Values Minimalist List */}
-            <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-[11px] font-mono text-[#8E8E88] uppercase tracking-wider">
-              {['Community', 'Collaboration', 'Belonging', 'Shared Curiosity'].map((val) => (
-                <span
-                  key={val}
-                  className="hover:text-white transition-colors flex items-center gap-1.5"
-                >
-                  <span className="w-1 h-1 rounded-sm bg-cluster-acid/60" />
-                  {val}
-                </span>
-              ))}
-            </div>
-
-            <div className="space-y-1.5 text-xs font-mono text-gray-400 pt-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-cluster-acid shrink-0" />
-                <span>Greater Noida, UP 203201</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-cluster-acid shrink-0" />
-                <span>contact@clustersociety.tech</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              {[
-                { href: 'https://discord.gg', Icon: Discord, label: 'Discord Community' },
-                { href: 'https://github.com/alwin2134/Cluster', Icon: Github, label: 'GitHub' },
-                { href: 'https://linkedin.com', Icon: Linkedin, label: 'LinkedIn' },
-                { href: 'https://instagram.com', Icon: Instagram, label: 'Instagram' },
-              ].map(({ href, Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-obsidian-900 border border-white/10 text-gray-400 hover:text-cluster-acid hover:border-cluster-acid/40 flex items-center justify-center transition-all shadow-sm"
-                  aria-label={label}
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
+            <a
+              href="https://github.com/alwin2134/Cluster"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Cluster on GitHub"
+              className="lift w-11 h-11 rounded-xl border border-line hover:border-black flex items-center justify-center"
+            >
+              <Github className="w-5 h-5" />
+            </a>
           </div>
 
-          {/* ── Quick Links ── */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-cluster-acid">
-              Quick Links
-            </h4>
-            <ul className="space-y-2 text-xs font-mono text-gray-400">
-              <li><Link to="/" className="hover:text-cluster-acid transition-colors">Home</Link></li>
-              <li><Link to="/join" className="hover:text-cluster-acid transition-colors">Join Society (Apply)</Link></li>
-              <li><Link to="/team" className="hover:text-cluster-acid transition-colors">About & Leadership</Link></li>
-              <li><Link to="/events" className="hover:text-cluster-acid transition-colors">Events & Meetups</Link></li>
-              <li><Link to="/admin/login" className="hover:text-cluster-acid transition-colors text-gray-500 hover:text-cluster-acid">Admin Portal</Link></li>
-            </ul>
-          </div>
+          <nav aria-label="Footer" className="flex flex-col gap-4">
+            <p className="caption-3">Explore</p>
+            <Link to="/" className={link}>Home</Link>
+            <Link to="/events" className={link}>Events</Link>
+            <Link to="/team" className={link}>Team</Link>
+            <Link to="/join" className={link}>Apply to join</Link>
+          </nav>
 
-          {/* ── Focus Areas ── */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-cluster-acid">
-              What We Do
-            </h4>
-            <ul className="space-y-2 text-xs font-mono text-gray-400">
-              <li>Compute & AI Engineering</li>
-              <li>Full-Stack Development</li>
-              <li>Open Source Projects</li>
-              <li>Hackathons & Build Sprints</li>
-              <li>Study Circles & Tech Meetups</li>
-            </ul>
+          <div className="flex flex-col gap-4">
+            <p className="caption-3">Contact</p>
+            <a href="mailto:contact@clustersociety.tech" className={link}>contact@clustersociety.tech</a>
+            <p className="body-6 text-graphite">Galgotias University<br />Greater Noida, UP 203201</p>
           </div>
         </div>
 
-        {/* ── Bottom Bar ── */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-gray-400">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cluster-acid shrink-0" />
-            <span>CLUSTER — Student Tech Community</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span>Good things happen in clusters.</span>
-            <span className="w-2 h-2 rounded-sm bg-cluster-acid inline-block" />
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t border-line">
+          <p className="caption-5 text-graphite flex items-center gap-2">
+            © {new Date().getFullYear()} Cluster. Good things happen in clusters. <Square className="w-1.5 h-1.5" />
+          </p>
+          <Link to="/admin/login" className="caption-5 text-graphite hover:text-black">Admin portal</Link>
         </div>
       </div>
     </footer>

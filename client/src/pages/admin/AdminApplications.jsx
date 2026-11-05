@@ -146,7 +146,8 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       data.github || '',
       data.linkedin || '',
       data.motivation || '',
-      data.status || 'Pending'
+      data.status || 'Pending',
+      data.projects || ''
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
@@ -628,6 +629,16 @@ export default function AdminApplications() {
               <div>
                 <div className="text-[10px] text-[#8E8E88]">Primary Domain</div>
                 <div className="text-cluster-acid mt-0.5 truncate">{selectedApp.domain}</div>
+              </div>
+            </div>
+
+            {/* What they've built (primary selection signal) */}
+            <div className="space-y-2">
+              <div className="text-xs font-mono text-white font-bold uppercase tracking-wider">
+                What they&apos;ve built
+              </div>
+              <div className="p-4 rounded-2xl bg-[#141517] border border-cluster-acid/30 text-xs text-[#D4D4CD] font-sans leading-relaxed whitespace-pre-wrap">
+                {selectedApp.projects || 'Not provided.'}
               </div>
             </div>
 

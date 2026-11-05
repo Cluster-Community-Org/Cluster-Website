@@ -1,113 +1,61 @@
-import { useState, useEffect } from 'react'
-import { Github, Linkedin, Users, Sparkles, Award } from 'lucide-react'
+import { Award, Github, Linkedin, Sparkle } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
+import { useLive } from '../hooks/useLive.js'
+import { DotWave, Eyebrow, PageHeader } from '../components/ui/Brand.jsx'
+
+const VALUES = [
+  { Icon: Sparkle, title: 'Our mission', body: 'Cluster exists to make compute, peer learning and builder culture easy to reach. Students build real projects, learn practical skills, work across teams and explore what comes next.' },
+  { Icon: Award, title: 'Student first', body: 'Every decision starts with what is best for members. Leadership is earned by contribution, knowledge is shared freely, and every student has a place here, whatever their year or background.' },
+]
 
 export default function TeamPage() {
-  const [teamMembers, setTeamMembers] = useState(() => clusterDataService.getTeamMembers())
+  const team = useLive('cluster_team_updated', () => clusterDataService.getTeamMembers())
 
-  useEffect(() => {
-    setTeamMembers(clusterDataService.getTeamMembers())
-    const handleUpdate = () => {
-      setTeamMembers(clusterDataService.getTeamMembers())
-    }
-    window.addEventListener('cluster_team_updated', handleUpdate)
-    return () => window.removeEventListener('cluster_team_updated', handleUpdate)
-  }, [])
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 space-y-16">
-      {/* Page Header */}
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
-          <span>TEAM & LEADERSHIP</span>
-        </div>
-        <h1 className="text-4xl sm:text-6xl font-display font-black text-[#F8F7F3] tracking-tight leading-tight">
-          A COMMUNITY AROUND COMPUTE.<br />
-          <span className="text-cluster-gradient">FIND YOUR PEOPLE.</span>
-        </h1>
-        <p className="text-[#B5B5AE] text-base leading-relaxed font-sans">
-          Good things happen in clusters. Bringing together passionate student builders, designers, and researchers —
-          united by a shared drive to <span className="text-cluster-acid font-semibold">build together</span>.
-        </p>
-      </div>
+    <div className="px-4 sm:px-8 lg:px-20 pb-32">
+      <div className="max-w-7xl mx-auto flex flex-col gap-24">
+        <PageHeader eyebrow="Team" title={<>The people who<br />run Cluster</>}>
+          Student builders, designers and researchers who keep the circles running and the projects shipping.
+        </PageHeader>
 
-      {/* Mission & Values Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="nvidia-card rounded-2xl p-8 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-cluster-acid/10 border border-cluster-acid/40 text-cluster-acid flex items-center justify-center shadow-cluster-glow">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <h2 className="text-2xl font-display font-bold text-white">Our Mission</h2>
-          <p className="text-gray-200 text-sm leading-relaxed">
-            CLUSTER exists to democratize access to compute, peer learning, and hands-on builder culture. 
-            We bring together students to build real projects, learn practical skills, 
-            collaborate across teams, and explore emerging technologies.
-          </p>
-        </div>
-
-        <div className="nvidia-card rounded-2xl p-8 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/20 text-cluster-acid flex items-center justify-center shadow-sm">
-            <Award className="w-6 h-6" />
-          </div>
-          <h2 className="text-2xl font-display font-bold text-white">Student-First Community</h2>
-          <p className="text-gray-200 text-sm leading-relaxed">
-            Every decision we make is guided by what's best for our members. Leadership is earned by contribution, 
-            knowledge is shared freely, and every student — regardless of background or year — 
-            has a place in CLUSTER.
-          </p>
-        </div>
-      </div>
-
-      {/* Leadership Team Grid */}
-      <div className="space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-mono text-cluster-acid uppercase font-semibold">EXECUTIVE BOARD</span>
-          <h2 className="text-3xl font-display font-bold text-white">CLUSTER STUDENT OFFICERS</h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {teamMembers.map((member) => (
-            <div key={member.id} className="nvidia-card rounded-2xl overflow-hidden p-5 space-y-4 flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="relative h-48 rounded-xl overflow-hidden bg-black flex items-center justify-center border border-white/10">
-                  {/* Avatar badge */}
-                  <div className="w-20 h-20 rounded-2xl bg-obsidian-900 border border-cluster-acid/40 text-cluster-acid flex items-center justify-center text-2xl font-display font-bold shadow-cluster-glow">
-                    {member.initials}
-                  </div>
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-obsidian-900 border border-cluster-acid/30 text-[10px] font-mono text-cluster-acid font-semibold">
-                    CLASS OF {member.graduationYear}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-display font-bold text-white group-hover:text-cluster-acid transition-colors">
-                    {member.name}
-                  </h3>
-                  <p className="text-xs font-mono text-cluster-acid font-medium mt-0.5">
-                    {member.role}
-                  </p>
-                </div>
-
-                <p className="text-xs text-gray-200 line-clamp-3 leading-relaxed">
-                  {member.bio}
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-white/10 flex items-center gap-3 text-gray-300">
-                {member.github && (
-                  <a href={member.github} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-acid transition-colors" aria-label="GitHub">
-                    <Github className="w-4 h-4" />
-                  </a>
-                )}
-                {member.linkedin && (
-                  <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-green transition-colors" aria-label="LinkedIn">
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
-            </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {VALUES.map(({ Icon, title, body }, i) => (
+            <article key={title} className={`reveal ${i ? 'reveal-2' : ''} relative overflow-hidden rounded-3xl p-8 sm:p-12 flex flex-col gap-6 ${i ? 'bg-white border border-line' : 'bg-black text-white'}`}>
+              {!i && <DotWave className="bottom-0 h-40 opacity-40" single />}
+              <span className={`relative w-12 h-12 rounded-lg flex items-center justify-center ${i ? 'bg-black text-lime' : 'border border-char-3 text-lime'}`}><Icon className="w-6 h-6" /></span>
+              <h2 className={`relative heading-3 ${i ? '' : 'text-grad-dark'}`}>{title}</h2>
+              <p className={`relative title-2 ${i ? 'text-graphite' : 'text-soft'}`}>{body}</p>
+            </article>
           ))}
         </div>
+
+        <section aria-labelledby="board-heading" className="flex flex-col gap-12">
+          <div className="reveal flex flex-col gap-4">
+            <Eyebrow>Executive board</Eyebrow>
+            <h2 id="board-heading" className="heading-2">Student officers</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {team.map((m, i) => (
+              <article key={m.id} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i % 4]} lift rounded-2xl border border-line hover:border-black bg-white p-6 flex flex-col gap-6`}>
+                <div className="relative h-48 rounded-xl bg-black flex items-center justify-center">
+                  <span className="heading-3 text-lime">{m.initials}</span>
+                  {m.graduationYear && <span className="absolute top-3 right-3 caption-3 rounded-full border border-char-3 px-3 py-1 text-soft">Class of {m.graduationYear}</span>}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h3 className="heading-6">{m.name}</h3>
+                  <p className="title-4 text-graphite">{m.role}</p>
+                </div>
+                <p className="body-6 text-graphite line-clamp-3">{m.bio}</p>
+                {(m.github || m.linkedin) && (
+                  <div className="mt-auto pt-4 border-t border-line flex gap-2">
+                    {m.github && <a href={m.github} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on GitHub`} className="p-2 rounded-full hover:bg-black/5"><Github className="w-5 h-5" /></a>}
+                    {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`} className="p-2 rounded-full hover:bg-black/5"><Linkedin className="w-5 h-5" /></a>}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   )
