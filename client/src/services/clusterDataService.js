@@ -711,6 +711,7 @@ export const clusterDataService = {
           domain: 'Full-Stack Web Dev',
           github: 'https://github.com/alwin2134',
           linkedin: '',
+          projects: 'https://github.com/alwin2134/cluster (Test Project)',
           motivation: 'System test ping from CLUSTER Admin to verify Google Sheet connection.',
           status: 'Pending',
           submittedAt: new Date().toISOString(),

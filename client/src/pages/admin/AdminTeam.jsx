@@ -103,7 +103,7 @@ export default function AdminTeam() {
       {/* Team Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {filteredTeam.map((m) => (
-          <div key={m.id} className="nvidia-card rounded-2xl p-5 border border-white/10 space-y-4 flex flex-col justify-between">
+          <div key={m.id} className="rounded-2xl p-5 border border-white/[0.08] bg-[#0F1012] space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded border border-cluster-acid/30">

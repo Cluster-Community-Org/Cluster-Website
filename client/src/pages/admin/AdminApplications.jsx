@@ -26,6 +26,7 @@ import {
   PlayCircle,
   Lock,
   Unlock,
+  Code,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { getSafeUrl } from '../../lib/safeUrl.js'
@@ -70,14 +71,14 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    // Auto-create header row on row 1 if sheet is empty
+    // Auto-create header row on row 1 if sheet is empty (13 columns)
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "Timestamp", "Full Name", "Email", "Roll Number", 
         "Course", "Branch", "Year", "Domain", 
-        "GitHub", "LinkedIn", "Motivation", "Status"
+        "GitHub", "LinkedIn", "Projects (Built/Shipped)", "Motivation", "Status"
       ]);
-      sheet.getRange(1, 1, 1, 12).setFontWeight("bold").setBackground("#C6FF4D").setFontColor("#000000");
+      sheet.getRange(1, 1, 1, 13).setFontWeight("bold").setBackground("#C6FF4D").setFontColor("#000000");
     }
 
     var data = {};
@@ -115,7 +116,7 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       var lastRow = sheet.getLastRow();
 
       if (lastRow > 1) {
-        var range = sheet.getRange(2, 1, lastRow - 1, 12);
+        var range = sheet.getRange(2, 1, lastRow - 1, 13);
         var values = range.getValues();
         var foundRow = -1;
 
@@ -129,7 +130,8 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
         }
 
         if (foundRow > 0) {
-          var statusCell = sheet.getRange(foundRow, 12);
+          // Column 13 is 'Status'
+          var statusCell = sheet.getRange(foundRow, 13);
           statusCell.setValue(sanitizeCell(data.status));
           
           // Color-code status cell in Google Sheet
@@ -151,7 +153,7 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       }
     }
 
-    // ── CASE 2: NEW APPLICATION INSERT ──
+    // ── CASE 2: NEW APPLICATION INSERT (13 Columns) ──
     sheet.appendRow([
       new Date(),
       sanitizeCell(data.fullName || data.full_name),
@@ -163,9 +165,9 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       sanitizeCell(data.domain),
       sanitizeCell(data.github),
       sanitizeCell(data.linkedin),
+      sanitizeCell(data.projects),
       sanitizeCell(data.motivation),
-      sanitizeCell(data.status || 'Pending'),
-      sanitizeCell(data.projects)
+      sanitizeCell(data.status || 'Pending')
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
@@ -241,7 +243,8 @@ export default function AdminApplications() {
       (app.branch || '').toLowerCase().includes(search.toLowerCase()) ||
       (app.year || '').toLowerCase().includes(search.toLowerCase()) ||
       (app.branchYear || '').toLowerCase().includes(search.toLowerCase()) ||
-      (app.domain || '').toLowerCase().includes(search.toLowerCase())
+      (app.domain || '').toLowerCase().includes(search.toLowerCase()) ||
+      (app.projects || '').toLowerCase().includes(search.toLowerCase())
 
     const matchesStatus =
       selectedStatusTab === 'All' ? true : app.status === selectedStatusTab
@@ -517,8 +520,19 @@ export default function AdminApplications() {
                     >
                       {/* Candidate Column */}
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-white group-hover:text-cluster-acid transition-colors">
-                          {app.fullName}
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white group-hover:text-cluster-acid transition-colors">
+                            {app.fullName}
+                          </span>
+                          {app.projects && (
+                            <span
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cluster-acid/15 border border-cluster-acid/40 text-cluster-acid"
+                              title={app.projects}
+                            >
+                              <Code className="w-2.5 h-2.5" />
+                              <span>Shipped</span>
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-[#8E8E88] font-mono mt-0.5">
                           {app.email} · {app.rollNumber}

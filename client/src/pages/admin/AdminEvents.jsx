@@ -238,7 +238,7 @@ export default function AdminEvents() {
       </div>
 
       {/* ── Events Table ── */}
-      <div className="nvidia-card rounded-2xl border border-white/10 overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#0F1012] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead className="bg-obsidian-950 border-b border-white/10 text-gray-400 uppercase tracking-wider text-[10px]">
