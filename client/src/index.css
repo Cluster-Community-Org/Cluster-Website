@@ -79,19 +79,27 @@
 }
 
 /* ─── Hero gradient: dark planet lit from behind, under a film grain ─── */
-.hero-grad {
+.hero-grad, .hero-rim {
   /* 85.7% is the block's bottom edge inside this -20% inset box. The rim keeps clear of it so the copy stays on black on short screens. */
   --r: 150vmax; --rim: min(52%, calc(85.7% - 545px));
   --at: 60% calc(var(--rim) + var(--r));
   position: absolute; inset: -20%; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(circle var(--r) at var(--at), #000 99.85%, transparent 100%),
-    radial-gradient(14% 5% at 60% var(--rim), #FFF, transparent),
-    radial-gradient(circle var(--r) at var(--at), #F6FFDF 100%, #C6FF4D 101%, #8FD11F 105%, #3D6B0B 110%, #12240A 117%, transparent 125%);
   animation: hero-drift 18s cubic-bezier(.45,0,.55,1) infinite alternate;
 }
+/* Clean glossy edge: painted above the grain so the grain never roughens it. Fades out toward the sides like a specular highlight. */
+.hero-rim {
+  background: radial-gradient(circle var(--r) at var(--at), transparent var(--r), rgba(255,255,255,.95) var(--r), rgba(246,255,223,.35) calc(var(--r) + 4px), transparent calc(var(--r) + 14px));
+  -webkit-mask-image: linear-gradient(90deg, transparent 5%, #000 35%, #000 70%, transparent 95%);
+  mask-image: linear-gradient(90deg, transparent 5%, #000 35%, #000 70%, transparent 95%);
+}
+.hero-grad {
+  background:
+    radial-gradient(circle var(--r) at var(--at), #000 var(--r), transparent calc(var(--r) + .5px)),
+    radial-gradient(14% 5% at 60% var(--rim), #FFF, transparent),
+    radial-gradient(circle var(--r) at var(--at), #F6FFDF 100%, #C6FF4D 101%, #8FD11F 105%, #3D6B0B 110%, #12240A 117%, transparent 125%);
+}
 /* Below lg the copy fills the block, so the rim sits higher */
-@media (max-width: 1023px) { .hero-grad { --rim: min(56%, calc(85.7% - 400px)); } }
+@media (max-width: 1023px) { .hero-grad, .hero-rim { --rim: min(56%, calc(85.7% - 400px)); } }
 @keyframes hero-drift { to { transform: translate3d(-2%, -2%, 0) scale(1.04); } }
 
 /* Multiply leaves the black untouched and stipples dark specks into the colour */

@@ -22,6 +22,7 @@ export default function HeroSection() {
       <div className="relative isolate overflow-hidden rounded-3xl bg-black text-white min-h-[calc(100svh-2rem)] flex flex-col justify-end px-6 pt-32 pb-16 sm:px-12 lg:px-20 lg:pb-24">
         <div aria-hidden="true" className="hero-grad" />
         <div aria-hidden="true" className="grain" />
+        <div aria-hidden="true" className="hero-rim" />
         <Corners inset="top-6 left-6 right-6 bottom-6" />
 
         <div className="relative flex flex-col gap-6 max-w-[680px]">
