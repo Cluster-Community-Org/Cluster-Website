@@ -783,7 +783,8 @@ export const clusterDataService = {
     // Defensive sanitization: neutralize CSV formula injection (=, +, -, @, \t, \r)
     const sanitizeCSV = (val) => {
       let str = String(val ?? '').replace(/"/g, '""')
-      if (/^[=+\-@\t\r]/.test(str)) {
+      const c = str.charAt(0)
+      if (c === '=' || c === '+' || c === '-' || c === '@' || c === '\t' || c === '\r') {
         str = `'${str}`
       }
       return `"${str}"`

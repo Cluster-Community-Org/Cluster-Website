@@ -103,7 +103,8 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
     // Neutralize spreadsheet formula injection (=, +, -, @)
     function sanitizeCell(val) {
       var str = (val || "").toString();
-      if (/^[=+\\-@\\t\\r]/.test(str)) {
+      var c = str.charAt(0);
+      if (c === '=' || c === '+' || c === '-' || c === '@' || c === '\\t' || c === '\\r') {
         return "'" + str;
       }
       return str;
