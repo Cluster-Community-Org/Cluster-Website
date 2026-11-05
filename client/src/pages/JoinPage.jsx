@@ -88,8 +88,25 @@ export default function JoinPage() {
     return () => window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
   }, [])
 
+  const isValidProtocol = (url) => {
+    if (!url || !url.trim()) return true
+    try {
+      const trimmed = url.trim()
+      const parsed = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`)
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+    } catch {
+      return false
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (!isValidProtocol(formData.github) || !isValidProtocol(formData.linkedin)) {
+      showToast('Please provide valid HTTP or HTTPS URLs for your social profiles.', 'error')
+      return
+    }
+
     setIsSubmitting(true)
 
     const branchYear = `${formData.course} · ${formData.branch} · ${formData.year}`

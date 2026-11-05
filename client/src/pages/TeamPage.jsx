@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react'
 import { Github, Linkedin, Users, Sparkles, Award } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 
+const getSafeUrl = (url) => {
+  if (!url || typeof url !== 'string') return null
+  try {
+    const trimmed = url.trim()
+    const parsed = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`)
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return parsed.href
+    }
+  } catch {}
+  return null
+}
+
 export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState(() => clusterDataService.getTeamMembers())
 
@@ -94,13 +106,13 @@ export default function TeamPage() {
               </div>
 
               <div className="pt-4 border-t border-white/10 flex items-center gap-3 text-gray-300">
-                {member.github && (
-                  <a href={member.github} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-acid transition-colors" aria-label="GitHub">
+                {getSafeUrl(member.github) && (
+                  <a href={getSafeUrl(member.github)} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-acid transition-colors" aria-label="GitHub">
                     <Github className="w-4 h-4" />
                   </a>
                 )}
-                {member.linkedin && (
-                  <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-green transition-colors" aria-label="LinkedIn">
+                {getSafeUrl(member.linkedin) && (
+                  <a href={getSafeUrl(member.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:text-cluster-green transition-colors" aria-label="LinkedIn">
                     <Linkedin className="w-4 h-4" />
                   </a>
                 )}

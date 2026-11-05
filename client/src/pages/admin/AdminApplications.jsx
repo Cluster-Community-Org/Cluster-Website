@@ -65,6 +65,19 @@ const DOMAINS = [
 
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
 
+// Safe URL sanitizer: prevents DOM XSS via javascript: or data: URIs
+export const getSafeUrl = (url) => {
+  if (!url || typeof url !== 'string') return null
+  try {
+    const trimmed = url.trim()
+    const parsed = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`)
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return parsed.href
+    }
+  } catch {}
+  return null
+}
+
 const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -90,6 +103,23 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       data = e.parameter;
     }
 
+    // ── SECURITY: OPTIONAL WEBHOOK SECRET TOKEN CHECK ──
+    // To protect status updates, set 'CLUSTER_WEBHOOK_SECRET' in Project Settings -> Script Properties
+    var configuredSecret = PropertiesService.getScriptProperties().getProperty("CLUSTER_WEBHOOK_SECRET");
+    if (configuredSecret && data.secret !== configuredSecret) {
+      return ContentService.createTextOutput(JSON.stringify({ result: "error", error: "Unauthorized: Invalid secret token" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Neutralize spreadsheet formula injection (=, +, -, @)
+    function sanitizeCell(val) {
+      var str = (val || "").toString();
+      if (/^[=+\\-@\\t\\r]/.test(str)) {
+        return "'" + str;
+      }
+      return str;
+    }
+
     // ── CASE 1: UPDATE STATUS OF AN EXISTING CANDIDATE ──
     if (data.action === "UPDATE_STATUS" && data.status) {
       var targetEmail = (data.email || "").toString().trim().toLowerCase();
@@ -112,7 +142,7 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
 
         if (foundRow > 0) {
           var statusCell = sheet.getRange(foundRow, 12);
-          statusCell.setValue(data.status);
+          statusCell.setValue(sanitizeCell(data.status));
           
           // Color-code status cell in Google Sheet
           if (data.status === "Accepted") {
@@ -136,17 +166,17 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
     // ── CASE 2: NEW APPLICATION INSERT ──
     sheet.appendRow([
       new Date(),
-      data.fullName || data.full_name || '',
-      data.email || '',
-      data.rollNumber || data.roll_number || '',
-      data.course || '',
-      data.branch || '',
-      data.year || '',
-      data.domain || '',
-      data.github || '',
-      data.linkedin || '',
-      data.motivation || '',
-      data.status || 'Pending'
+      sanitizeCell(data.fullName || data.full_name),
+      sanitizeCell(data.email),
+      sanitizeCell(data.rollNumber || data.roll_number),
+      sanitizeCell(data.course),
+      sanitizeCell(data.branch),
+      sanitizeCell(data.year),
+      sanitizeCell(data.domain),
+      sanitizeCell(data.github),
+      sanitizeCell(data.linkedin),
+      sanitizeCell(data.motivation),
+      sanitizeCell(data.status || 'Pending')
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
@@ -643,11 +673,11 @@ export default function AdminApplications() {
 
             {/* Profiles & Links */}
             <div className="flex items-center gap-3">
-              {selectedApp.github && (
+              {getSafeUrl(selectedApp.github) && (
                 <a
-                  href={selectedApp.github}
+                  href={getSafeUrl(selectedApp.github)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="px-3.5 py-2 rounded-xl bg-[#141517] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white flex items-center gap-2"
                 >
                   <Github className="w-4 h-4 text-cluster-acid" />
@@ -655,11 +685,11 @@ export default function AdminApplications() {
                   <ExternalLink className="w-3 h-3 text-gray-500" />
                 </a>
               )}
-              {selectedApp.linkedin && (
+              {getSafeUrl(selectedApp.linkedin) && (
                 <a
-                  href={selectedApp.linkedin}
+                  href={getSafeUrl(selectedApp.linkedin)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="px-3.5 py-2 rounded-xl bg-[#141517] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white flex items-center gap-2"
                 >
                   <Linkedin className="w-4 h-4 text-cluster-acid" />
