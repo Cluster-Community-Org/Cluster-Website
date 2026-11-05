@@ -1,6 +1,7 @@
 import { Award, Github, Linkedin, Target } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useLive } from '../hooks/useLive.js'
+import { getSafeUrl } from '../lib/safeUrl.js'
 import { DotWave, Eyebrow, PageHeader } from '../components/ui/Brand.jsx'
 
 const VALUES = [
@@ -46,10 +47,10 @@ export default function TeamPage() {
                   <p className="title-4 text-graphite">{m.role}</p>
                 </div>
                 <p className="body-6 text-graphite line-clamp-3">{m.bio}</p>
-                {(m.github || m.linkedin) && (
+                {(getSafeUrl(m.github) || getSafeUrl(m.linkedin)) && (
                   <div className="mt-auto pt-4 border-t border-line flex gap-2">
-                    {m.github && <a href={m.github} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on GitHub`} className="p-2 rounded-full hover:bg-black/5"><Github className="w-5 h-5" /></a>}
-                    {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`} className="p-2 rounded-full hover:bg-black/5"><Linkedin className="w-5 h-5" /></a>}
+                    {getSafeUrl(m.github) && <a href={getSafeUrl(m.github)} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on GitHub`} className="p-2 rounded-full hover:bg-black/5"><Github className="w-5 h-5" /></a>}
+                    {getSafeUrl(m.linkedin) && <a href={getSafeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`} className="p-2 rounded-full hover:bg-black/5"><Linkedin className="w-5 h-5" /></a>}
                   </div>
                 )}
               </article>

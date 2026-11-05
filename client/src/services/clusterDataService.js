@@ -779,23 +779,31 @@ export const clusterDataService = {
 
   exportApplicationsCSV() {
     const apps = this.getApplications()
+    // Defensive sanitization: neutralize CSV formula injection (=, +, -, @, \t, \r)
+    const sanitizeCSV = (val) => {
+      let str = String(val ?? '').replace(/"/g, '""')
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = `'${str}`
+      }
+      return `"${str}"`
+    }
     const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Course', 'Branch', 'Year', 'Combined Info', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation', 'Projects']
     const rows = apps.map((a) => [
-      a.id,
-      `"${(a.fullName || '').replace(/"/g, '""')}"`,
-      `"${(a.email || '').replace(/"/g, '""')}"`,
-      `"${(a.rollNumber || '').replace(/"/g, '""')}"`,
-      `"${(a.course || '').replace(/"/g, '""')}"`,
-      `"${(a.branch || '').replace(/"/g, '""')}"`,
-      `"${(a.year || '').replace(/"/g, '""')}"`,
-      `"${(a.branchYear || '').replace(/"/g, '""')}"`,
-      `"${(a.domain || '').replace(/"/g, '""')}"`,
-      `"${(a.status || '').replace(/"/g, '""')}"`,
-      `"${a.submittedAt || ''}"`,
-      `"${(a.github || '').replace(/"/g, '""')}"`,
-      `"${(a.linkedin || '').replace(/"/g, '""')}"`,
-      `"${(a.motivation || '').replace(/"/g, '""')}"`,
-      `"${(a.projects || '').replace(/"/g, '""')}"`,
+      sanitizeCSV(a.id),
+      sanitizeCSV(a.fullName),
+      sanitizeCSV(a.email),
+      sanitizeCSV(a.rollNumber),
+      sanitizeCSV(a.course),
+      sanitizeCSV(a.branch),
+      sanitizeCSV(a.year),
+      sanitizeCSV(a.branchYear),
+      sanitizeCSV(a.domain),
+      sanitizeCSV(a.status),
+      sanitizeCSV(a.submittedAt),
+      sanitizeCSV(a.github),
+      sanitizeCSV(a.linkedin),
+      sanitizeCSV(a.motivation),
+      sanitizeCSV(a.projects),
     ])
 
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')

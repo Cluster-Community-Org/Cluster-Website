@@ -4,6 +4,7 @@ import { ArrowRight, Check, Lock } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useToast } from '../context/ToastContext.jsx'
 import { useLive } from '../hooks/useLive.js'
+import { getSafeUrl } from '../lib/safeUrl.js'
 import { Corners, DotWave, PageHeader } from '../components/ui/Brand.jsx'
 import { LiveChip } from '../components/sections/HeroSection.jsx'
 import { STEPS } from '../components/sections/HowItWorksSection.jsx'
@@ -35,6 +36,10 @@ export default function JoinPage() {
 
   const submit = (e) => {
     e.preventDefault()
+    if ([form.github, form.linkedin].some((url) => url.trim() && !getSafeUrl(url))) {
+      showToast('Please provide valid HTTP or HTTPS URLs for your social profiles.', 'error')
+      return
+    }
     const app = clusterDataService.addApplication({ ...form, branchYear: `${form.course} · ${form.branch} · ${form.year}` })
     setSent(app)
     window.scrollTo({ top: 0, behavior: 'smooth' })

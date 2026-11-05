@@ -19,6 +19,7 @@ import {
 import { ClusterMark } from '../components/ui/Brand.jsx'
 import CommandPalette from '../components/admin/CommandPalette.jsx'
 import { clusterDataService } from '../services/clusterDataService.js'
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -33,14 +34,66 @@ export default function AdminLayout() {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const auth = JSON.parse(localStorage.getItem('cluster_admin_auth') || 'null')
-
-  // Auth guard
-  useEffect(() => {
-    if (!auth) {
-      navigate('/admin/login')
+  const [auth, setAuth] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('cluster_admin_auth') || 'null')
+    } catch {
+      return null
     }
-  }, [auth, navigate])
+  })
+
+  // Cryptographic Auth guard & active session verification
+  useEffect(() => {
+    let isMounted = true
+
+    const verifyAuth = async () => {
+      const localAuth = JSON.parse(localStorage.getItem('cluster_admin_auth') || 'null')
+      if (!localAuth) {
+        if (isMounted) navigate('/admin/login')
+        return
+      }
+      if (isMounted) setAuth(localAuth)
+
+      // If Supabase is configured, verify the server-side JWT session token
+      if (isSupabaseConfigured() && supabase) {
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession()
+          if (error || !session) {
+            console.warn('[Admin Security] Invalid or expired Supabase session. Redirecting to login.')
+            localStorage.removeItem('cluster_admin_auth')
+            if (isMounted) {
+              setAuth(null)
+              navigate('/admin/login')
+            }
+          }
+        } catch {
+          // If network check fails, maintain local state
+        }
+      }
+    }
+
+    verifyAuth()
+
+    // Subscribe to Supabase auth state transitions (logout, token refresh, etc.)
+    let authListener = null
+    if (isSupabaseConfigured() && supabase) {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
+          localStorage.removeItem('cluster_admin_auth')
+          if (isMounted) {
+            setAuth(null)
+            navigate('/admin/login')
+          }
+        }
+      })
+      authListener = data?.subscription
+    }
+
+    return () => {
+      isMounted = false
+      if (authListener) authListener.unsubscribe()
+    }
+  }, [navigate])
 
   // Real-time pending applications count listener
   useEffect(() => {

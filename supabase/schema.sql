@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 );
 
 -- ==============================================================================
--- Row Level Security (RLS) Policies (Clean Drop & Recreate)
+-- Row Level Security (RLS) Policies & Admin Role Verification
 -- ==============================================================================
 
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
@@ -103,46 +103,69 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.homepage_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Events Policies: Public (anon + authenticated) can READ, admins can WRITE
+-- Helper function to check if the current user has verified admin rights
+-- Admins are verified via app_metadata role, user_metadata role, or verified admin email
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN (
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    OR (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
+    OR auth.jwt() ->> 'email' IN ('cluster.society@gmail.com', 'admin@cluster.org')
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Events Policies: Public (anon + authenticated) can READ, verified admins can WRITE
 DROP POLICY IF EXISTS "Public events read access" ON public.events;
 CREATE POLICY "Public events read access" ON public.events
   FOR SELECT TO anon, authenticated USING (true);
 
 DROP POLICY IF EXISTS "Admin events full access" ON public.events;
 CREATE POLICY "Admin events full access" ON public.events
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  FOR ALL TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
--- Team Members Policies: Public can READ, admins can WRITE
+-- Team Members Policies: Public can READ, verified admins can WRITE
 DROP POLICY IF EXISTS "Public team read access" ON public.team_members;
 CREATE POLICY "Public team read access" ON public.team_members
   FOR SELECT TO anon, authenticated USING (true);
 
 DROP POLICY IF EXISTS "Admin team full access" ON public.team_members;
 CREATE POLICY "Admin team full access" ON public.team_members
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  FOR ALL TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
--- Applications Policies: Anyone can SUBMIT (INSERT), authenticated admins can manage
+-- Applications Policies: Anyone can SUBMIT (INSERT), ONLY verified admins can SELECT, UPDATE, DELETE
 DROP POLICY IF EXISTS "Public application submit access" ON public.applications;
 CREATE POLICY "Public application submit access" ON public.applications
   FOR INSERT TO anon, authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Admin applications full access" ON public.applications;
 CREATE POLICY "Admin applications full access" ON public.applications
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  FOR ALL TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
--- Homepage Config Policies: Public can READ, authenticated admins can write
+-- Homepage Config Policies: Public can READ, verified admins can WRITE
 DROP POLICY IF EXISTS "Public homepage config read access" ON public.homepage_config;
 CREATE POLICY "Public homepage config read access" ON public.homepage_config
   FOR SELECT TO anon, authenticated USING (true);
 
 DROP POLICY IF EXISTS "Admin homepage config update access" ON public.homepage_config;
 CREATE POLICY "Admin homepage config update access" ON public.homepage_config
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  FOR ALL TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
--- Audit Logs Policies: Authenticated admins can read and insert
+-- Audit Logs Policies: Authenticated verified admins can read and insert
 DROP POLICY IF EXISTS "Admin audit logs access" ON public.audit_logs;
 CREATE POLICY "Admin audit logs access" ON public.audit_logs
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  FOR ALL TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
 -- ==============================================================================
 -- Initial Seed Data
