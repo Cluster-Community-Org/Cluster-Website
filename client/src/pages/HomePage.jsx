@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Plus } from 'lucide-react'
 import HeroSection from '../components/sections/HeroSection.jsx'
@@ -41,6 +42,23 @@ function ValuesMarquee() {
   )
 }
 
+function FaqItem({ q, a, startOpen }) {
+  const [open, setOpen] = useState(startOpen)
+  return (
+    <div className="border-b border-line">
+      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="title-2 w-full flex cursor-pointer items-center justify-between gap-6 py-6 text-left [--press:.99]">
+        {q}
+        <Plus aria-hidden="true" className={`w-5 h-5 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'rotate-45' : ''}`} />
+      </button>
+      <div inert={!open} className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden">
+          <p className="body-3 text-graphite pb-6 pr-12">{a}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function FaqSection() {
   return (
     <section aria-labelledby="faq-heading" className="relative px-4 sm:px-8 lg:px-20 pb-32">
@@ -52,15 +70,7 @@ function FaqSection() {
           <p className="body-3 text-graphite">Still unsure? Come to the next open event. No application needed for that.</p>
         </div>
         <div className="reveal reveal-2 border-t border-line">
-          {FAQ.map(([q, a], i) => (
-            <details key={q} open={i === 0} className="group border-b border-line">
-              <summary className="title-2 flex cursor-pointer list-none items-center justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
-                {q}
-                <Plus aria-hidden="true" className="w-5 h-5 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45" />
-              </summary>
-              <p className="body-3 text-graphite pb-6 pr-12">{a}</p>
-            </details>
-          ))}
+          {FAQ.map(([q, a], i) => <FaqItem key={q} q={q} a={a} startOpen={i === 0} />)}
         </div>
       </div>
     </section>
