@@ -81,7 +81,7 @@
 /* ─── Hero gradient: dark planet lit from behind, under a film grain ─── */
 .hero-grad {
   /* 85.7% is the block's bottom edge inside this -20% inset box. The rim keeps clear of it so the copy stays on black on short screens. */
-  --r: 150vmax; --rim: min(40%, calc(85.7% - 580px));
+  --r: 150vmax; --rim: min(52%, calc(85.7% - 545px));
   --at: 60% calc(var(--rim) + var(--r));
   position: absolute; inset: -20%; z-index: -1; pointer-events: none;
   background:
@@ -91,7 +91,7 @@
   animation: hero-drift 18s cubic-bezier(.45,0,.55,1) infinite alternate;
 }
 /* Below lg the copy fills the block, so the rim sits higher */
-@media (max-width: 1023px) { .hero-grad { --rim: min(48%, calc(85.7% - 420px)); } }
+@media (max-width: 1023px) { .hero-grad { --rim: min(56%, calc(85.7% - 400px)); } }
 @keyframes hero-drift { to { transform: translate3d(-2%, -2%, 0) scale(1.04); } }
 
 /* Multiply leaves the black untouched and stipples dark specks into the colour */
