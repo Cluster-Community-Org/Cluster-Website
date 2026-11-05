@@ -1,10 +1,10 @@
-import { Award, Github, Linkedin, Sparkle } from 'lucide-react'
+import { Award, Github, Linkedin, Target } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useLive } from '../hooks/useLive.js'
 import { DotWave, Eyebrow, PageHeader } from '../components/ui/Brand.jsx'
 
 const VALUES = [
-  { Icon: Sparkle, title: 'Our mission', body: 'Cluster exists to make compute, peer learning and builder culture easy to reach. Students build real projects, learn practical skills, work across teams and explore what comes next.' },
+  { Icon: Target, title: 'Our mission', body: 'Cluster exists to make compute, peer learning and builder culture easy to reach. Students build real projects, learn practical skills, work across teams and explore what comes next.' },
   { Icon: Award, title: 'Student first', body: 'Every decision starts with what is best for members. Leadership is earned by contribution, knowledge is shared freely, and every student has a place here, whatever their year or background.' },
 ]
 

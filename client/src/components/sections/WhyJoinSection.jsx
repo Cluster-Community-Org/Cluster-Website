@@ -1,4 +1,4 @@
-import { BookOpen, Box, Layers, Sparkle, Terminal, Users, Zap } from 'lucide-react'
+import { BookOpen, Box, Compass, Layers, Presentation, Terminal, Users, Zap } from 'lucide-react'
 import { DotWave, Eyebrow, PixelCluster, TONES } from '../ui/Brand.jsx'
 
 const REPOS = [['your-first-project', 'shipped', true], ['team-hackathon-build', 'in progress', true], ['next-idea', 'next', false]]
@@ -6,7 +6,7 @@ const TILES = [
   [BookOpen, 'Paper club', 'Read one, argue about it', false],
   [Zap, 'Hack nights', 'Build until something works', true],
   [Box, 'Build sprints', 'Short sprint, one shipped thing', true],
-  [Sparkle, 'Showcases', 'Demo what you made', false],
+  [Presentation, 'Showcases', 'Demo what you made', false],
 ]
 
 const CARDS = [
@@ -50,7 +50,7 @@ const CARDS = [
     ),
   },
   {
-    tone: 'light', label: 'Explore', Icon: Sparkle, title: 'A semester ahead of the syllabus',
+    tone: 'light', label: 'Explore', Icon: Compass, title: 'A semester ahead of the syllabus',
     body: "Paper reading groups, hack nights and build sprints on what is next, not what was on last year's exam.",
     visual: (
       <div className="grid grid-cols-2 gap-3 min-h-[360px]">
