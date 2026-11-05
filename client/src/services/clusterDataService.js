@@ -807,24 +807,24 @@ export const clusterDataService = {
 
     try {
       // 1. Fetch remote Events
-      const { data: remoteEvents } = await supabase.from('events').select('*').order('id', { ascending: true })
-      if (remoteEvents && remoteEvents.length > 0) {
+      const { data: remoteEvents, error: eventsErr } = await supabase.from('events').select('*').order('id', { ascending: true })
+      if (!eventsErr && Array.isArray(remoteEvents)) {
         const mapped = remoteEvents.map(eventFromDB)
         localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(mapped))
         dispatchUpdate('cluster_events_updated', mapped)
       }
 
       // 2. Fetch remote Team Members
-      const { data: remoteTeam } = await supabase.from('team_members').select('*').order('id', { ascending: true })
-      if (remoteTeam && remoteTeam.length > 0) {
+      const { data: remoteTeam, error: teamErr } = await supabase.from('team_members').select('*').order('id', { ascending: true })
+      if (!teamErr && Array.isArray(remoteTeam)) {
         const mapped = remoteTeam.map(memberFromDB)
         localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(mapped))
         dispatchUpdate('cluster_team_updated', mapped)
       }
 
       // 3. Fetch remote Applications
-      const { data: remoteApps } = await supabase.from('applications').select('*').order('submitted_at', { ascending: false })
-      if (remoteApps && remoteApps.length > 0) {
+      const { data: remoteApps, error: appsErr } = await supabase.from('applications').select('*').order('submitted_at', { ascending: false })
+      if (!appsErr && Array.isArray(remoteApps)) {
         const mapped = remoteApps.map(appFromDB)
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(mapped))
         dispatchUpdate('cluster_applications_updated', mapped)
