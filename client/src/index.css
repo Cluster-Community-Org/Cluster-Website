@@ -105,6 +105,7 @@
   mask-image: radial-gradient(circle var(--r) at var(--at), #000 calc(var(--r) - 110px), transparent calc(var(--r) - 8px)), linear-gradient(90deg, transparent calc(14.3% + 600px), #000 calc(14.3% + 880px));
   mask-composite: intersect;
 }
+.hero-liquid::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 1px, transparent 1px 3px); }
 /* Below lg the copy fills the block, so the rim sits higher */
 @media (max-width: 1023px) { .hero-grad, .hero-rim, .grain { --rim: min(56%, calc(85.7% - 400px)); } }
 @keyframes hero-drift { to { transform: translate3d(-2%, -2%, 0) scale(1.04); } }
