@@ -109,7 +109,6 @@
 .blip { animation: blip 1.8s cubic-bezier(.22,1,.36,1) infinite; }
 .float { animation: float 9s cubic-bezier(.45,0,.55,1) infinite alternate; }
 .float-slow { animation: float 13s cubic-bezier(.45,0,.55,1) infinite alternate-reverse; }
-.node { transform-box: fill-box; transform-origin: center; animation: node 4.2s cubic-bezier(.22,1,.36,1) infinite; }
 .tick { animation: tick 1s steps(1) infinite; }
 .roll { display: inline-block; animation: roll .3s cubic-bezier(.22,1,.36,1); }
 
@@ -119,7 +118,6 @@
 @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.75); opacity: .6; } }
 @keyframes blip { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .45; } }
 @keyframes float { to { transform: translateY(-20px) rotate(8deg); } }
-@keyframes node { 0%, 100% { transform: scale(1); opacity: .6; } 50% { transform: scale(1.5); opacity: 1; } }
 @keyframes tick { 50% { opacity: .35; } }
 @keyframes roll { from { transform: translateY(60%); opacity: 0; } }
 @keyframes sheen { 0%, 62% { transform: translateX(-140%) skewX(-20deg); } 100% { transform: translateX(420%) skewX(-20deg); } }
@@ -174,6 +172,5 @@
   }
   .reveal, .stack-card, .tagline, .tagline-word { animation: none !important; }
   .tagline-word { color: #000; transform: none; }
-  .travel { display: none; }
   html { scroll-behavior: auto; }
 }

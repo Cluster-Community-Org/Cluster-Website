@@ -6,7 +6,7 @@ import WhyJoinSection from '../components/sections/WhyJoinSection.jsx'
 import CirclesSection from '../components/sections/CirclesSection.jsx'
 import HowItWorksSection from '../components/sections/HowItWorksSection.jsx'
 import SpotlightSection from '../components/sections/SpotlightSection.jsx'
-import { ClusterMark, Corners, DotWave, Eyebrow, PixelCluster, Square } from '../components/ui/Brand.jsx'
+import { ClusterMark, Corners, DotWave, Eyebrow, FullStop, PixelCluster, Square } from '../components/ui/Brand.jsx'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useLive } from '../hooks/useLive.js'
 
@@ -76,7 +76,7 @@ function FinalCta() {
         <Corners inset="top-6 left-6 right-6 bottom-6" />
         <ClusterMark className="relative w-16 h-16 sm:w-20 sm:h-20 text-white" animated />
         <h2 id="cta-heading" className="reveal relative heading-1 text-grad-dark max-w-[680px]">
-          Good things happen<br />in clusters.<Square className="w-3 h-3 sm:w-4 sm:h-4 ml-4" pulse />
+          Good things happen<br />in clusters<FullStop />
         </h2>
         <p className="reveal reveal-2 relative title-2 text-soft max-w-xl">
           {open
