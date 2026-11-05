@@ -14,11 +14,6 @@ import {
   Github,
   Linkedin,
   MessageSquare,
-  QrCode,
-  Download,
-  Share2,
-  Copy,
-  Check,
   Zap,
   ShieldCheck,
   Users,
@@ -83,8 +78,6 @@ export default function JoinPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedApp, setSubmittedApp] = useState(null)
-  const [showQrModal, setShowQrModal] = useState(false)
-  const [copiedLink, setCopiedLink] = useState(false)
   const [isApplicationsOpen, setIsApplicationsOpen] = useState(() => clusterDataService.isApplicationsOpen())
 
   useEffect(() => {
@@ -94,20 +87,6 @@ export default function JoinPage() {
     window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
     return () => window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
   }, [])
-
-  // Determine current live URL for QR code
-  const currentUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/join`
-    : 'https://cluster-club.vercel.app/join'
-
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=24&color=080808&bgcolor=FFFFFF&data=${encodeURIComponent(currentUrl)}`
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(currentUrl)
-    setCopiedLink(true)
-    showToast('Link copied to clipboard!')
-    setTimeout(() => setCopiedLink(false), 2000)
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -135,8 +114,8 @@ export default function JoinPage() {
 
       <div className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* Top Header Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-white/[0.08]">
-          <div className="space-y-2 max-w-2xl">
+        <div className="pb-8 border-b border-white/[0.08]">
+          <div className="space-y-2 max-w-3xl">
             <div className="text-xs font-mono font-bold tracking-widest text-cluster-acid uppercase flex items-center gap-2">
               <span className="w-2 h-2 rounded-sm bg-cluster-acid shadow-[0_0_8px_rgba(198,255,77,0.8)]" />
               <span>CLUSTER SOCIETY // STUDENT RECRUITMENT 2026</span>
@@ -148,26 +127,6 @@ export default function JoinPage() {
             <p className="text-xs sm:text-sm text-[#C2C2B8] font-sans leading-relaxed pt-1">
               A community around compute, engineering, and shared curiosity. Apply below to join our focused developer circles, build production software, and access mentorship.
             </p>
-          </div>
-
-          {/* QR Code Action Card */}
-          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
-            <button
-              onClick={() => setShowQrModal(true)}
-              className="btn-cluster-secondary px-4 py-2.5 text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
-            >
-              <QrCode className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
-              <span>Get Shareable QR</span>
-            </button>
-
-            <button
-              onClick={handleCopyLink}
-              className="btn-cluster-secondary px-3.5 py-2.5 text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer"
-              title="Copy page link"
-            >
-              {copiedLink ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
-              <span>{copiedLink ? 'Copied' : 'Share Link'}</span>
-            </button>
           </div>
         </div>
 
@@ -568,67 +527,6 @@ export default function JoinPage() {
           </div>
         )}
       </div>
-
-      {/* Shareable QR Code Modal */}
-      {showQrModal && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowQrModal(false)
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
-        >
-          <div
-            className="relative w-full max-w-sm rounded-3xl bg-[#0F1012] border border-white/[0.1] p-6 sm:p-7 shadow-2xl text-center space-y-5"
-            role="dialog"
-            aria-modal="true"
-          >
-            <div className="space-y-1">
-              <div className="text-[10px] font-mono font-bold tracking-widest text-cluster-acid uppercase">
-                PRINT & PROJECTOR READY
-              </div>
-              <h3 className="text-xl font-display font-black text-white">
-                Scan to Join CLUSTER
-              </h3>
-              <p className="text-xs text-[#8E8E88] font-sans">
-                Scan using any phone camera to open this recruitment form directly.
-              </p>
-            </div>
-
-            {/* High-Resolution QR Card */}
-            <div className="p-4 rounded-2xl bg-white mx-auto inline-block shadow-[0_0_30px_rgba(255,255,255,0.15)]">
-              <img
-                src={qrImageUrl}
-                alt="QR Code for CLUSTER Join Application"
-                className="w-56 h-56 object-contain rounded-lg"
-              />
-            </div>
-
-            <div className="text-[11px] font-mono text-gray-400 break-all bg-black p-2.5 rounded-xl border border-white/[0.08]">
-              {currentUrl}
-            </div>
-
-            <div className="flex items-center gap-2 pt-1">
-              <a
-                href={qrImageUrl}
-                download="cluster_join_qr_code.png"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-cluster-primary flex-1 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>Save QR Image</span>
-              </a>
-
-              <button
-                onClick={() => setShowQrModal(false)}
-                className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-mono text-white"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

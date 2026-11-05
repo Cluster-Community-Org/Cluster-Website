@@ -22,7 +22,6 @@ import {
   Check,
   Send,
   HelpCircle,
-  QrCode,
   PauseCircle,
   PlayCircle,
   Lock,
@@ -329,16 +328,16 @@ export default function AdminApplications() {
             )}
           </button>
 
-          {/* Public Join Page & QR Link */}
+          {/* Public Join Page Link */}
           <a
             href={typeof window !== 'undefined' ? `${window.location.origin}/join` : '/join'}
             target="_blank"
             rel="noreferrer"
             className="btn-cluster-secondary px-3.5 py-2.5 text-xs font-mono font-bold flex items-center gap-1.5"
-            title="Open dedicated public join page and shareable QR code"
+            title="Open dedicated public join page"
           >
-            <QrCode className="w-4 h-4 text-cluster-acid" />
-            <span>Join Page & QR</span>
+            <ExternalLink className="w-4 h-4 text-cluster-acid" />
+            <span>View Join Page</span>
           </a>
 
           {/* Google Sheets Sync Trigger */}
