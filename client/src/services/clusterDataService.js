@@ -708,6 +708,27 @@ export const clusterDataService = {
       })
     }
 
+    // Realtime Google Sheet Status Update (Sync status change to sheet)
+    const sheetWebhookUrl = this.getApplicationsSheetUrl()
+    if (sheetWebhookUrl && sheetWebhookUrl.startsWith('http') && target) {
+      try {
+        fetch(sheetWebhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'UPDATE_STATUS',
+            id: target.id,
+            email: target.email,
+            rollNumber: target.rollNumber,
+            status: newStatus,
+          }),
+        }).catch((err) => console.warn('[Google Sheets Status Update Error]', err))
+      } catch (err) {
+        console.warn('[Google Sheets Status Update Trigger Error]', err)
+      }
+    }
+
     return updated
   },
 

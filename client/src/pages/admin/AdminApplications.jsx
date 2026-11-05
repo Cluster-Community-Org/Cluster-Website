@@ -86,6 +86,50 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       data = e.parameter;
     }
 
+    // ── CASE 1: UPDATE STATUS OF AN EXISTING CANDIDATE ──
+    if (data.action === "UPDATE_STATUS" && data.status) {
+      var targetEmail = (data.email || "").toString().trim().toLowerCase();
+      var targetRoll = (data.rollNumber || data.roll_number || "").toString().trim().toLowerCase();
+      var lastRow = sheet.getLastRow();
+
+      if (lastRow > 1) {
+        var range = sheet.getRange(2, 1, lastRow - 1, 12);
+        var values = range.getValues();
+        var foundRow = -1;
+
+        for (var i = 0; i < values.length; i++) {
+          var rowEmail = values[i][2].toString().trim().toLowerCase();
+          var rowRoll = values[i][3].toString().trim().toLowerCase();
+          if ((targetEmail && rowEmail === targetEmail) || (targetRoll && rowRoll === targetRoll)) {
+            foundRow = i + 2;
+            break;
+          }
+        }
+
+        if (foundRow > 0) {
+          var statusCell = sheet.getRange(foundRow, 12);
+          statusCell.setValue(data.status);
+          
+          // Color-code status cell in Google Sheet
+          if (data.status === "Accepted") {
+            statusCell.setBackground("#C6FF4D").setFontColor("#000000").setFontWeight("bold");
+          } else if (data.status === "Rejected") {
+            statusCell.setBackground("#FFCDD2").setFontColor("#B71C1C").setFontWeight("bold");
+          } else if (data.status === "Under Review") {
+            statusCell.setBackground("#E1F5FE").setFontColor("#0277BD").setFontWeight("bold");
+          } else if (data.status === "Waitlisted") {
+            statusCell.setBackground("#EDE7F6").setFontColor("#512DA8").setFontWeight("bold");
+          } else {
+            statusCell.setBackground("#FFF9C4").setFontColor("#F57F17").setFontWeight("bold");
+          }
+
+          return ContentService.createTextOutput(JSON.stringify({ result: "success", action: "status_updated" }))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    }
+
+    // ── CASE 2: NEW APPLICATION INSERT ──
     sheet.appendRow([
       new Date(),
       data.fullName || data.full_name || '',
