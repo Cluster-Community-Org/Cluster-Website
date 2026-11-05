@@ -1,7 +1,12 @@
-import { BookOpen, Box, Compass, Layers, Presentation, Terminal, Users, Zap } from 'lucide-react'
+import { BookOpen, Box, Compass, Github, Layers, Presentation, Terminal, Users, Zap } from 'lucide-react'
 import { DotWave, Eyebrow, PixelCluster, TONES } from '../ui/Brand.jsx'
 
-const REPOS = [['your-first-project', 'shipped', true], ['team-hackathon-build', 'in progress', true], ['next-idea', 'next', false]]
+// GitHub-style contribution grid: 26 weeks x 7 days, fixed pseudo-random levels (no hydration drift), skewed green.
+const LEVELS = ['bg-char-3', 'bg-lime/25', 'bg-lime/50', 'bg-lime/75', 'bg-lime']
+const GRID = Array.from({ length: 26 * 7 }, (_, i) => {
+  const n = (i * 37 + (i >> 3) * 11) % 13
+  return n < 1 ? 0 : n < 3 ? 1 : n < 6 ? 2 : n < 10 ? 3 : 4
+})
 const TILES = [
   [BookOpen, 'Paper club', 'Read one, argue about it', false],
   [Zap, 'Hack nights', 'Build until something works', true],
@@ -24,14 +29,18 @@ const CARDS = [
     tone: 'dark', label: 'Build', Icon: Layers, title: 'Real projects under your name',
     body: "Join a circle, pick a project, ship it. Code and demos go on GitHub under your name, not the club's.",
     visual: (
-      <div className="rounded-2xl border border-char-2 bg-char-1 min-h-[360px] p-6 flex flex-col justify-end gap-3">
-        {REPOS.map(([name, state, on]) => (
-          <div key={name} className="flex items-center gap-3 rounded-lg border border-char-3 bg-black p-4">
-            <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-full ${on ? 'bg-lime' : 'bg-mute'}`} />
-            <span className="title-4 font-mono">{name}</span>
-            <span className="caption-5 text-mute ml-auto">{state}</span>
-          </div>
-        ))}
+      <div className="rounded-2xl border border-char-2 bg-char-1 min-h-[360px] p-6 flex flex-col justify-center gap-4">
+        <div className="flex items-center gap-2 text-white">
+          <Github aria-hidden="true" className="w-5 h-5" />
+          <span className="title-4 font-mono">github.com/you</span>
+        </div>
+        <div className="grid grid-flow-col grid-rows-7 gap-1" style={{ gridTemplateColumns: 'repeat(26, 1fr)' }}>
+          {GRID.map((l, i) => <span key={i} className={`aspect-square rounded-[3px] ${LEVELS[l]}`} />)}
+        </div>
+        <div className="flex items-center justify-between caption-5 text-mute">
+          <span>Shipped under your name</span>
+          <span className="flex items-center gap-1">Less {LEVELS.map(c => <span key={c} className={`w-3 h-3 rounded-[3px] ${c}`} />)} More</span>
+        </div>
       </div>
     ),
   },
