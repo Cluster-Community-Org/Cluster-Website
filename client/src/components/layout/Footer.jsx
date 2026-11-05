@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="flex flex-col gap-6 max-w-sm">
             <ClusterLogo markClass="w-10 h-10" textClass="text-xl" />
             <p className="body-6 text-graphite">
-              A community around compute. Student tech community at Galgotias University, Greater Noida.
+              A community around compute, anchored by the NVIDIA DGX H200 at Galgotias University, Greater Noida.
             </p>
             <a
               href="https://github.com/alwin2134/Cluster"

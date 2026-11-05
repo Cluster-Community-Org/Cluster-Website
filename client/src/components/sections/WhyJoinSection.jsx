@@ -37,10 +37,10 @@ const CARDS = [
   },
   {
     tone: 'lime', label: 'Compute', Icon: Terminal, title: 'Hands on compute',
-    body: 'Sessions on systems, GPUs and ML pipelines, run by members who have already done it once and want you to skip their mistakes.',
+    body: 'Sessions on systems, GPUs and ML pipelines at Galgotias University, run by members who have already done it once and want you to skip their mistakes.',
     visual: (
       <div className="rounded-2xl bg-black text-white min-h-[360px] p-8 flex flex-col justify-between font-mono text-sm">
-        <p className="text-lime">you@cluster ~</p>
+        <p className="text-lime">you@dgx-h200 ~</p>
         <div className="flex flex-col gap-2">
           <p className="text-mute">$ git clone the-project-you-joined</p>
           <p>$ pip install -r requirements.txt</p>
