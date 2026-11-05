@@ -225,16 +225,30 @@ export default function AdminHomepage() {
 
         {/* Section 3: Hero Subtitle & Live Society Metrics */}
         <div className="rounded-2xl p-6 bg-[#0F1012] border border-white/[0.08] space-y-5">
-          <div className="flex items-center gap-3 pb-4 border-b border-white/[0.06]">
-            <div className="w-9 h-9 rounded-xl bg-black border border-white/10 text-cluster-acid flex items-center justify-center">
-              <Layers className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-black border border-white/10 text-cluster-acid flex items-center justify-center">
+                <Layers className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-base font-display font-bold text-white">Hero Subtitle & Society Metrics</h3>
+                <p className="text-xs text-[#8E8E88] font-sans">
+                  Customize the lead paragraph and toggle the 4 metric panels displayed in the hero section.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-display font-bold text-white">Hero Subtitle & Society Metrics</h3>
-              <p className="text-xs text-[#8E8E88] font-sans">
-                Customize the lead paragraph and the 4 metric panels displayed in the hero section.
-              </p>
-            </div>
+
+            <label className="flex items-center gap-3 cursor-pointer self-start sm:self-auto">
+              <span className="text-xs font-mono text-[#D4D4CD]">
+                {config.statsEnabled ? 'Metrics Visible' : 'Metrics Hidden'}
+              </span>
+              <input
+                type="checkbox"
+                checked={Boolean(config.statsEnabled)}
+                onChange={(e) => setConfig({ ...config, statsEnabled: e.target.checked })}
+                className="w-4 h-4 accent-cluster-acid rounded cursor-pointer"
+              />
+            </label>
           </div>
 
           <div className="space-y-4">
@@ -251,8 +265,15 @@ export default function AdminHomepage() {
 
             {/* 4 Metric Counters Grid */}
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-mono text-[#D4D4CD]">4 Hero Metric Counters</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-[#D4D4CD]">4 Hero Metric Counters</label>
+                {!config.statsEnabled && (
+                  <span className="text-[10px] font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                    Currently hidden on public hero
+                  </span>
+                )}
+              </div>
+              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 transition-opacity ${!config.statsEnabled ? 'opacity-60' : 'opacity-100'}`}>
                 {config.stats && config.stats.map((stat, idx) => (
                   <div
                     key={idx}

@@ -24,6 +24,7 @@ export default function HeroSection() {
   }, [])
 
   const stats = (config.stats && config.stats.length > 0) ? config.stats : DEFAULT_HERO_STATS
+  const showStats = Boolean(config.statsEnabled)
 
   return (
     <section className="relative min-h-[calc(100dvh-4rem)] flex flex-col justify-center overflow-hidden bg-[#080808] border-b border-white/[0.08] px-4 py-6 sm:py-8 lg:py-10">
@@ -34,10 +35,10 @@ export default function HeroSection() {
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-cluster-acid/[0.05] rounded-full blur-[140px] pointer-events-none" />
 
       {/* Main Content (Vertically centered and tuned to fit single screen without scroll) */}
-      <div className="relative z-10 max-w-5xl mx-auto my-auto text-center flex flex-col justify-center items-center space-y-4 sm:space-y-5 lg:space-y-6 w-full">
+      <div className={`relative z-10 max-w-5xl mx-auto my-auto text-center flex flex-col justify-center items-center w-full ${showStats ? 'space-y-4 sm:space-y-5 lg:space-y-6' : 'space-y-6 sm:space-y-8 lg:space-y-9'}`}>
 
         {/* Hero Headline (Pure Editorial Brand Board Direction, No awkward double period) */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight text-[#F8F7F3] leading-[1.06]">
+        <h1 className={`${showStats ? 'text-4xl sm:text-6xl lg:text-7xl' : 'text-4xl sm:text-6xl lg:text-7xl xl:text-8xl'} font-display font-black tracking-tight text-[#F8F7F3] leading-[1.06]`}>
           Find your people.<br />
           <span className="text-cluster-gradient">Build together</span>
           <span className="inline-block w-3 sm:w-3.5 h-3 sm:h-3.5 bg-cluster-acid ml-2 rounded-sm align-baseline shadow-[0_0_10px_rgba(198,255,77,0.5)]" />
@@ -72,21 +73,23 @@ export default function HeroSection() {
         </div>
 
         {/* Metric Bar: High-contrast, Architectural, 1px Hairline Borders */}
-        <div className="pt-2 sm:pt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5 w-full max-w-4xl text-left font-mono">
-          {stats.map((stat, idx) => (
-            <div
-              key={idx}
-              className="py-3 px-4 rounded-xl bg-[#0F1012]/90 border border-white/[0.08] hover:border-cluster-acid/30 transition-colors backdrop-blur-md"
-            >
-              <div className={`text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight tabular-nums font-mono ${idx % 2 === 0 ? 'text-cluster-acid' : 'text-white'}`}>
-                {stat.value}
+        {showStats && (
+          <div className="pt-2 sm:pt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5 w-full max-w-4xl text-left font-mono animate-fadeIn">
+            {stats.map((stat, idx) => (
+              <div
+                key={idx}
+                className="py-3 px-4 rounded-xl bg-[#0F1012]/90 border border-white/[0.08] hover:border-cluster-acid/30 transition-colors backdrop-blur-md"
+              >
+                <div className={`text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight tabular-nums font-mono ${idx % 2 === 0 ? 'text-cluster-acid' : 'text-white'}`}>
+                  {stat.value}
+                </div>
+                <div className="text-[10px] sm:text-[11px] text-[#8E8E88] font-medium tracking-wider mt-0.5 uppercase truncate">
+                  {stat.label}
+                </div>
               </div>
-              <div className="text-[10px] sm:text-[11px] text-[#8E8E88] font-medium tracking-wider mt-0.5 uppercase truncate">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

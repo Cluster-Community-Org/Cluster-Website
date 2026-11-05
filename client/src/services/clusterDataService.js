@@ -75,6 +75,7 @@ const DEFAULT_HOMEPAGE = {
   bannerLinkText: 'Join In →',
   heroHeadline: 'Find your people.\nBuild together.',
   heroSubtitle: 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
+  statsEnabled: false,
   stats: [
     { label: 'COMMUNITY MEMBERS', value: '150+' },
     { label: 'EVENTS & SESSIONS', value: '20+' },
@@ -292,6 +293,7 @@ function configFromDB(row) {
     bannerLinkText: row.banner_link_text,
     heroHeadline: row.hero_headline,
     heroSubtitle: row.hero_subtitle,
+    statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : false,
     stats: row.stats || [],
   }
 }
@@ -305,6 +307,7 @@ function configToDB(c) {
     banner_link_text: c.bannerLinkText,
     hero_headline: c.heroHeadline,
     hero_subtitle: c.heroSubtitle,
+    stats_enabled: Boolean(c.statsEnabled),
     stats: c.stats,
     updated_at: new Date().toISOString(),
   }
@@ -450,7 +453,14 @@ export const clusterDataService = {
   getHomepageConfig() {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.HOMEPAGE)
-      if (stored) return JSON.parse(stored)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        return {
+          ...DEFAULT_HOMEPAGE,
+          ...parsed,
+          statsEnabled: parsed.statsEnabled !== undefined ? Boolean(parsed.statsEnabled) : false,
+        }
+      }
       localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(DEFAULT_HOMEPAGE))
       return DEFAULT_HOMEPAGE
     } catch {
@@ -466,8 +476,17 @@ export const clusterDataService = {
     dispatchUpdate('cluster_homepage_updated', updated)
 
     if (isSupabaseConfigured() && supabase) {
-      supabase.from('homepage_config').upsert(configToDB(updated)).then(({ error }) => {
-        if (error) console.warn('[Supabase Sync Error] homepage_config.upsert:', error.message)
+      const payload = configToDB(updated)
+      supabase.from('homepage_config').upsert(payload).then(async ({ error }) => {
+        if (error) {
+          console.warn('[Supabase Sync Error] homepage_config.upsert:', error.message)
+          if (error.code === 'PGRST204' || error.message?.includes('column')) {
+            const fallback = { ...payload }
+            delete fallback.stats_enabled
+            const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback)
+            if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
+          }
+        }
       })
     }
 

@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS public.homepage_config (
   hero_headline TEXT DEFAULT 'Find your people.
 Build together',
   hero_subtitle TEXT DEFAULT 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
+  stats_enabled BOOLEAN DEFAULT FALSE,
   stats JSONB DEFAULT '[
     {"label": "COMMUNITY MEMBERS", "value": "150+"},
     {"label": "EVENTS & SESSIONS", "value": "20+"},
@@ -73,6 +74,8 @@ Build together',
   ]',
   updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
+ALTER TABLE public.homepage_config ADD COLUMN IF NOT EXISTS stats_enabled BOOLEAN DEFAULT FALSE;
 
 -- 5. Society Audit Trail Table
 CREATE TABLE IF NOT EXISTS public.audit_logs (
