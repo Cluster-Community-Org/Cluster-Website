@@ -44,8 +44,8 @@
   .caption-3 { @apply text-xs font-semibold uppercase tracking-[0.14em]; }
   .caption-5 { @apply text-xs; }
 
-  .text-grad-dark  { background: linear-gradient(90deg, #FFFFFF, #9B9B9B); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .text-grad-light { background: linear-gradient(90deg, #000000, #666666); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .text-grad-dark  { background: linear-gradient(90deg, #FFFFFF, #9B9B9B); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .2em; }
+  .text-grad-light { background: linear-gradient(90deg, #000000, #666666); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .2em; }
 
   .btn {
     @apply inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2 rounded-full border border-transparent text-base font-semibold cursor-pointer;
