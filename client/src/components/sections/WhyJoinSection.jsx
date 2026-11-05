@@ -70,17 +70,12 @@ const CARDS = [
 
 export default function WhyJoinSection() {
   return (
-    <section aria-labelledby="why-heading" className="relative px-4 sm:px-8 lg:px-20 pb-32">
+    <section aria-labelledby="why-heading" className="relative px-4 sm:px-8 lg:px-20 pt-24 sm:pt-32 pb-32">
       <PixelCluster className="w-24 h-24 right-32 -top-16" />
-      <div className="max-w-7xl mx-auto flex flex-col gap-12">
-        <div className="reveal flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12">
-          <div className="flex flex-col gap-4 max-w-[680px]">
-            <Eyebrow>Why join</Eyebrow>
-            <h2 id="why-heading" className="heading-2">What you actually get<br />out of Cluster</h2>
-          </div>
-          <p className="body-3 text-graphite max-w-sm">
-            Not a club you list on a résumé and forget. Four things that change what your next semester looks like.
-          </p>
+      <div className="max-w-7xl mx-auto flex flex-col gap-12 lg:gap-16">
+        <div className="reveal flex flex-col items-center text-center gap-4">
+          <h2 id="why-heading" className="heading-1">Why join Cluster</h2>
+          <p className="title-2 text-graphite">Not a club you list on a résumé and forget.</p>
         </div>
 
         <div className="flex flex-col gap-6 pb-24">
