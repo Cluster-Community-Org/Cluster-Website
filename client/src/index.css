@@ -79,7 +79,7 @@
 }
 
 /* ─── Hero gradient: dark planet lit from behind, under a film grain ─── */
-.hero-grad, .hero-rim, .grain {
+.hero-grad, .hero-rim, .hero-liquid, .grain {
   /* 85.7% is the block's bottom edge inside this -20% inset box. The rim keeps clear of it so the copy stays on black on short screens. */
   --r: 150vmax; --rim: min(52%, calc(85.7% - 545px));
   --at: 60% calc(var(--rim) + var(--r));
@@ -97,6 +97,13 @@
     radial-gradient(circle var(--r) at var(--at), #000 var(--r), transparent calc(var(--r) + .5px)),
     radial-gradient(14% 5% at 60% var(--rim), #FFF, transparent),
     radial-gradient(circle var(--r) at var(--at), #F6FFDF 100%, #C6FF4D 101%, #8FD11F 105%, #3D6B0B 110%, #12240A 117%, transparent 125%);
+}
+/* Flowing black liquid on the planet, beside the copy (desktop only). Masked to stay inside the rim and clear of the text: 14.3% is the block's left edge in this -20% inset box, and the fade starts past the heading at any width. */
+.hero-liquid {
+  -webkit-mask-image: radial-gradient(circle var(--r) at var(--at), #000 calc(var(--r) - 110px), transparent calc(var(--r) - 8px)), linear-gradient(90deg, transparent calc(14.3% + 600px), #000 calc(14.3% + 880px));
+  -webkit-mask-composite: source-in;
+  mask-image: radial-gradient(circle var(--r) at var(--at), #000 calc(var(--r) - 110px), transparent calc(var(--r) - 8px)), linear-gradient(90deg, transparent calc(14.3% + 600px), #000 calc(14.3% + 880px));
+  mask-composite: intersect;
 }
 /* Below lg the copy fills the block, so the rim sits higher */
 @media (max-width: 1023px) { .hero-grad, .hero-rim, .grain { --rim: min(56%, calc(85.7% - 400px)); } }

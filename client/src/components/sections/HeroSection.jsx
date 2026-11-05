@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useLive } from '../../hooks/useLive.js'
 import { Corners, FullStop } from '../ui/Brand.jsx'
+import HeroLiquid from './HeroLiquid.jsx'
 
 export function LiveChip({ open }) {
   return (
@@ -23,6 +24,7 @@ export default function HeroSection() {
         <div aria-hidden="true" className="hero-grad" />
         <div aria-hidden="true" className="grain" />
         <div aria-hidden="true" className="hero-rim" />
+        <HeroLiquid />
         <Corners inset="top-6 left-6 right-6 bottom-6" />
 
         <div className="relative flex flex-col gap-6 max-w-[680px]">
