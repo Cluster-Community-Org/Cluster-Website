@@ -14,6 +14,7 @@ import {
   Github,
   Linkedin,
   MessageSquare,
+  Lock,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
@@ -138,7 +139,35 @@ export default function JoinClusterModal({ isOpen, onClose }) {
           <X className="w-5 h-5" />
         </button>
 
-        {submittedApp ? (
+        {!clusterDataService.isApplicationsOpen() ? (
+          /* Applications Closed Screen */
+          <div className="py-8 text-center space-y-5 animate-fadeIn">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+              <Lock className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
+                RECRUITMENT PAUSED // APPLICATIONS CLOSED
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-display font-black text-white">
+                Not Accepting Applications Anymore
+              </h2>
+              <p className="text-xs sm:text-sm text-[#A8A8A0] max-w-md mx-auto font-sans leading-relaxed">
+                Membership applications are currently closed for this recruitment cohort. Thank you for your interest in CLUSTER!
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                onClick={handleReset}
+                className="btn-cluster-secondary px-6 py-2.5 text-xs font-semibold cursor-pointer"
+              >
+                Close Window
+              </button>
+            </div>
+          </div>
+        ) : submittedApp ? (
           /* Success Screen */
           <div className="py-8 text-center space-y-5 animate-fadeIn">
             <div className="w-16 h-16 rounded-2xl bg-cluster-acid/15 border border-cluster-acid/40 text-cluster-acid flex items-center justify-center mx-auto">

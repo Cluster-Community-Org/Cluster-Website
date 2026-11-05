@@ -23,6 +23,10 @@ import {
   Send,
   HelpCircle,
   QrCode,
+  PauseCircle,
+  PlayCircle,
+  Lock,
+  Unlock,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
@@ -176,6 +180,9 @@ export default function AdminApplications() {
   const [isTestingPing, setIsTestingPing] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
+  // Recruitment Window State (Open vs Paused/Closed)
+  const [isApplicationsOpen, setIsApplicationsOpen] = useState(() => clusterDataService.isApplicationsOpen())
+
   useEffect(() => {
     const handleUpdate = () => {
       setApplications(clusterDataService.getApplications())
@@ -184,6 +191,7 @@ export default function AdminApplications() {
       const url = clusterDataService.getApplicationsSheetUrl()
       setSheetUrl(url)
       setSheetUrlInput(url)
+      setIsApplicationsOpen(clusterDataService.isApplicationsOpen())
     }
     window.addEventListener('cluster_applications_updated', handleUpdate)
     window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
@@ -192,6 +200,18 @@ export default function AdminApplications() {
       window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
     }
   }, [])
+
+  const handleToggleApplicationsOpen = () => {
+    const next = !isApplicationsOpen
+    clusterDataService.setApplicationsOpen(next)
+    setIsApplicationsOpen(next)
+    showToast(
+      next
+        ? 'Recruitment OPEN: Form is now active on /join'
+        : 'Recruitment PAUSED: "Applications Closed" notice is now active on /join',
+      next ? 'success' : 'info'
+    )
+  }
 
   // Filter logic
   const filteredApps = applications.filter((app) => {
@@ -284,6 +304,31 @@ export default function AdminApplications() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Master Recruitment Status Toggle */}
+          <button
+            onClick={handleToggleApplicationsOpen}
+            className={`px-3.5 py-2.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              isApplicationsOpen
+                ? 'bg-cluster-acid/15 border-cluster-acid/50 text-cluster-acid hover:bg-cluster-acid/25'
+                : 'bg-red-500/15 border-red-500/40 text-red-300 hover:bg-red-500/25'
+            }`}
+            title="Toggle whether public visitors can submit applications on /join"
+          >
+            {isApplicationsOpen ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-cluster-acid animate-pulse" />
+                <Unlock className="w-4 h-4 text-cluster-acid" />
+                <span>Applications Open</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-red-400" />
+                <Lock className="w-4 h-4 text-red-400" />
+                <span>Applications Closed</span>
+              </>
+            )}
+          </button>
+
           {/* Public Join Page & QR Link */}
           <a
             href={typeof window !== 'undefined' ? `${window.location.origin}/join` : '/join'}
@@ -319,6 +364,25 @@ export default function AdminApplications() {
           </button>
         </div>
       </div>
+
+      {/* Paused Recruitment Alert Banner */}
+      {!isApplicationsOpen && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <Lock className="w-5 h-5 text-amber-400 shrink-0" />
+            <div>
+              <strong className="text-white block font-sans text-sm">Recruitment is Currently Closed / Paused</strong>
+              <span>Public visitors navigating to <code className="text-amber-300 bg-black/40 px-1.5 py-0.5 rounded">/join</code> or opening the join modal see the &quot;Applications Closed&quot; notice. No new submissions can be made.</span>
+            </div>
+          </div>
+          <button
+            onClick={handleToggleApplicationsOpen}
+            className="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold shrink-0 hover:bg-amber-300 transition-colors cursor-pointer"
+          >
+            Re-Open Applications
+          </button>
+        </div>
+      )}
 
       {/* KPI Cards Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 font-mono">

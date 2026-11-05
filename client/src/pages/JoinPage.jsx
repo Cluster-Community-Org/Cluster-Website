@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   Users,
   Terminal,
+  Lock,
 } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useToast } from '../context/ToastContext.jsx'
@@ -84,6 +85,15 @@ export default function JoinPage() {
   const [submittedApp, setSubmittedApp] = useState(null)
   const [showQrModal, setShowQrModal] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [isApplicationsOpen, setIsApplicationsOpen] = useState(() => clusterDataService.isApplicationsOpen())
+
+  useEffect(() => {
+    const handleConfigUpdate = () => {
+      setIsApplicationsOpen(clusterDataService.isApplicationsOpen())
+    }
+    window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
+    return () => window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
+  }, [])
 
   // Determine current live URL for QR code
   const currentUrl = typeof window !== 'undefined'
@@ -279,7 +289,9 @@ export default function JoinPage() {
                 <div className="space-y-3 font-mono text-xs">
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
                     <span className="text-gray-400">1. Online Application</span>
-                    <span className="text-cluster-acid font-bold">Open Now</span>
+                    <span className={isApplicationsOpen ? 'text-cluster-acid font-bold' : 'text-amber-400 font-bold'}>
+                      {isApplicationsOpen ? 'Open Now' : 'Closed / Paused'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-black border border-white/[0.06]">
                     <span className="text-gray-400">2. Portfolio / Shortlisting</span>
@@ -297,212 +309,261 @@ export default function JoinPage() {
               </div>
             </div>
 
-            {/* Right Column: The Application Form (7 cols) */}
+            {/* Right Column: The Application Form or Paused Notice (7 cols) */}
             <div className="lg:col-span-7">
-              <form
-                onSubmit={handleSubmit}
-                className="rounded-3xl p-6 sm:p-8 bg-[#0F1012] border border-white/[0.08] space-y-6 shadow-xl"
-              >
-                <div>
-                  <h3 className="text-xl font-display font-bold text-white tracking-tight">
-                    Submit Candidate Profile
-                  </h3>
-                  <p className="text-xs text-[#8E8E88] font-sans mt-0.5">
-                    All tech students are welcome regardless of branch or graduation year.
-                  </p>
+              {!isApplicationsOpen ? (
+                <div className="rounded-3xl p-8 sm:p-10 bg-[#0F1012] border border-amber-500/30 text-center space-y-6 shadow-2xl animate-fadeIn">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+                    <Lock className="w-8 h-8" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-[11px] font-mono font-bold tracking-widest text-amber-400 uppercase">
+                      RECRUITMENT PAUSED // APPLICATIONS CLOSED
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-display font-black text-white">
+                      Not Accepting Applications Anymore
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#A8A8A0] font-sans leading-relaxed max-w-md mx-auto">
+                      Membership applications for this cohort are currently closed. Thank you to everyone who applied!
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-black border border-white/[0.08] text-left text-xs font-mono space-y-2 max-w-md mx-auto">
+                    <div className="text-cluster-acid font-bold flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-cluster-acid" />
+                      <span>STAY CONNECTED UNTIL NEXT CYCLE:</span>
+                    </div>
+                    <p className="text-gray-400 font-sans text-xs leading-relaxed">
+                      All our hackathons, open workshops, tech study circles, and community meetups remain open to all students year-round.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <Link
+                      to="/events"
+                      className="btn-cluster-primary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
+                    >
+                      <Zap className="w-4 h-4" />
+                      <span>Explore Public Events</span>
+                    </Link>
+                    <a
+                      href="https://discord.gg/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-cluster-secondary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Join Discord Community</span>
+                    </a>
+                  </div>
                 </div>
-
-                {/* Full Name & Email */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Full Name *</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="e.g. Diya Patel"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                    />
+              ) : (
+                <form
+                  onSubmit={handleSubmit}
+                  className="rounded-3xl p-6 sm:p-8 bg-[#0F1012] border border-white/[0.08] space-y-6 shadow-xl"
+                >
+                  <div>
+                    <h3 className="text-xl font-display font-bold text-white tracking-tight">
+                      Submit Candidate Profile
+                    </h3>
+                    <p className="text-xs text-[#8E8E88] font-sans mt-0.5">
+                      All tech students are welcome regardless of branch or graduation year.
+                    </p>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Email Address *</span>
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. diya.p@example.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                    />
-                  </div>
-                </div>
+                  {/* Full Name & Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Full Name *</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="e.g. Diya Patel"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                      />
+                    </div>
 
-                {/* Roll Number & Course */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Hash className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>University Roll / Student ID *</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.rollNumber}
-                      onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
-                      placeholder="e.g. 23SCSE102045"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                    />
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Email Address *</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="e.g. diya.p@example.com"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                      />
+                    </div>
                   </div>
 
+                  {/* Roll Number & Course */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <Hash className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>University Roll / Student ID *</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.rollNumber}
+                        onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+                        placeholder="e.g. 23SCSE102045"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <GraduationCap className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Degree Program / Course *</span>
+                      </label>
+                      <select
+                        value={formData.course}
+                        onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                      >
+                        {COURSES.map((c) => (
+                          <option key={c} value={c} className="bg-[#141517] text-white">
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Branch & Year */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <GitBranch className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Branch / Specialization *</span>
+                      </label>
+                      <select
+                        value={formData.branch}
+                        onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                      >
+                        {BRANCHES.map((b) => (
+                          <option key={b} value={b} className="bg-[#141517] text-white">
+                            {b}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Current Academic Year *</span>
+                      </label>
+                      <select
+                        value={formData.year}
+                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                      >
+                        {YEARS.map((y) => (
+                          <option key={y} value={y} className="bg-[#141517] text-white">
+                            {y}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Preferred Domain */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <GraduationCap className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Degree Program / Course *</span>
+                      <Code className="w-3.5 h-3.5 text-cluster-acid" />
+                      <span>Primary Domain Interest *</span>
                     </label>
                     <select
-                      value={formData.course}
-                      onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                      value={formData.domain}
+                      onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
                     >
-                      {COURSES.map((c) => (
-                        <option key={c} value={c} className="bg-[#141517] text-white">
-                          {c}
+                      {DOMAINS.map((d) => (
+                        <option key={d} value={d} className="bg-[#141517] text-white">
+                          {d}
                         </option>
                       ))}
                     </select>
                   </div>
-                </div>
 
-                {/* Branch & Year */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <GitBranch className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Branch / Specialization *</span>
-                    </label>
-                    <select
-                      value={formData.branch}
-                      onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                    >
-                      {BRANCHES.map((b) => (
-                        <option key={b} value={b} className="bg-[#141517] text-white">
-                          {b}
-                        </option>
-                      ))}
-                    </select>
+                  {/* GitHub & LinkedIn Profiles */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <Github className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>GitHub Profile (Optional)</span>
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.github}
+                        onChange={(e) => setFormData({ ...formData, github: e.target.value })}
+                        placeholder="https://github.com/yourhandle"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
+                        <Linkedin className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>LinkedIn Profile (Optional)</span>
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.linkedin}
+                        onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                        placeholder="https://linkedin.com/in/yourhandle"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                      />
+                    </div>
                   </div>
 
+                  {/* Motivation / SOP */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Current Academic Year *</span>
+                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span>Why CLUSTER? What do you want to build?</span>
+                      </span>
+                      <span className="text-[11px] text-[#8E8E88] font-normal">Optional but valued</span>
                     </label>
-                    <select
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                    >
-                      {YEARS.map((y) => (
-                        <option key={y} value={y} className="bg-[#141517] text-white">
-                          {y}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Preferred Domain */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                    <Code className="w-3.5 h-3.5 text-cluster-acid" />
-                    <span>Primary Domain Interest *</span>
-                  </label>
-                  <select
-                    value={formData.domain}
-                    onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                  >
-                    {DOMAINS.map((d) => (
-                      <option key={d} value={d} className="bg-[#141517] text-white">
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* GitHub & LinkedIn Profiles */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Github className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>GitHub Profile (Optional)</span>
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.github}
-                      onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                      placeholder="https://github.com/yourhandle"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+                    <textarea
+                      rows={3}
+                      value={formData.motivation}
+                      onChange={(e) => setFormData({ ...formData, motivation: e.target.value })}
+                      placeholder="Tell us about a project you worked on, a tech stack you love, or what you want to build alongside peers..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none resize-none leading-relaxed"
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-[#D4D4CD] flex items-center gap-1.5">
-                      <Linkedin className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>LinkedIn Profile (Optional)</span>
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.linkedin}
-                      onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                      placeholder="https://linkedin.com/in/yourhandle"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
-                    />
+                  {/* Submit Action Bar */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/[0.08]">
+                    <p className="text-[11px] text-[#8E8E88] font-sans">
+                      Submissions are synced to the live review pipeline.
+                    </p>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="btn-cluster-primary w-full sm:w-auto px-7 py-3 text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] transition-transform"
+                    >
+                      <span>{isSubmitting ? 'Transmitting...' : 'Submit Membership Application'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
-                </div>
-
-                {/* Motivation / SOP */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#D4D4CD] flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Why CLUSTER? What do you want to build?</span>
-                    </span>
-                    <span className="text-[11px] text-[#8E8E88] font-normal">Optional but valued</span>
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.motivation}
-                    onChange={(e) => setFormData({ ...formData, motivation: e.target.value })}
-                    placeholder="Tell us about a project you worked on, a tech stack you love, or what you want to build alongside peers..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none resize-none leading-relaxed"
-                  />
-                </div>
-
-                {/* Submit Action Bar */}
-                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/[0.08]">
-                  <p className="text-[11px] text-[#8E8E88] font-sans">
-                    Submissions are synced to the live review pipeline.
-                  </p>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-cluster-primary w-full sm:w-auto px-7 py-3 text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] transition-transform"
-                  >
-                    <span>{isSubmitting ? 'Transmitting...' : 'Submit Membership Application'}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           </div>
         )}
@@ -585,3 +646,4 @@ function ClockIcon(props) {
     </svg>
   )
 }
+

@@ -77,6 +77,7 @@ const DEFAULT_HOMEPAGE = {
   heroSubtitle: 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
   statsEnabled: false,
   applicationsSheetUrl: '',
+  applicationsOpen: true,
   stats: [
     { label: 'COMMUNITY MEMBERS', value: '150+' },
     { label: 'EVENTS & SESSIONS', value: '20+' },
@@ -287,6 +288,12 @@ function memberToDB(m) {
 
 function configFromDB(row) {
   if (!row) return null
+  let localConfig = {}
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.HOMEPAGE)
+    if (stored) localConfig = JSON.parse(stored)
+  } catch {}
+
   return {
     bannerEnabled: Boolean(row.banner_enabled),
     bannerText: row.banner_text,
@@ -294,9 +301,10 @@ function configFromDB(row) {
     bannerLinkText: row.banner_link_text,
     heroHeadline: row.hero_headline,
     heroSubtitle: row.hero_subtitle,
-    statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : false,
-    applicationsSheetUrl: row.applications_sheet_url || '',
-    stats: row.stats || [],
+    statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : (localConfig.statsEnabled !== undefined ? Boolean(localConfig.statsEnabled) : false),
+    applicationsSheetUrl: row.applications_sheet_url !== undefined ? row.applications_sheet_url : (localConfig.applicationsSheetUrl || ''),
+    applicationsOpen: row.applications_open !== undefined ? Boolean(row.applications_open) : (localConfig.applicationsOpen !== undefined ? Boolean(localConfig.applicationsOpen) : true),
+    stats: row.stats || localConfig.stats || [],
   }
 }
 
@@ -311,6 +319,7 @@ function configToDB(c) {
     hero_subtitle: c.heroSubtitle,
     stats_enabled: Boolean(c.statsEnabled),
     applications_sheet_url: (c.applicationsSheetUrl || '').trim(),
+    applications_open: c.applicationsOpen !== undefined ? Boolean(c.applicationsOpen) : true,
     stats: c.stats,
     updated_at: new Date().toISOString(),
   }
@@ -462,6 +471,7 @@ export const clusterDataService = {
           ...DEFAULT_HOMEPAGE,
           ...parsed,
           statsEnabled: parsed.statsEnabled !== undefined ? Boolean(parsed.statsEnabled) : false,
+          applicationsOpen: parsed.applicationsOpen !== undefined ? Boolean(parsed.applicationsOpen) : true,
         }
       }
       localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(DEFAULT_HOMEPAGE))
@@ -487,6 +497,7 @@ export const clusterDataService = {
             const fallback = { ...payload }
             delete fallback.stats_enabled
             delete fallback.applications_sheet_url
+            delete fallback.applications_open
             const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback)
             if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
           }
@@ -495,6 +506,19 @@ export const clusterDataService = {
     }
 
     return updated
+  },
+
+  isApplicationsOpen() {
+    return this.getHomepageConfig().applicationsOpen !== false
+  },
+
+  setApplicationsOpen(isOpen) {
+    this.logAudit(
+      'RECRUITMENT_TOGGLED',
+      isOpen ? 'Membership applications opened for submissions' : 'Membership applications paused / closed',
+      'applications'
+    )
+    return this.updateHomepageConfig({ applicationsOpen: Boolean(isOpen) })
   },
 
   // ── Team Management ──

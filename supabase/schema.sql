@@ -73,11 +73,13 @@ Build together',
     {"label": "OPEN COLLABORATION", "value": "100%"}
   ]',
   applications_sheet_url TEXT DEFAULT '',
+  applications_open BOOLEAN DEFAULT TRUE,
   updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
 ALTER TABLE public.homepage_config ADD COLUMN IF NOT EXISTS stats_enabled BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.homepage_config ADD COLUMN IF NOT EXISTS applications_sheet_url TEXT DEFAULT '';
+ALTER TABLE public.homepage_config ADD COLUMN IF NOT EXISTS applications_open BOOLEAN DEFAULT TRUE;
 
 -- 5. Society Audit Trail Table
 CREATE TABLE IF NOT EXISTS public.audit_logs (
