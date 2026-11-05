@@ -79,7 +79,7 @@
 }
 
 /* ─── Hero gradient: dark planet lit from behind, under a film grain ─── */
-.hero-grad, .hero-rim {
+.hero-grad, .hero-rim, .grain {
   /* 85.7% is the block's bottom edge inside this -20% inset box. The rim keeps clear of it so the copy stays on black on short screens. */
   --r: 150vmax; --rim: min(52%, calc(85.7% - 545px));
   --at: 60% calc(var(--rim) + var(--r));
@@ -99,12 +99,15 @@
     radial-gradient(circle var(--r) at var(--at), #F6FFDF 100%, #C6FF4D 101%, #8FD11F 105%, #3D6B0B 110%, #12240A 117%, transparent 125%);
 }
 /* Below lg the copy fills the block, so the rim sits higher */
-@media (max-width: 1023px) { .hero-grad, .hero-rim { --rim: min(56%, calc(85.7% - 400px)); } }
+@media (max-width: 1023px) { .hero-grad, .hero-rim, .grain { --rim: min(56%, calc(85.7% - 400px)); } }
 @keyframes hero-drift { to { transform: translate3d(-2%, -2%, 0) scale(1.04); } }
 
 /* Multiply leaves the black untouched and stipples dark specks into the colour */
 .grain {
-  position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: multiply; opacity: .5;
+  mix-blend-mode: multiply; opacity: .5;
+  /* Keep the grain off the bright band hugging the edge so the rim stays clean */
+  -webkit-mask-image: radial-gradient(circle var(--r) at var(--at), transparent calc(var(--r) + 20px), #000 calc(var(--r) + 150px));
+  mask-image: radial-gradient(circle var(--r) at var(--at), transparent calc(var(--r) + 20px), #000 calc(var(--r) + 150px));
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1.3 1.3 1.3 0 -1 1.3 1.3 1.3 0 -1 1.3 1.3 1.3 0 -1 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
