@@ -1,6 +1,19 @@
 import { Link } from 'react-router-dom'
-import { Github } from 'lucide-react'
+import { Github, Instagram } from 'lucide-react'
 import { ClusterLogo, Square } from '../ui/Brand.jsx'
+
+// lucide has no X logo, so inline it
+const XIcon = (p) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...p}>
+    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+  </svg>
+)
+
+const SOCIALS = [
+  { href: 'https://github.com/alwin2134/Cluster', label: 'Cluster on GitHub', Icon: Github },
+  { href: 'https://x.com/the_clusterclub', label: 'Cluster on X', Icon: XIcon },
+  { href: 'https://www.instagram.com/theclustercommunity', label: 'Cluster on Instagram', Icon: Instagram },
+]
 
 const link = 'body-6 text-graphite hover:text-black transition-colors duration-300'
 
@@ -14,15 +27,20 @@ export default function Footer() {
             <p className="body-6 text-graphite">
               A community around compute, anchored by the NVIDIA DGX H200 at Galgotias University, Greater Noida.
             </p>
-            <a
-              href="https://github.com/alwin2134/Cluster"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Cluster on GitHub"
-              className="lift w-11 h-11 rounded-xl border border-line hover:border-black flex items-center justify-center"
-            >
-              <Github className="w-5 h-5" />
-            </a>
+            <div className="flex gap-3">
+              {SOCIALS.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="lift w-11 h-11 rounded-xl border border-line hover:border-black flex items-center justify-center"
+                >
+                  <Icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
           </div>
 
           <nav aria-label="Footer" className="flex flex-col gap-4">
