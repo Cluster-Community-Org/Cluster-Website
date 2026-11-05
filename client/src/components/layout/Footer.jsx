@@ -76,6 +76,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs font-mono text-gray-400">
               <li><Link to="/" className="hover:text-cluster-acid transition-colors">Home</Link></li>
+              <li><Link to="/join" className="hover:text-cluster-acid transition-colors">Join Society (Apply)</Link></li>
               <li><Link to="/team" className="hover:text-cluster-acid transition-colors">About & Leadership</Link></li>
               <li><Link to="/events" className="hover:text-cluster-acid transition-colors">Events & Meetups</Link></li>
               <li><Link to="/admin/login" className="hover:text-cluster-acid transition-colors text-gray-500 hover:text-cluster-acid">Admin Portal</Link></li>

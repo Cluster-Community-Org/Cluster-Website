@@ -90,13 +90,13 @@ export default function Navbar() {
 
           {/* ── Right Action Controls ── */}
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => setIsJoinModalOpen(true)}
-              className="btn-cluster-primary px-5 py-2 text-xs"
+            <Link
+              to="/join"
+              className="btn-cluster-primary px-5 py-2 text-xs flex items-center gap-1.5"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>Join CLUSTER</span>
-            </button>
+            </Link>
           </div>
 
           {/* ── Mobile Hamburger ── */}
@@ -162,16 +162,14 @@ export default function Navbar() {
 
               {/* Bottom Actions */}
               <div className="pt-4 border-t border-white/10 space-y-3">
-                <button
-                  onClick={() => {
-                    setIsOpen(false)
-                    setIsJoinModalOpen(true)
-                  }}
-                  className="btn-cluster-primary w-full py-3 text-xs"
+                <Link
+                  to="/join"
+                  onClick={() => setIsOpen(false)}
+                  className="btn-cluster-primary w-full py-3 text-xs flex items-center justify-center gap-2"
                 >
                   <UserPlus className="w-4 h-4" />
                   <span>Join CLUSTER Community</span>
-                </button>
+                </Link>
 
                 <Link
                   to="/admin/login"

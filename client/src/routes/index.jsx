@@ -4,6 +4,7 @@ import AdminLayout from '../layouts/AdminLayout.jsx'
 import HomePage from '../pages/HomePage.jsx'
 import EventsPage from '../pages/EventsPage.jsx'
 import TeamPage from '../pages/TeamPage.jsx'
+import JoinPage from '../pages/JoinPage.jsx'
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin.jsx'
@@ -21,6 +22,8 @@ export default function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/join" element={<JoinPage />} />
+        <Route path="/apply" element={<Navigate to="/join" replace />} />
       </Route>
 
       {/* Admin Auth Route */}

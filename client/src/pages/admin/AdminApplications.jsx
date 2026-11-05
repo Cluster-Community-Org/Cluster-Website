@@ -22,6 +22,7 @@ import {
   Check,
   Send,
   HelpCircle,
+  QrCode,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
@@ -283,6 +284,18 @@ export default function AdminApplications() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Public Join Page & QR Link */}
+          <a
+            href={typeof window !== 'undefined' ? `${window.location.origin}/join` : '/join'}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-cluster-secondary px-3.5 py-2.5 text-xs font-mono font-bold flex items-center gap-1.5"
+            title="Open dedicated public join page and shareable QR code"
+          >
+            <QrCode className="w-4 h-4 text-cluster-acid" />
+            <span>Join Page & QR</span>
+          </a>
+
           {/* Google Sheets Sync Trigger */}
           <button
             onClick={() => {
