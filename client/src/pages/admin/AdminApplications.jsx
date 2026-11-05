@@ -17,6 +17,11 @@ import {
   Mail,
   Hash,
   BookOpen,
+  FileSpreadsheet,
+  Copy,
+  Check,
+  Send,
+  HelpCircle,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
@@ -56,6 +61,40 @@ const DOMAINS = [
 
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
 
+const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  // Create headers on row 1 if sheet is brand new
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "Timestamp", "Full Name", "Email", "Roll Number", 
+      "Course", "Branch", "Year", "Domain", 
+      "GitHub", "LinkedIn", "Motivation", "Status"
+    ]);
+    sheet.getRange(1, 1, 1, 12).setFontWeight("bold").setBackground("#C6FF4D");
+  }
+
+  var data = JSON.parse(e.postData.contents);
+  
+  sheet.appendRow([
+    new Date(),
+    data.fullName || '',
+    data.email || '',
+    data.rollNumber || '',
+    data.course || '',
+    data.branch || '',
+    data.year || '',
+    data.domain || '',
+    data.github || '',
+    data.linkedin || '',
+    data.motivation || '',
+    data.status || 'Pending'
+  ]);
+  
+  return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}`
+
 export default function AdminApplications() {
   const { showToast } = useToast()
   const [applications, setApplications] = useState(() => clusterDataService.getApplications())
@@ -64,12 +103,28 @@ export default function AdminApplications() {
   const [selectedDomain, setSelectedDomain] = useState('All Domains')
   const [selectedApp, setSelectedApp] = useState(null)
 
+  // Google Sheets Webhook Integration State
+  const [isSheetModalOpen, setIsSheetModalOpen] = useState(false)
+  const [sheetUrl, setSheetUrl] = useState(() => clusterDataService.getApplicationsSheetUrl())
+  const [sheetUrlInput, setSheetUrlInput] = useState(() => clusterDataService.getApplicationsSheetUrl())
+  const [isTestingPing, setIsTestingPing] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+
   useEffect(() => {
     const handleUpdate = () => {
       setApplications(clusterDataService.getApplications())
     }
+    const handleConfigUpdate = () => {
+      const url = clusterDataService.getApplicationsSheetUrl()
+      setSheetUrl(url)
+      setSheetUrlInput(url)
+    }
     window.addEventListener('cluster_applications_updated', handleUpdate)
-    return () => window.removeEventListener('cluster_applications_updated', handleUpdate)
+    window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
+    return () => {
+      window.removeEventListener('cluster_applications_updated', handleUpdate)
+      window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
+    }
   }, [])
 
   // Filter logic
@@ -124,6 +179,27 @@ export default function AdminApplications() {
     showToast(`Applications exported to CSV`)
   }
 
+  const handleSaveSheetUrl = () => {
+    clusterDataService.updateApplicationsSheetUrl(sheetUrlInput)
+    setSheetUrl(sheetUrlInput.trim())
+    showToast(sheetUrlInput.trim() ? 'Google Sheets Webhook saved successfully!' : 'Webhook URL cleared')
+    setIsSheetModalOpen(false)
+  }
+
+  const handleTestPing = async () => {
+    setIsTestingPing(true)
+    const res = await clusterDataService.testApplicationsSheetUrl(sheetUrlInput)
+    setIsTestingPing(false)
+    showToast(res.message, res.success ? 'success' : 'error')
+  }
+
+  const handleCopyScript = () => {
+    navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_TEMPLATE)
+    setIsCopied(true)
+    showToast('Google Apps Script code copied to clipboard!')
+    setTimeout(() => setIsCopied(false), 2500)
+  }
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Top Header */}
@@ -141,13 +217,29 @@ export default function AdminApplications() {
           </p>
         </div>
 
-        <button
-          onClick={handleExportCSV}
-          className="btn-cluster-secondary px-4 py-2.5 text-xs font-mono font-bold flex items-center gap-2 self-start sm:self-auto"
-        >
-          <Download className="w-4 h-4 text-cluster-acid" />
-          <span>Export CSV</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Google Sheets Sync Trigger */}
+          <button
+            onClick={() => {
+              setSheetUrlInput(sheetUrl)
+              setIsSheetModalOpen(true)
+            }}
+            className="btn-cluster-secondary px-3.5 py-2.5 text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
+            title="Configure or edit the Google Sheet webhook link for yearly recruitment"
+          >
+            <span className={`w-2 h-2 rounded-full ${sheetUrl ? 'bg-cluster-acid shadow-[0_0_8px_rgba(198,255,77,0.8)]' : 'bg-gray-500'}`} />
+            <FileSpreadsheet className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
+            <span>{sheetUrl ? 'Sheet Sync Active' : 'Connect Google Sheet'}</span>
+          </button>
+
+          <button
+            onClick={handleExportCSV}
+            className="btn-cluster-secondary px-4 py-2.5 text-xs font-mono font-bold flex items-center gap-2"
+          >
+            <Download className="w-4 h-4 text-cluster-acid" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards Strip */}
@@ -453,6 +545,139 @@ export default function AdminApplications() {
                     {status}
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Google Sheets Webhook Configuration Modal */}
+      {isSheetModalOpen && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSheetModalOpen(false)
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
+        >
+          <div
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0C0D0E] border border-white/[0.1] p-6 sm:p-8 shadow-2xl text-[#F8F7F3] space-y-6"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-white/[0.08]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-cluster-acid/15 border border-cluster-acid/40 text-cluster-acid flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-display font-bold text-white">
+                    Google Sheets Live Webhook Sync
+                  </h3>
+                  <p className="text-xs text-[#8E8E88] font-sans mt-0.5">
+                    Stream new membership applications straight into your yearly Google Sheet in real time.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsSheetModalOpen(false)}
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[#8E8E88] hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Status Pill Indicator */}
+            <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs font-mono ${
+              sheetUrl
+                ? 'bg-cluster-acid/10 border-cluster-acid/30 text-cluster-acid'
+                : 'bg-amber-400/10 border-amber-400/25 text-amber-300'
+            }`}>
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${sheetUrl ? 'bg-cluster-acid animate-pulse' : 'bg-amber-400'}`} />
+                <span className="font-bold">
+                  {sheetUrl ? 'LIVE GOOGLE SHEET SYNC ACTIVE' : 'NO WEBHOOK CONFIGURED'}
+                </span>
+              </div>
+              <span className="text-[11px] opacity-80">
+                {sheetUrl ? 'Apps append to sheet automatically' : 'Saved in Supabase only'}
+              </span>
+            </div>
+
+            {/* Webhook Input Field */}
+            <div className="space-y-2">
+              <label className="text-xs font-mono text-white font-bold flex items-center justify-between">
+                <span>Google Apps Script Webhook URL</span>
+                <span className="text-[11px] text-[#8E8E88] font-normal">Editable anytime per academic year</span>
+              </label>
+              <input
+                type="url"
+                value={sheetUrlInput}
+                onChange={(e) => setSheetUrlInput(e.target.value)}
+                placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                className="w-full px-4 py-3 rounded-xl bg-[#141517] border border-white/[0.1] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+              />
+              <p className="text-[11px] text-[#8E8E88] font-sans leading-relaxed">
+                When you create a new Google Sheet for the next academic year or cohort, simply deploy its script and paste the new URL above.
+              </p>
+            </div>
+
+            {/* Action Buttons: Test Ping & Save */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleTestPing}
+                disabled={!sheetUrlInput || isTestingPing}
+                className="btn-cluster-secondary w-full sm:w-auto px-5 py-2.5 text-xs font-mono font-bold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Send className="w-3.5 h-3.5 text-cluster-acid" />
+                <span>{isTestingPing ? 'Sending Ping...' : 'Send Test Ping to Sheet'}</span>
+              </button>
+
+              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsSheetModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-mono text-[#D4D4CD]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveSheetUrl}
+                  className="btn-cluster-primary px-6 py-2.5 text-xs font-semibold"
+                >
+                  Save Webhook URL
+                </button>
+              </div>
+            </div>
+
+            {/* Copyable Setup Guide */}
+            <div className="pt-4 border-t border-white/[0.08] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <HelpCircle className="w-3.5 h-3.5 text-cluster-acid" />
+                  <span>Google Apps Script Template (Copy & Paste)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyScript}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-cluster-acid border border-cluster-acid/30 flex items-center gap-1.5 transition-colors"
+                >
+                  {isCopied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{isCopied ? 'Copied!' : 'Copy Script'}</span>
+                </button>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#080808] border border-white/[0.08] text-[11px] font-mono text-[#A8A8A0] max-h-44 overflow-y-auto leading-relaxed select-all">
+                <pre className="whitespace-pre">{GOOGLE_APPS_SCRIPT_TEMPLATE}</pre>
+              </div>
+
+              <div className="text-[11px] text-[#8E8E88] font-sans space-y-1">
+                <div><strong>1.</strong> In your Google Sheet, open <em>Extensions → Apps Script</em> and paste this code.</div>
+                <div><strong>2.</strong> Click <em>Deploy → New deployment → Web app</em> (Who has access: <strong>Anyone</strong>).</div>
+                <div><strong>3.</strong> Paste the resulting Web app URL into the box above and click <em>Save Webhook URL</em>.</div>
               </div>
             </div>
           </div>

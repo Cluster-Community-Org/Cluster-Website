@@ -11,6 +11,7 @@ import {
   Calendar,
   Sparkles,
   Link as LinkIcon,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
@@ -302,6 +303,46 @@ export default function AdminHomepage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Section 4: Google Sheets Recruitment Integration */}
+        <div className="rounded-2xl p-6 bg-[#0F1012] border border-white/[0.08] space-y-5">
+          <div className="flex items-center gap-3 pb-4 border-b border-white/[0.06]">
+            <div className="w-9 h-9 rounded-xl bg-black border border-white/10 text-cluster-acid flex items-center justify-center">
+              <FileSpreadsheet className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-display font-bold text-white">Google Sheets Recruitment Sync</h3>
+              <p className="text-xs text-[#8E8E88] font-sans">
+                Automatically stream new student membership applications to a Google Sheet. Change this webhook yearly as you create new sheets.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-[#D4D4CD]">Google Apps Script Webhook URL</label>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                  config.applicationsSheetUrl
+                    ? 'text-cluster-acid bg-cluster-acid/10 border-cluster-acid/30'
+                    : 'text-gray-400 bg-white/5 border-white/10'
+                }`}>
+                  {config.applicationsSheetUrl ? 'Sync Active' : 'Not Configured'}
+                </span>
+              </div>
+              <input
+                type="url"
+                value={config.applicationsSheetUrl || ''}
+                onChange={(e) => setConfig({ ...config, applicationsSheetUrl: e.target.value })}
+                placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-mono placeholder-gray-500 focus:border-cluster-acid focus:outline-none"
+              />
+            </div>
+            <p className="text-[11px] text-[#8E8E88] font-sans leading-relaxed">
+              Tip: You can also manage and test this webhook directly from the <strong className="text-white">Admin → Applications</strong> page.
+            </p>
           </div>
         </div>
 

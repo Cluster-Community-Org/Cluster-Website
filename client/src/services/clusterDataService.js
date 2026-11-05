@@ -76,6 +76,7 @@ const DEFAULT_HOMEPAGE = {
   heroHeadline: 'Find your people.\nBuild together.',
   heroSubtitle: 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
   statsEnabled: false,
+  applicationsSheetUrl: '',
   stats: [
     { label: 'COMMUNITY MEMBERS', value: '150+' },
     { label: 'EVENTS & SESSIONS', value: '20+' },
@@ -294,6 +295,7 @@ function configFromDB(row) {
     heroHeadline: row.hero_headline,
     heroSubtitle: row.hero_subtitle,
     statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : false,
+    applicationsSheetUrl: row.applications_sheet_url || '',
     stats: row.stats || [],
   }
 }
@@ -308,6 +310,7 @@ function configToDB(c) {
     hero_headline: c.heroHeadline,
     hero_subtitle: c.heroSubtitle,
     stats_enabled: Boolean(c.statsEnabled),
+    applications_sheet_url: (c.applicationsSheetUrl || '').trim(),
     stats: c.stats,
     updated_at: new Date().toISOString(),
   }
@@ -483,6 +486,7 @@ export const clusterDataService = {
           if (error.code === 'PGRST204' || error.message?.includes('column')) {
             const fallback = { ...payload }
             delete fallback.stats_enabled
+            delete fallback.applications_sheet_url
             const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback)
             if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
           }
@@ -606,7 +610,88 @@ export const clusterDataService = {
       })
     }
 
+    // Google Sheets Realtime Webhook Sync (Dynamic / Yearly configurable)
+    const sheetWebhookUrl = this.getApplicationsSheetUrl()
+    if (sheetWebhookUrl && sheetWebhookUrl.startsWith('http')) {
+      try {
+        fetch(sheetWebhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: newApp.id,
+            fullName: newApp.fullName,
+            email: newApp.email,
+            rollNumber: newApp.rollNumber,
+            course: newApp.course || '',
+            branch: newApp.branch || '',
+            year: newApp.year || '',
+            domain: newApp.domain,
+            github: newApp.github || '',
+            linkedin: newApp.linkedin || '',
+            motivation: newApp.motivation || '',
+            status: newApp.status || 'Pending',
+            submittedAt: newApp.submittedAt,
+          }),
+        }).catch((err) => console.warn('[Google Sheets Sync Error]', err))
+      } catch (err) {
+        console.warn('[Google Sheets Sync Trigger Error]', err)
+      }
+    }
+
     return newApp
+  },
+
+  getApplicationsSheetUrl() {
+    try {
+      const config = this.getHomepageConfig()
+      if (config.applicationsSheetUrl && config.applicationsSheetUrl.trim()) {
+        return config.applicationsSheetUrl.trim()
+      }
+      if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_SHEETS_APPLICATIONS_URL) {
+        return import.meta.env.VITE_GOOGLE_SHEETS_APPLICATIONS_URL.trim()
+      }
+      return ''
+    } catch {
+      return ''
+    }
+  },
+
+  updateApplicationsSheetUrl(url) {
+    return this.updateHomepageConfig({ applicationsSheetUrl: (url || '').trim() })
+  },
+
+  async testApplicationsSheetUrl(testUrl) {
+    const url = (testUrl || this.getApplicationsSheetUrl()).trim()
+    if (!url || !url.startsWith('http')) {
+      return { success: false, message: 'Please enter a valid Webhook URL starting with http:// or https://' }
+    }
+
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: `test-${Date.now()}`,
+          fullName: 'Test Candidate (CLUSTER Admin)',
+          email: 'test.builder@clustersociety.tech',
+          rollNumber: 'TEST2026',
+          course: 'B.Tech',
+          branch: 'Computer Science & Engineering (CSE)',
+          year: '2nd Year',
+          domain: 'Full-Stack Web Dev',
+          github: 'https://github.com/alwin2134',
+          linkedin: '',
+          motivation: 'System test ping from CLUSTER Admin to verify Google Sheet connection.',
+          status: 'Pending',
+          submittedAt: new Date().toISOString(),
+        }),
+      })
+      return { success: true, message: 'Test row dispatched! Open your Google Sheet to verify the new row.' }
+    } catch (err) {
+      return { success: false, message: err.message || 'Failed to dispatch test row.' }
+    }
   },
 
   updateApplicationStatus(id, newStatus) {
