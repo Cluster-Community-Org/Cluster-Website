@@ -16,7 +16,7 @@ export function LiveChip({ open }) {
 
 export default function HeroSection() {
   const config = useLive('cluster_homepage_updated', () => clusterDataService.getHomepageConfig())
-  const lines = (config.heroHeadline || 'Find your people.\nBuild together.').split('\n')
+  const lines = (config.heroHeadline || 'Find your people.\nBuild together.').split(/\\n|\n/) // stored copy may contain a literal "\n"
 
   return (
     <section aria-labelledby="hero-heading" className="-mt-20 px-2 pt-2 sm:px-4 sm:pt-4">
