@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Calendar, Image as ImageIcon, MapPin, X } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
@@ -13,6 +14,9 @@ const isoDate = (d) => {
 }
 const pill = (on) =>
   `title-4 capitalize rounded-full px-4 py-2 transition-colors duration-300 ${on ? 'bg-black text-white' : 'text-graphite hover:text-black'}`
+
+// Crossfades the swap so cards and the footer don't snap when the list height changes.
+const swap = (update) => (document.startViewTransition ? document.startViewTransition(() => flushSync(update)) : update())
 
 export default function EventsPage() {
   const events = useLive('cluster_events_updated', () => clusterDataService.getEvents())
@@ -36,14 +40,14 @@ export default function EventsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div aria-label="When" className="inline-flex self-start rounded-full border border-line bg-white p-1">
             {['upcoming', 'past'].map((t) => (
-              <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)} className={pill(tab === t)}>
+              <button key={t} type="button" aria-pressed={tab === t} onClick={() => swap(() => setTab(t))} className={pill(tab === t)}>
                 {t}
               </button>
             ))}
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0" aria-label="Filter by type">
+          <div className="flex flex-wrap gap-2" aria-label="Filter by type">
             {types.map((t) => (
-              <button key={t} type="button" aria-pressed={type === t} onClick={() => setType(t)} className={`${pill(type === t)} border ${type === t ? 'border-black' : 'border-line bg-white'}`}>
+              <button key={t} type="button" aria-pressed={type === t} onClick={() => swap(() => setType(t))} className={`${pill(type === t)} border ${type === t ? 'border-black' : 'border-line bg-white'}`}>
                 {t}
               </button>
             ))}
