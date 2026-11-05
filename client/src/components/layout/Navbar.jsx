@@ -1,199 +1,96 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, X, UserPlus, Home, Calendar, Users, Shield, ArrowRight } from 'lucide-react'
-import ClusterLogo from '../ui/ClusterLogo.jsx'
-import JoinClusterModal from '../modals/JoinClusterModal.jsx'
-import AnnouncementBanner from './AnnouncementBanner.jsx'
+import { ArrowRight } from 'lucide-react'
+import { ClusterLogo } from '../ui/Brand.jsx'
+
+const LINKS = [
+  { name: 'Home', to: '/' },
+  { name: 'Events', to: '/events' },
+  { name: 'Team', to: '/team' },
+]
+
+const line = 'absolute left-1/2 h-0.5 w-5 -ml-2.5 bg-current transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    const handleOpenJoin = () => setIsJoinModalOpen(true)
-
-    window.addEventListener('scroll', handleScroll)
-    window.addEventListener('open_join_modal', handleOpenJoin)
-
+    if (!open) return
+    document.body.style.overflow = 'hidden'
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('open_join_modal', handleOpenJoin)
-    }
-  }, [])
-
-  // Lock body scroll and listen for Escape key when mobile sidebar is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-      const handleKeyDown = (e) => {
-        if (e.key === 'Escape') setIsOpen(false)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-      return () => {
-        document.body.style.overflow = ''
-        window.removeEventListener('keydown', handleKeyDown)
-      }
-    } else {
       document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
     }
-  }, [isOpen])
-
-  const navLinks = [
-    { name: 'Home',   href: '/',       icon: Home },
-    { name: 'Events', href: '/events', icon: Calendar },
-    { name: 'Team',   href: '/team',   icon: Users },
-  ]
+  }, [open])
 
   return (
-    <>
-      <header
-        className={`sticky top-0 z-40 w-full transition-colors duration-200 ${
-          scrolled
-            ? 'bg-black/95 backdrop-blur-md border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
-            : 'bg-black/85 backdrop-blur-md border-b border-white/[0.08]'
-        }`}
-      >
-        {/* Top Ticker Alert Banner (if enabled) */}
-        <AnnouncementBanner />
+    <header className="sticky top-0 z-40 h-20 flex items-center justify-center px-4 pointer-events-none">
+      <nav aria-label="Main" className="relative z-10 pointer-events-auto w-full md:w-auto flex items-center justify-between gap-6 rounded-full border border-black/10 bg-paper/80 backdrop-blur-lg shadow-[0_8px_32px_rgba(0,0,0,0.06)] py-2 pr-2 pl-4">
+        <ClusterLogo />
 
-        {/* Main Navbar Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
-
-          {/* ── Brand Logo ── */}
-          <ClusterLogo
-            to="/"
-            size="md"
-            showTagline={true}
-            tagline="Community Around Compute"
-          />
-
-          {/* ── Desktop Nav pill (Perfect Horizontal and Vertical Center) ── */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#0C0D0E]/90 p-1.5 rounded-full border border-white/10 backdrop-blur-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            {navLinks.map((link) => (
+        <ul className="hidden md:flex items-center gap-1">
+          {LINKS.map((l) => (
+            <li key={l.to}>
               <NavLink
-                key={link.name}
-                to={link.href}
+                to={l.to}
+                end
                 className={({ isActive }) =>
-                  `px-5 py-1.5 rounded-full text-xs font-mono transition-all duration-200 ${
-                    isActive
-                      ? 'bg-cluster-acid text-black font-bold shadow-[0_0_20px_rgba(198,255,77,0.35)]'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`
+                  `title-4 rounded-full px-3 py-2 transition-colors duration-300 ${isActive ? 'bg-black text-white' : 'text-graphite hover:bg-black/5 hover:text-black'}`
                 }
               >
-                {link.name}
+                {l.name}
               </NavLink>
-            ))}
-          </nav>
+            </li>
+          ))}
+        </ul>
 
-          {/* ── Right Action Controls ── */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link
-              to="/join"
-              className="btn-cluster-primary px-5 py-2 text-xs flex items-center gap-1.5"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Join CLUSTER</span>
-            </Link>
-          </div>
-
-          {/* ── Mobile Hamburger ── */}
-          <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] text-gray-300 hover:text-white border border-white/10 transition-colors"
-              aria-label="Toggle navigation menu"
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <Link to="/join" className="btn btn-lime btn-sm" onClick={() => setOpen(false)}>
+            <span>Apply<span className="hidden sm:inline"> to join</span></span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            className="md:hidden relative w-9 h-9 rounded-full border border-black/10"
+          >
+            <span className={`${line} top-[13px] ${open ? 'translate-y-[4px] rotate-45' : ''}`} />
+            <span className={`${line} top-[21px] ${open ? '-translate-y-[4px] -rotate-45' : ''}`} />
+          </button>
         </div>
+      </nav>
 
-        {/* ── Mobile Slide-Over Sidebar Drawer ── */}
-        {isOpen && (
-          <div className="fixed inset-0 z-50 md:hidden flex justify-end">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Sidebar Content */}
-            <div className="relative w-72 max-w-[85vw] h-full bg-[#0C0D0E] border-l border-white/10 flex flex-col justify-between p-6 z-10 shadow-2xl animate-fadeIn">
-              <div className="space-y-6">
-                {/* Header with Close */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-                  <ClusterLogo to="/" size="sm" showTagline={false} />
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label="Close menu"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Nav Links */}
-                <nav className="flex flex-col space-y-2">
-                  {navLinks.map((link) => {
-                    const Icon = link.icon
-                    return (
-                      <NavLink
-                        key={link.name}
-                        to={link.href}
-                        onClick={() => setIsOpen(false)}
-                        className={({ isActive }) =>
-                          `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-mono font-medium transition-all ${
-                            isActive
-                              ? 'bg-cluster-acid text-black font-bold shadow-[0_0_20px_rgba(198,255,77,0.3)]'
-                              : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'
-                          }`
-                        }
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span>{link.name}</span>
-                      </NavLink>
-                    )
-                  })}
-                </nav>
-              </div>
-
-              {/* Bottom Actions */}
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <Link
-                  to="/join"
-                  onClick={() => setIsOpen(false)}
-                  className="btn-cluster-primary w-full py-3 text-xs flex items-center justify-center gap-2"
+      {open && (
+        <div id="mobile-menu" className="md:hidden fixed inset-0 pointer-events-auto bg-paper/95 backdrop-blur-xl px-6 pt-28 pb-12 flex flex-col">
+          <ul className="flex flex-col gap-2">
+            {LINKS.map((l, i) => (
+              <li key={l.to} className="rise" style={{ animationDelay: `${Math.min(i * 60, 400)}ms` }}>
+                <NavLink
+                  to={l.to}
+                  end
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) => `heading-3 flex items-center justify-between py-3 border-b border-line ${isActive ? 'text-black' : 'text-graphite'}`}
                 >
-                  <UserPlus className="w-4 h-4" />
-                  <span>Join CLUSTER Community</span>
-                </Link>
-
-                <Link
-                  to="/admin/login"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 text-[11px] font-mono text-gray-400 hover:text-cluster-acid transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Admin Access</span>
-                  </span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Join Community Modal */}
-      <JoinClusterModal
-        isOpen={isJoinModalOpen}
-        onClose={() => setIsJoinModalOpen(false)}
-      />
-    </>
+                  {({ isActive }) => (
+                    <>
+                      {l.name}
+                      {isActive && <span aria-hidden="true" className="w-3 h-3 bg-lime" />}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+          <Link to="/admin/login" onClick={() => setOpen(false)} className="mt-auto body-6 text-graphite rise" style={{ animationDelay: '240ms' }}>
+            Admin portal
+          </Link>
+        </div>
+      )}
+    </header>
   )
 }
-

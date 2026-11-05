@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.applications (
   github TEXT,
   linkedin TEXT,
   motivation TEXT,
+  projects TEXT,
   status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected')),
   submitted_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -54,17 +55,19 @@ CREATE TABLE IF NOT EXISTS public.applications (
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS course TEXT;
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS branch TEXT;
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS year TEXT;
+-- What the applicant has built, broken or shipped (primary selection signal)
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS projects TEXT;
 
 -- 4. Homepage & CMS Configuration Table (Singleton Row id=1)
 CREATE TABLE IF NOT EXISTS public.homepage_config (
   id INT PRIMARY KEY DEFAULT 1,
   banner_enabled BOOLEAN DEFAULT TRUE,
-  banner_text TEXT DEFAULT '⚡ Good things happen in clusters. Kickstart ''26 registrations are now open for tech students.',
+  banner_text TEXT DEFAULT 'Kickstart ''26 registrations are open for tech students.',
   banner_link TEXT DEFAULT '/events',
-  banner_link_text TEXT DEFAULT 'Join In →',
+  banner_link_text TEXT DEFAULT 'See events',
   hero_headline TEXT DEFAULT 'Find your people.
 Build together',
-  hero_subtitle TEXT DEFAULT 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
+  hero_subtitle TEXT DEFAULT 'A student community around compute.',
   stats_enabled BOOLEAN DEFAULT FALSE,
   stats JSONB DEFAULT '[
     {"label": "COMMUNITY MEMBERS", "value": "150+"},

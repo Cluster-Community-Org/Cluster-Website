@@ -4,6 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Public site (light brand board look)
+        paper: '#F8F8F5',
+        line: '#E4E4DF',
+        lime: '#C6FF4D',
+        graphite: '#3A3A3A',
+        mute: '#9B9B9B',
+        soft: '#C9C9C4',
+        char: { 1: '#181818', 2: '#272727', 3: '#313131' },
         // CLUSTER Brand Identity v2.0
         // Ink #080808 | Black #000000 | Off-White #F8F7F3 | Graphite #3A3A3A | Acid Lime #C6FF4D
         'cluster-green': '#C6FF4D',
@@ -59,8 +67,8 @@ export default {
         'cyber-cyan': '#C6FF4D',
       },
       fontFamily: {
-        sans:    ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Manrope', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'system-ui', 'sans-serif'],
         mono:    ['"Fira Code"', '"JetBrains Mono"', 'monospace'],
       },
       fontSize: {

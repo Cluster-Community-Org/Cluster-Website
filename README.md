@@ -26,12 +26,10 @@ The production app is live at: **[https://cluster-club.vercel.app/](https://clus
 ## ✨ Key Features
 
 ### 1. Public Experience
-* **Cybernetic Visual Identity**: Designed strictly around obsidian dark `#080808` surfaces, Acid Lime `#C6FF4D`, and Cyber Cyan `#00E5FF` with crisp typography and subtle luminous borders.
-* **Interactive 3D Circuit & Particle Canvas**: High-performance WebGL particle field and interactive circuit board backdrop.
-* **Developer CLI Terminal**: Interactive terminal emulator (`cluster@society:~$`) with built-in command interpreter (`help`, `about`, `events`, `team`, `join`, `clear`).
+* **Brand board identity**: Off-white ground, inset black blocks and acid lime `#C6FF4D`, with dot wave, scroll stacks and word reveal motion.
 * **Live Event Spotlight System**: Real-time countdown timer dynamically spotlights the society's flagship hackathon or workshop directly from the Admin CMS.
 * **Dedicated Recruitment Portal (`/join` & `/apply`)**:
-  * Comprehensive application form capturing domain interest, academic degree, engineering branch, graduation year, GitHub, LinkedIn, and motivation.
+  * Application form built around what the applicant has built, broken or shipped, plus circle interest, degree, branch, year, GitHub and LinkedIn.
   * Instant application receipt generation with candidate reference ID.
   * **Pausable Recruitment State**: When closed by administrators, visitors see a sleek *"Not Accepting Applications Anymore"* notice preventing unsolicited submissions.
 * **Events & RSVP System (`/events`)**:
@@ -67,23 +65,28 @@ Accessible at **`/admin/dashboard`** with role-based access control:
 
 ## 🎨 Design System
 
-| Token | Name | Hex / Value | Description |
-|---|---|---|---|
-| `--color-bg` | Obsidian Dark | `#080808` | Primary page background |
-| `--color-surface` | Deep Slate | `#0F1012` | Card & modal background |
-| `--color-border` | Luminous White | `rgba(255, 255, 255, 0.08)` | Structural borders & dividers |
-| `--color-acid` | Acid Lime | `#C6FF4D` | Primary accent, CTA buttons, active state |
-| `--color-cyan` | Cyber Cyan | `#00E5FF` | Secondary accent & gradient end |
-| `--font-display` | Syne / Space Grotesk | Display Font | Expressive headlines & titles |
-| `--font-sans` | Inter | UI Font | High-legibility body typography |
-| `--font-mono` | JetBrains Mono / Fira Code | Monospace | Terminal, timestamps, status badges |
+The public site follows the CLUSTER brand board: off-white ground, inset black blocks, acid lime as the only accent.
+
+| Tailwind token | Hex | Use |
+|---|---|---|
+| `paper` | `#F8F8F5` | Page background |
+| `black` | `#000000` | Hero, circles and CTA blocks, primary text |
+| `lime` | `#C6FF4D` | Accent: primary buttons, squares, live states |
+| `graphite` | `#3A3A3A` | Secondary text on light |
+| `line` | `#E4E4DF` | Borders and dividers on light |
+| `mute` / `soft` | `#9B9B9B` / `#C9C9C4` | Secondary text on black |
+| `char-1/2/3` | `#181818` / `#272727` / `#313131` | Surfaces and borders on black |
+
+* **Type**: Manrope everywhere (Fira Code only for code). Named text styles (`heading-1`, `title-2`, `body-3`, `caption-3`, ...) live in `src/index.css`.
+* **Motion**: one curve, `cubic-bezier(0.22, 1, 0.36, 1)`. Dot wave, logo sparks and marquee are CSS loops; section reveals, the tagline word reveal and the scroll stacks use CSS scroll driven animations (Chrome, Edge, Safari 26; other browsers get the static layout). All of it is disabled under `prefers-reduced-motion`.
+* **Brand pieces**: `src/components/ui/Brand.jsx` (logo mark, dot wave, corner brackets, eyebrow, pixel cluster).
 
 ---
 
 ## 🛠️ Tech Stack
 
 * **Frontend**: React 19, Vite, Tailwind CSS 3.4, React Router 7, Lucide Icons
-* **Animations & Canvas**: Canvas 2D particle simulation, interactive circuit backdrop, custom CSS glows
+* **Motion**: CSS keyframes and scroll driven animations (no animation libraries)
 * **Persistence Layer**:
   * **Supabase (PostgreSQL)**: Cloud database for events, team, applications, and homepage configs.
   * **Reactive Client Service (`clusterDataService`)**: Provides seamless offline fallback to `localStorage` with window event broadcasting.
@@ -100,10 +103,9 @@ Cluster/
 │   ├── public/                      # Static brand assets & icons
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── 3d/                  # Circuit Canvas, Particle Field, Interactive Terminal
 │   │   │   ├── layout/              # Navbar, Footer
-│   │   │   ├── modals/              # JoinClusterModal, EventRSVPModal
-│   │   │   └── sections/            # Hero, Pillars, Spotlight, Communities, Stats
+│   │   │   ├── ui/                  # Brand pieces: logo mark, dot wave, corners, eyebrow
+│   │   │   └── sections/            # Hero, Tagline, Why join, Circles, How it works, Spotlight
 │   │   ├── context/                 # ToastContext (global notification system)
 │   │   ├── layouts/                 # PublicLayout, AdminLayout
 │   │   ├── pages/

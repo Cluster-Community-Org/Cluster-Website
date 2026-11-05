@@ -70,11 +70,11 @@ const DEFAULT_EVENTS = [
 
 const DEFAULT_HOMEPAGE = {
   bannerEnabled: true,
-  bannerText: '⚡ Good things happen in clusters. Kickstart \'26 registrations are now open for tech students.',
+  bannerText: 'Kickstart \'26 registrations are open for tech students.',
   bannerLink: '/events',
-  bannerLinkText: 'Join In →',
+  bannerLinkText: 'See events',
   heroHeadline: 'Find your people.\nBuild together.',
-  heroSubtitle: 'A community around compute. Good things happen in clusters — join a space to build real projects, learn practical skills, collaborate with peers, and share your curiosity.',
+  heroSubtitle: 'A student community around compute.',
   statsEnabled: false,
   applicationsSheetUrl: '',
   applicationsOpen: true,
@@ -235,6 +235,7 @@ function appFromDB(row) {
     domain: row.domain,
     github: row.github,
     linkedin: row.linkedin,
+    projects: row.projects || '',
     motivation: row.motivation,
     status: row.status,
     submittedAt: row.submitted_at,
@@ -255,6 +256,7 @@ function appToDB(a) {
     domain: a.domain,
     github: a.github || '',
     linkedin: a.linkedin || '',
+    projects: a.projects || '',
     motivation: a.motivation || '',
     status: a.status || 'Pending',
   }
@@ -613,7 +615,8 @@ export const clusterDataService = {
       supabase.from('applications').insert(appToDB(newApp)).then(async ({ error }) => {
         if (error) {
           console.warn('[Supabase Sync Error] applications.insert:', error.message)
-          // If remote schema doesn't yet have course/branch/year columns, retry with legacy payload
+          // If remote schema doesn't yet have course/branch/year/projects columns, retry with legacy payload
+          // (projects folded into motivation so nothing is lost)
           if (error.code === 'PGRST204' || error.message?.includes('column')) {
             const legacyPayload = {
               id: newApp.id,
@@ -624,7 +627,7 @@ export const clusterDataService = {
               domain: newApp.domain,
               github: newApp.github || '',
               linkedin: newApp.linkedin || '',
-              motivation: newApp.motivation || '',
+              motivation: [newApp.projects && `Built: ${newApp.projects}`, newApp.motivation].filter(Boolean).join('\n\n'),
               status: newApp.status || 'Pending',
             }
             const { error: retryErr } = await supabase.from('applications').insert(legacyPayload)
@@ -656,6 +659,7 @@ export const clusterDataService = {
             motivation: newApp.motivation || '',
             status: newApp.status || 'Pending',
             submittedAt: newApp.submittedAt,
+            projects: newApp.projects || '',
           }),
         }).catch((err) => console.warn('[Google Sheets Sync Error]', err))
       } catch (err) {
@@ -783,7 +787,7 @@ export const clusterDataService = {
       }
       return `"${str}"`
     }
-    const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Course', 'Branch', 'Year', 'Combined Info', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation']
+    const headers = ['ID', 'Full Name', 'Email', 'Roll Number', 'Course', 'Branch', 'Year', 'Combined Info', 'Domain', 'Status', 'Submitted At', 'GitHub', 'LinkedIn', 'Motivation', 'Projects']
     const rows = apps.map((a) => [
       sanitizeCSV(a.id),
       sanitizeCSV(a.fullName),
@@ -799,6 +803,7 @@ export const clusterDataService = {
       sanitizeCSV(a.github),
       sanitizeCSV(a.linkedin),
       sanitizeCSV(a.motivation),
+      sanitizeCSV(a.projects),
     ])
 
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
