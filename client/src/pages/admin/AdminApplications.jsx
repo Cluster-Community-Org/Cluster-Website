@@ -329,11 +329,10 @@ export default function AdminApplications() {
           {/* Master Recruitment Status Toggle */}
           <button
             onClick={handleToggleApplicationsOpen}
-            className={`px-3.5 py-2.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer ${
-              isApplicationsOpen
+            className={`px-3.5 py-2.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer ${isApplicationsOpen
                 ? 'bg-cluster-acid/15 border-cluster-acid/50 text-cluster-acid hover:bg-cluster-acid/25'
                 : 'bg-red-500/15 border-red-500/40 text-red-300 hover:bg-red-500/25'
-            }`}
+              }`}
             title="Toggle whether public visitors can submit applications on /join"
           >
             {isApplicationsOpen ? (
@@ -439,17 +438,15 @@ export default function AdminApplications() {
               <button
                 key={tab}
                 onClick={() => setSelectedStatusTab(tab)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
-                  selectedStatusTab === tab
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${selectedStatusTab === tab
                     ? 'bg-cluster-acid text-black font-bold'
                     : 'text-[#8E8E88] hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <span>{tab}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    selectedStatusTab === tab ? 'bg-black/20 text-black' : 'bg-white/10 text-gray-400'
-                  }`}
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedStatusTab === tab ? 'bg-black/20 text-black' : 'bg-white/10 text-gray-400'
+                    }`}
                 >
                   {count}
                 </span>
@@ -721,11 +718,10 @@ export default function AdminApplications() {
                   <button
                     key={status}
                     onClick={() => handleStatusChange(selectedApp.id, status)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-                      selectedApp.status === status
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${selectedApp.status === status
                         ? 'bg-cluster-acid text-black font-bold'
                         : 'bg-white/5 text-[#8E8E88] hover:text-white'
-                    }`}
+                      }`}
                   >
                     {status}
                   </button>
@@ -774,11 +770,10 @@ export default function AdminApplications() {
             </div>
 
             {/* Status Pill Indicator */}
-            <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs font-mono ${
-              sheetUrl
+            <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs font-mono ${sheetUrl
                 ? 'bg-cluster-acid/10 border-cluster-acid/30 text-cluster-acid'
                 : 'bg-amber-400/10 border-amber-400/25 text-amber-300'
-            }`}>
+              }`}>
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${sheetUrl ? 'bg-cluster-acid animate-pulse' : 'bg-amber-400'}`} />
                 <span className="font-bold">

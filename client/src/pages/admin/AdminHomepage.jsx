@@ -78,7 +78,7 @@ export default function AdminHomepage() {
             Homepage & Alert Settings
           </h1>
           <p className="text-xs text-[#8E8E88] font-sans mt-0.5">
-            Configure the live announcement ticker, hero subtitle, live society metrics, and active countdown spotlight.
+            Configure the live announcement ticker, hero title & subtitle, society metrics, and active countdown spotlight.
           </p>
         </div>
 
@@ -224,7 +224,7 @@ export default function AdminHomepage() {
           </div>
         </div>
 
-        {/* Section 3: Hero Subtitle & Live Society Metrics */}
+        {/* Section 3: Hero Title, Subtitle & Live Society Metrics */}
         <div className="rounded-2xl p-6 bg-[#0F1012] border border-white/[0.08] space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
             <div className="flex items-center gap-3">
@@ -232,9 +232,9 @@ export default function AdminHomepage() {
                 <Layers className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-display font-bold text-white">Hero Subtitle & Society Metrics</h3>
+                <h3 className="text-base font-display font-bold text-white">Hero Title, Subtitle & Society Metrics</h3>
                 <p className="text-xs text-[#8E8E88] font-sans">
-                  Customize the lead paragraph and toggle the 4 metric panels displayed in the hero section.
+                  Customize the main hero title, lead subtitle, and toggle the metric counters on the public homepage.
                 </p>
               </div>
             </div>
@@ -252,16 +252,64 @@ export default function AdminHomepage() {
             </label>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* Main Hero Headline (Title) */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-[#D4D4CD]">Hero Lead Subtitle</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-[#D4D4CD] font-bold">Hero Main Headline (Title)</label>
+                <span className="text-[11px] text-[#8E8E88] font-mono">Press Enter for line breaks</span>
+              </div>
               <textarea
-                rows={3}
-                value={config.heroSubtitle}
+                rows={2}
+                value={config.heroHeadline || ''}
+                onChange={(e) => setConfig({ ...config, heroHeadline: e.target.value })}
+                placeholder={'Find your people.\nBuild together.'}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-sm font-display font-bold placeholder-gray-500 focus:border-cluster-acid focus:outline-none resize-none leading-snug"
+              />
+              <p className="text-[11px] text-[#8E8E88] font-sans">
+                Each line appears as a bold heading line on the homepage. Trailing periods are automatically colored with the signature brand dot.
+              </p>
+            </div>
+
+            {/* Hero Subtitle */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-[#D4D4CD] font-bold">Hero Lead Subtitle</label>
+              <textarea
+                rows={2}
+                value={config.heroSubtitle || ''}
                 onChange={(e) => setConfig({ ...config, heroSubtitle: e.target.value })}
-                placeholder="A community around compute. Good things happen in clusters..."
+                placeholder="A student community around compute."
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans placeholder-gray-500 focus:border-cluster-acid focus:outline-none resize-none leading-relaxed"
               />
+            </div>
+
+            {/* Live Hero Title Preview */}
+            <div className="space-y-2 pt-1">
+              <div className="text-[10px] font-mono text-[#8E8E88] uppercase tracking-wider flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-cluster-acid" />
+                <span>Live Hero Title & Subtitle Preview</span>
+              </div>
+              <div className="p-5 rounded-2xl bg-black border border-cluster-acid/30 space-y-2 text-white">
+                <div className="text-2xl sm:text-3xl font-display font-black leading-tight text-white tracking-tight">
+                  {(config.heroHeadline || 'Find your people.\nBuild together.').split(/\\n|\n/).map((line, idx, arr) => (
+                    <div key={idx} className="block">
+                      {idx === arr.length - 1 ? (
+                        <>
+                          {line.replace(/\.$/, '')}
+                          <span className="text-cluster-acid font-bold">.</span>
+                        </>
+                      ) : (
+                        line
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {config.heroSubtitle && (
+                  <p className="text-xs font-sans text-[#A8A8A0] pt-1">
+                    {config.heroSubtitle}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* 4 Metric Counters Grid */}
