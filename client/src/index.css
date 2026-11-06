@@ -107,7 +107,7 @@
 }
 .hero-liquid::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 1px, transparent 1px 3px); }
 /* Below lg the copy fills the block, so the rim sits higher */
-@media (max-width: 1023px) { .hero-grad, .hero-rim, .grain { --rim: min(56%, calc(85.7% - 400px)); } }
+@media (max-width: 1023px) { .hero-grad, .hero-rim, .grain { --rim: min(50%, calc(85.7% - 500px)); } }
 @keyframes hero-drift { to { transform: translate3d(-2%, -2%, 0) scale(1.04); } }
 
 /* Multiply leaves the black untouched and stipples dark specks into the colour */
