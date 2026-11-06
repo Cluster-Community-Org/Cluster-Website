@@ -4,7 +4,7 @@
 > `BUILD` / `LEARN` / `COLLABORATE` / `CREATE` — Shaping the next generation of engineers and builders.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-cluster--club.vercel.app-C6FF4D?style=for-the-badge&logo=vercel&logoColor=080808)](https://cluster-club.vercel.app/)
-[![Repository](https://img.shields.io/badge/GitHub-alwin2134%2FCluster-00E5FF?style=for-the-badge&logo=github&logoColor=080808)](https://github.com/alwin2134/Cluster)
+[![Repository](https://img.shields.io/badge/GitHub-Cluster--Community--Org%2FCluster--Website-00E5FF?style=for-the-badge&logo=github&logoColor=080808)](https://github.com/Cluster-Community-Org/Cluster-Website)
 [![Vite](https://img.shields.io/badge/Vite-6.4-C6FF4D?style=for-the-badge&logo=vite&logoColor=080808)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-19-00E5FF?style=for-the-badge&logo=react&logoColor=080808)](https://react.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-C6FF4D?style=for-the-badge&logo=tailwindcss&logoColor=080808)](https://tailwindcss.com/)
@@ -150,8 +150,8 @@ Cluster/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/alwin2134/Cluster.git
-cd Cluster
+git clone https://github.com/Cluster-Community-Org/Cluster-Website.git
+cd Cluster-Website
 ```
 
 ### 2. Configure Environment Variables
