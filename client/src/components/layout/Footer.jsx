@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Github, Instagram } from 'lucide-react'
+import { Github, Instagram, Linkedin } from 'lucide-react'
 import { ClusterLogo, Square } from '../ui/Brand.jsx'
 
 // lucide has no X logo, so inline it
@@ -13,6 +13,7 @@ const SOCIALS = [
   { href: 'https://github.com/Cluster-Community-Org', label: 'Cluster on GitHub', Icon: Github },
   { href: 'https://x.com/the_clusterclub', label: 'Cluster on X', Icon: XIcon },
   { href: 'https://www.instagram.com/theclustercommunity', label: 'Cluster on Instagram', Icon: Instagram },
+  { href: 'https://www.linkedin.com/company/cluster-club-gu/', label: 'Cluster on LinkedIn', Icon: Linkedin },
 ]
 
 const link = 'body-6 text-graphite hover:text-black transition-colors duration-300'
