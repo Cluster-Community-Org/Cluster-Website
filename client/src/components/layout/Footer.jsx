@@ -10,7 +10,7 @@ const XIcon = (p) => (
 )
 
 const SOCIALS = [
-  { href: 'https://github.com/Cluster-Community-Org/Cluster-Website', label: 'Cluster on GitHub', Icon: Github },
+  { href: 'https://github.com/Cluster-Community-Org', label: 'Cluster on GitHub', Icon: Github },
   { href: 'https://x.com/the_clusterclub', label: 'Cluster on X', Icon: XIcon },
   { href: 'https://www.instagram.com/theclustercommunity', label: 'Cluster on Instagram', Icon: Instagram },
 ]
