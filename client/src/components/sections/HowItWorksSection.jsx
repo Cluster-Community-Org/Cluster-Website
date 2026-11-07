@@ -43,7 +43,7 @@ export const STEPS = [
     body: 'You hear back by email once the round closes, with the circle and mentor that fit what you showed us. Not the right fit? Switching is one message away.',
     visual: (
       <div className="flex flex-col gap-2">
-        {['Compute & ML circle', 'Developer circle', 'Mentorship circle'].map((c, i) => (
+        {['Crew circle', 'Compute circle', 'Applied AI & Simulation circle'].map((c, i) => (
           <div key={c} className={`flex items-center justify-between rounded-xl px-5 py-4 ${i === 0 ? 'bg-black text-white' : 'border border-black'}`}>
             <span className="title-3">{c}</span>
             {i === 0 && <span className="caption-3 text-lime">Matched</span>}
@@ -60,7 +60,7 @@ export const STEPS = [
         <Zap className="w-10 h-10 shrink-0" strokeWidth={1.8} />
         <div>
           <p className="title-3">Demo day</p>
-          <p className="body-6 text-char-1">Your name on the slide, your repo on the screen.</p>
+          <p className="body-6 text-char-1">Your name on the slide, your repo or your poster on the screen.</p>
         </div>
       </div>
     ),

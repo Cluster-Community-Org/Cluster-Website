@@ -55,15 +55,8 @@ const STATUS_CONFIG = {
   },
 }
 
-const DOMAINS = [
-  'All Domains',
-  'AI & Machine Learning',
-  'Full-Stack Web Dev',
-  'Mobile & Systems',
-  'Design & Creative Tech',
-  'Cloud & DevOps',
-  'Open Source & Dev Tools',
-]
+import { CIRCLES } from '../../components/sections/CirclesSection.jsx'
+const DOMAINS = ['All Domains', ...CIRCLES.flatMap((c) => c.tracks.map(([t]) => t))]
 
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
 
@@ -251,7 +244,7 @@ export default function AdminApplications() {
       selectedStatusTab === 'All' ? true : app.status === selectedStatusTab
 
     const matchesDomain =
-      selectedDomain === 'All Domains' ? true : app.domain === selectedDomain
+      selectedDomain === 'All Domains' ? true : (app.domain || '').includes(selectedDomain)
 
     return matchesSearch && matchesStatus && matchesDomain
   })

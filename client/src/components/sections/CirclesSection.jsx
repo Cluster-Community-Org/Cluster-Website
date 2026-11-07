@@ -3,10 +3,22 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { Eyebrow } from '../ui/Brand.jsx'
 
-const CIRCLES = [
-  { name: 'Developer', label: 'Dev & open source', title: 'Developer circle', body: 'Weekly code sessions, pair programming and open source contributions. First app or tenth, there is a seat for you.' },
-  { name: 'Compute & ML', label: 'Compute & AI', title: 'Compute & ML circle', body: 'Study groups, paper reading and hands on ML projects, from data pipelines to fine tuning models.' },
-  { name: 'Mentorship', label: 'Peers & leadership', title: 'Mentorship circle', body: 'Seniors mentor newcomers and run the workshops. Leadership roles are earned by contribution, not by year.' },
+export const CIRCLES = [
+  {
+    name: 'Compute', label: 'GPUs & the DGX', title: 'Compute circle',
+    body: 'Everything that runs on the DGX H200: kernels, multi-node jobs and the models that need them.',
+    tracks: [['CUDA & GPU Architecture', 'Kernels, memory hierarchy, parallel C++'], ['Distributed Supercomputing', 'Slurm, InfiniBand, multi-node MPI'], ['LLMs & Generative AI', 'Fine-tuning, RAG, TensorRT-LLM']],
+  },
+  {
+    name: 'Applied AI', label: 'Vision, robotics & simulation', title: 'Applied AI & Simulation circle',
+    body: 'Models that leave the rack: cameras, robots and digital twins on Jetson and Omniverse.',
+    tracks: [['Computer Vision & 3D', 'Gaussian splatting, DeepStream, NeRF'], ['Edge AI & Robotics', 'Jetson Orin, Isaac ROS, drones'], ['Omniverse & Digital Twins', 'USD, physics simulation, rendering']],
+  },
+  {
+    name: 'Crew', label: 'Design, media, outreach & events', title: 'Crew circle',
+    body: 'The people who make the club visible and make the day run. Posters, reels, sponsors, venues and new members.',
+    tracks: [['Design & brand', 'Posters, decks, the way the club looks'], ['Media & content', 'Photos, reels and recaps of every event'], ['Marketing & socials', 'Fill the room, run the pages'], ['Outreach & partnerships', 'Sponsors, speakers, other campuses'], ['Events & logistics', 'Venues, schedules, making the day run'], ['Community & mentoring', 'Onboard juniors, run study circles']],
+  },
 ]
 
 const DIM = 0.4
@@ -91,7 +103,7 @@ function Sphere({ active, phase }) {
 }
 
 export default function CirclesSection() {
-  const [on, setOn] = useState(1)
+  const [on, setOn] = useState(2) // Crew lights up first
   const select = (i) => ({ onMouseEnter: () => setOn(i), onFocus: () => setOn(i), onClick: () => setOn(i) })
 
   return (
@@ -126,11 +138,16 @@ export default function CirclesSection() {
           <div aria-live="polite" className="grid pt-8 border-t border-char-2">
             {CIRCLES.map((c, i) => (
               <div key={c.title} inert={on !== i} className={`[grid-area:1/1] grid lg:grid-cols-12 lg:items-center gap-x-8 gap-y-4 transition-opacity duration-300 ease-[cubic-bezier(.22,1,.36,1)] ${on === i ? '' : 'opacity-0'}`}>
-                <div className="lg:col-span-5 flex flex-col gap-2">
+                <div className="lg:col-span-4 flex flex-col gap-2">
                   <p className="caption-3 text-lime">{c.label}</p>
                   <h3 className="heading-3">{c.title}</h3>
                 </div>
-                <p className="lg:col-span-4 body-3 text-soft">{c.body}</p>
+                <div className="lg:col-span-5 flex flex-col gap-4">
+                  <p className="body-3 text-soft">{c.body}</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {c.tracks.map(([t]) => <li key={t} className="title-4 rounded-full border border-char-3 px-3 py-1.5 text-soft">{t}</li>)}
+                  </ul>
+                </div>
                 <div className="lg:col-span-3 lg:justify-self-end">
                   <Link to="/join" className="btn btn-lime">Join this circle <ArrowRight className="w-5 h-5" /></Link>
                 </div>

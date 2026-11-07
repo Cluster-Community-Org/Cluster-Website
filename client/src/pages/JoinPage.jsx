@@ -8,14 +8,19 @@ import { getSafeUrl } from '../lib/safeUrl.js'
 import { Corners, DotWave, PageHeader } from '../components/ui/Brand.jsx'
 import { LiveChip } from '../components/sections/HeroSection.jsx'
 import { STEPS } from '../components/sections/HowItWorksSection.jsx'
+import { CIRCLES } from '../components/sections/CirclesSection.jsx'
 
-const DOMAINS = ['AI & Machine Learning', 'Full-Stack Web Dev', 'Mobile & Systems', 'Design & Creative Tech', 'Cloud & DevOps', 'Open Source & Dev Tools']
+const MAX_TRACKS = 3
+const GROUPS = [
+  ['Build & research', 'Hands on the GPUs, the models and the hardware', CIRCLES.slice(0, 2).flatMap((c) => c.tracks), ''],
+  ['Run the club', 'Design, media, outreach and events', CIRCLES[2].tracks, 'order-first lg:order-none'],
+]
 const COURSES = ['B.Tech', 'BCA', 'MCA', 'M.Tech', 'B.Sc Computer Science', 'Dual Degree (B.Tech + M.Tech)', 'Other Degree']
 const BRANCHES = ['Computer Science & Engineering (CSE)', 'Information Technology (IT)', 'AI & Data Science (AIDS)', 'AI & Machine Learning (AIML)', 'Electronics & Communication (ECE)', 'Electrical & Electronics (EEE)', 'Mechanical Engineering', 'Other Branch']
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Postgraduate / Research']
 
-const EMPTY = { fullName: '', email: '', rollNumber: '', course: COURSES[0], branch: BRANCHES[0], year: YEARS[0], domain: DOMAINS[0], github: '', projects: '', linkedin: '', motivation: '' }
-const field = 'w-full rounded-lg border border-line bg-white px-3 py-2 body-3 text-black placeholder:text-mute'
+const EMPTY = { fullName: '', email: '', rollNumber: '', course: COURSES[0], branch: BRANCHES[0], year: YEARS[0], tracks: [], github: '', projects: '', linkedin: '', motivation: '' }
+const field = 'w-full rounded-lg border border-line bg-cream px-3 py-2 body-3 text-black placeholder:text-mute'
 
 function Field({ label, hint, children }) {
   return (
@@ -33,6 +38,7 @@ export default function JoinPage() {
   const [form, setForm] = useState(EMPTY)
   const [sent, setSent] = useState(null)
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+  const toggle = (t) => setForm((f) => ({ ...f, tracks: f.tracks.includes(t) ? f.tracks.filter((x) => x !== t) : f.tracks.length < MAX_TRACKS ? [...f.tracks, t] : f.tracks }))
 
   const submit = (e) => {
     e.preventDefault()
@@ -40,7 +46,11 @@ export default function JoinPage() {
       showToast('Please provide valid HTTP or HTTPS URLs for your social profiles.', 'error')
       return
     }
-    const app = clusterDataService.addApplication({ ...form, branchYear: `${form.course} · ${form.branch} · ${form.year}` })
+    if (form.tracks.length === 0) {
+      showToast('Pick at least one track.', 'error')
+      return
+    }
+    const app = clusterDataService.addApplication({ ...form, domain: form.tracks.join(', '), branchYear: `${form.course} · ${form.branch} · ${form.year}` })
     setSent(app)
     window.scrollTo({ top: 0, behavior: 'smooth' })
     showToast(`Application sent. We will email ${app.email}.`, 'success')
@@ -64,7 +74,7 @@ export default function JoinPage() {
             </p>
             <dl className="relative w-full max-w-md rounded-2xl border border-char-2 bg-char-1 p-6 text-left grid grid-cols-2 gap-4 rise" style={{ animationDelay: '300ms' }}>
               <dt className="caption-3 text-mute">Reference</dt><dd className="title-4 font-mono text-lime text-right break-all">{sent.id}</dd>
-              <dt className="caption-3 text-mute">Interest</dt><dd className="title-4 text-right">{sent.domain}</dd>
+              <dt className="caption-3 text-mute">Tracks</dt><dd className="title-4 text-right">{sent.domain}</dd>
               <dt className="caption-3 text-mute">Status</dt><dd className="title-4 text-right">Received</dd>
             </dl>
             <div className="relative flex flex-wrap justify-center gap-3 pt-2">
@@ -113,9 +123,32 @@ export default function JoinPage() {
                     <Field label="What do you want to build next? (optional)">
                       <textarea rows={3} value={form.motivation} onChange={set('motivation')} className={`${field} resize-y`} placeholder="The thing you would start this semester if you had a team." />
                     </Field>
-                    <Field label="Circle you're most interested in">
-                      <select value={form.domain} onChange={set('domain')} className={field}>{DOMAINS.map((d) => <option key={d}>{d}</option>)}</select>
-                    </Field>
+                  </fieldset>
+
+                  <fieldset className="flex flex-col gap-8 pt-8 border-t border-line">
+                    <legend className="title-3 pb-4 w-full flex items-center justify-between gap-4">
+                      Pick up to three tracks
+                      <span className="caption-3 text-graphite tabular-nums" aria-live="polite">{form.tracks.length} of {MAX_TRACKS} picked</span>
+                    </legend>
+                    {GROUPS.map(([name, sub, tracks, order]) => (
+                      <div key={name} className={`flex flex-col gap-3 ${order}`}>
+                        <div>
+                          <p className="caption-3">{name}</p>
+                          <p className="caption-5 text-graphite">{sub}</p>
+                        </div>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {tracks.map(([t, hint]) => {
+                            const on = form.tracks.includes(t)
+                            return (
+                              <button key={t} type="button" aria-pressed={on} onClick={() => toggle(t)} disabled={!on && form.tracks.length >= MAX_TRACKS} className={`text-left rounded-xl border px-4 py-3 flex flex-col gap-0.5 [--press:.98] disabled:opacity-40 disabled:cursor-not-allowed ${on ? 'border-black bg-black text-white' : 'border-line bg-cream hover:border-black'}`}>
+                                <span className="title-4">{t}</span>
+                                <span className={`caption-5 ${on ? 'text-mute' : 'text-graphite'}`}>{hint}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </fieldset>
 
                   <fieldset className="flex flex-col gap-6 pt-8 border-t border-line">

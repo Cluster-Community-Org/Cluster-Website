@@ -14,7 +14,7 @@ import { useLive } from '../hooks/useLive.js'
 const VALUES = ['Community', 'Collaboration', 'Belonging', 'Shared curiosity', 'Good things happen in clusters.']
 
 const FAQ = [
-  ['Do I need to know how to code?', 'Not necessarily. We select on what you have done, not on how polished it is: a class project you took further, a hackathon entry, a script that saved you an hour. Show us that, and the developer circle takes it from there.'],
+  ['Do I need to know how to code?', 'No. The posters, reels, sponsor emails and event days are run by members of the Crew circle, many of whom never open a terminal. The technical circles select on what you have built, not on how polished it is: a class project you took further, a hackathon entry, a script that saved you an hour.'],
   ['Which branches and years can apply?', 'Any. Every tech student is welcome, whatever your branch or graduation year.'],
   ['What should I put in my application?', 'Links to anything you have built, broken or shipped: repos, hackathon entries, open source PRs, class projects you extended. A short note on what each one was is enough. Rough is fine.'],
   ['How are members selected?', 'Circle leads read every application. Shortlisted applicants get an informal chat, on campus or online, and then a place in the circle that fits what they showed us.'],

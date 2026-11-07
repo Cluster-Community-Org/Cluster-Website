@@ -68,11 +68,14 @@ function Spotlight({ event }) {
               {event.time && <li className="title-3 flex items-center gap-3"><Clock className="w-5 h-5 shrink-0" />{event.time}</li>}
               {event.location && <li className="title-3 flex items-center gap-3"><MapPin className="w-5 h-5 shrink-0" />{event.location}</li>}
             </ul>
-            {event.registrationUrl && (
-              <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-black self-start">
-                Save your spot <ArrowRight className="w-5 h-5" />
-              </a>
-            )}
+            <div className="flex flex-col items-start gap-4">
+              {event.registrationUrl && (
+                <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-black">
+                  Save your spot <ArrowRight className="w-5 h-5" />
+                </a>
+              )}
+              <Link to="/join" className="body-6 text-graphite hover:text-black">Want to run the next one? Join the crew</Link>
+            </div>
           </div>
         </article>
       </div>
