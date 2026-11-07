@@ -36,9 +36,7 @@ export default function HeroSection() {
             ))}
           </h1>
 
-          {config.heroSubtitle && (
-            <p className="title-2 text-soft rise" style={{ animationDelay: '100ms' }}>{config.heroSubtitle}</p>
-          )}
+          <p className="title-2 text-soft rise" style={{ animationDelay: '100ms' }}>A student community around compute.</p>
 
           <div className="pt-2 rise" style={{ animationDelay: '200ms' }}>
             <Link to="/join" className="btn btn-lime">Apply to join <ArrowRight className="w-5 h-5" /></Link>
