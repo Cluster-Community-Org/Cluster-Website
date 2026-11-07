@@ -20,8 +20,10 @@ const link = 'body-6 text-graphite hover:text-black transition-colors duration-3
 
 export default function Footer() {
   return (
-    <footer className="px-4 sm:px-8 lg:px-20 pt-24 pb-12">
-      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+    <footer className="relative overflow-hidden px-4 sm:px-8 lg:px-20 pt-24 pb-12">
+      {/* Ghost wordmark, half sunk below the edge */}
+      <span aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2 -bottom-[0.22em] whitespace-nowrap font-bold leading-none tracking-[0.08em] text-black/[0.035] text-[clamp(120px,24vw,400px)]">CLUSTER</span>
+      <div className="relative max-w-7xl mx-auto flex flex-col gap-16">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] reveal">
           <div className="flex flex-col gap-6 max-w-sm">
             <ClusterLogo markClass="w-10 h-10" textClass="text-xl" />
