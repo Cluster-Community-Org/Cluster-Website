@@ -76,7 +76,7 @@ export default function JoinPage() {
           <div className="grid gap-12 lg:grid-cols-12 items-start">
             <ol className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
               {STEPS.map(({ title, body }, i) => (
-                <li key={title} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i]} rounded-2xl border p-6 flex gap-4 ${i === 0 ? 'border-black bg-white' : 'border-line'}`}>
+                <li key={title} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i]} rounded-2xl border p-6 flex gap-4 ${i === 0 ? 'border-black bg-cream' : 'border-line'}`}>
                   <span className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center title-4 tabular-nums ${i === 0 ? 'bg-lime' : 'bg-black text-white'}`}>0{i + 1}</span>
                   <div className="flex flex-col gap-1">
                     <h2 className="title-2">{title}</h2>
@@ -88,14 +88,14 @@ export default function JoinPage() {
 
             <div className="lg:col-span-7">
               {!open ? (
-                <section aria-labelledby="closed-heading" className="rounded-3xl border border-line bg-white p-8 sm:p-12 flex flex-col items-start gap-6">
+                <section aria-labelledby="closed-heading" className="rounded-3xl border border-line bg-cream p-8 sm:p-12 flex flex-col items-start gap-6">
                   <span className="w-12 h-12 rounded-lg bg-black text-lime flex items-center justify-center"><Lock className="w-6 h-6" /></span>
                   <h2 id="closed-heading" className="heading-3">Applications are closed for this round</h2>
                   <p className="title-2 text-graphite">Hackathons, open workshops, study circles and meetups stay open to every student all year. Come build with us there, and apply when the next round opens.</p>
                   <Link to="/events" className="btn btn-black">See upcoming events <ArrowRight className="w-5 h-5" /></Link>
                 </section>
               ) : (
-                <form onSubmit={submit} className="rounded-3xl border border-line bg-white p-6 sm:p-10 flex flex-col gap-8">
+                <form onSubmit={submit} className="rounded-3xl border border-line bg-cream p-6 sm:p-10 flex flex-col gap-8">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <h2 className="heading-5">Your application</h2>
                     <span className="bg-black rounded-full"><LiveChip open /></span>

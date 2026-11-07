@@ -47,7 +47,7 @@ export default function EventsPage() {
           </div>
           <div className="flex flex-wrap gap-2" aria-label="Filter by type">
             {types.map((t) => (
-              <button key={t} type="button" aria-pressed={type === t} onClick={() => swap(() => setType(t))} className={`${pill(type === t)} border ${type === t ? 'border-black' : 'border-line bg-white'}`}>
+              <button key={t} type="button" aria-pressed={type === t} onClick={() => swap(() => setType(t))} className={`${pill(type === t)} border ${type === t ? 'border-black' : 'border-line bg-cream'}`}>
                 {t}
               </button>
             ))}
@@ -55,7 +55,7 @@ export default function EventsPage() {
         </div>
 
         {shown.length === 0 ? (
-          <div className="rounded-3xl border border-line bg-white px-6 py-16 flex flex-col items-center text-center gap-4">
+          <div className="rounded-3xl border border-line bg-cream px-6 py-16 flex flex-col items-center text-center gap-4">
             <Calendar className="w-10 h-10" />
             <h2 className="heading-5">Nothing {tab === 'past' ? 'in the archive' : 'scheduled'} here yet</h2>
             <p className="body-3 text-graphite max-w-sm">
@@ -66,7 +66,7 @@ export default function EventsPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {shown.map((e, i) => (
-              <article key={e.slug || e.id} className={`reveal ${i % 2 ? 'reveal-2' : ''} lift rounded-2xl border border-line hover:border-black bg-white p-6 sm:p-8 flex flex-col gap-6`}>
+              <article key={e.slug || e.id} className={`reveal ${i % 2 ? 'reveal-2' : ''} lift rounded-2xl border border-line hover:border-black bg-cream p-6 sm:p-8 flex flex-col gap-6`}>
                 <div className="flex items-center justify-between gap-4">
                   <span className="caption-3 rounded-full bg-black text-lime px-3 py-2">{e.type}</span>
                   <span className="title-4 text-graphite flex items-center gap-2"><Calendar className="w-4 h-4" />{e.date}</span>

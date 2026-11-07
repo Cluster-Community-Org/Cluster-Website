@@ -5,8 +5,9 @@ export default {
     extend: {
       colors: {
         // Public site (light brand board look)
-        paper: '#F8F8F5',
-        line: '#E4E4DF',
+        paper: '#F3EFE4',
+        cream: '#FBF9F3',
+        line: '#E3DED0',
         lime: '#C6FF4D',
         graphite: '#3A3A3A',
         mute: '#9B9B9B',

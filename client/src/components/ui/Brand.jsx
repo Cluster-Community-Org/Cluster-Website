@@ -32,7 +32,7 @@ export function ClusterLogo({ className = '', markClass = 'w-7 h-7', textClass =
 
 // Card tones for the scroll stacks: white, black, lime.
 export const TONES = {
-  light: { card: 'bg-white border-line text-black', body: 'text-graphite', eyebrow: 'text-graphite', sq: 'bg-lime' },
+  light: { card: 'bg-cream border-line text-black', body: 'text-graphite', eyebrow: 'text-graphite', sq: 'bg-lime' },
   dark: { card: 'bg-black border-char-2 text-white', body: 'text-soft', eyebrow: 'text-lime', sq: 'bg-lime' },
   lime: { card: 'bg-lime border-black/10 text-black', body: 'text-char-1', eyebrow: 'text-black', sq: 'bg-black' },
 }

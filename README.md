@@ -69,11 +69,12 @@ The public site follows the CLUSTER brand board: off-white ground, inset black b
 
 | Tailwind token | Hex | Use |
 |---|---|---|
-| `paper` | `#F8F8F5` | Page background |
+| `paper` | `#F3EFE4` | Page background (cream) |
+| `cream` | `#FBF9F3` | Cards and panels on paper |
 | `black` | `#000000` | Hero, circles and CTA blocks, primary text |
 | `lime` | `#C6FF4D` | Accent: primary buttons, squares, live states |
 | `graphite` | `#3A3A3A` | Secondary text on light |
-| `line` | `#E4E4DF` | Borders and dividers on light |
+| `line` | `#E3DED0` | Borders and dividers on light |
 | `mute` / `soft` | `#9B9B9B` / `#C9C9C4` | Secondary text on black |
 | `char-1/2/3` | `#181818` / `#272727` / `#313131` | Surfaces and borders on black |
 

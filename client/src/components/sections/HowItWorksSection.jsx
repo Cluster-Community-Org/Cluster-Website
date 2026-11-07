@@ -10,9 +10,9 @@ export const STEPS = [
     visual: (
       <div className="rounded-2xl border border-line bg-paper p-6 flex flex-col gap-3">
         <p className="caption-3 text-graphite">GitHub or portfolio</p>
-        <p className="body-3 rounded-lg border border-line bg-white px-3 py-2">github.com/you</p>
+        <p className="body-3 rounded-lg border border-line bg-cream px-3 py-2">github.com/you</p>
         <p className="caption-3 text-graphite">Something you built, broke or shipped</p>
-        <p className="body-3 rounded-lg border border-black bg-white px-3 py-2">A Discord bot for the hostel mess menu. Broke twice, fixed both.</p>
+        <p className="body-3 rounded-lg border border-black bg-cream px-3 py-2">A Discord bot for the hostel mess menu. Broke twice, fixed both.</p>
         <div className="flex flex-wrap gap-2 pt-1">
           {['Hackathon entry', 'Open source PR', 'Class project, extended'].map((c, i) => (
             <span key={c} className={`caption-3 rounded-full border px-3 py-2 ${i === 0 ? 'border-black bg-black text-white' : 'border-line'}`}>{c}</span>

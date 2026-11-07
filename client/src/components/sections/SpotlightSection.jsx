@@ -38,7 +38,7 @@ function Spotlight({ event }) {
           <Link to="/events" className="btn btn-ghost self-start sm:self-auto">All events</Link>
         </div>
 
-        <article className="reveal grid lg:grid-cols-2 overflow-hidden rounded-3xl border border-line bg-white">
+        <article className="reveal grid lg:grid-cols-2 overflow-hidden rounded-3xl border border-line bg-cream">
           <div className="relative overflow-hidden bg-black text-white p-8 sm:p-12 flex flex-col justify-between gap-12 min-h-[420px]">
             <DotWave className="bottom-0 h-48 opacity-50" single />
             <Corners size="w-5 h-5" inset="top-6 left-6 right-6 bottom-6" className="border-white/80" />

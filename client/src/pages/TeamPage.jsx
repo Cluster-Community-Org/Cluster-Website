@@ -21,7 +21,7 @@ export default function TeamPage() {
 
         <div className="grid gap-4 md:grid-cols-2">
           {VALUES.map(({ Icon, title, body }, i) => (
-            <article key={title} className={`reveal ${i ? 'reveal-2' : ''} relative overflow-hidden rounded-3xl p-8 sm:p-12 flex flex-col gap-6 ${i ? 'bg-white border border-line' : 'bg-black text-white'}`}>
+            <article key={title} className={`reveal ${i ? 'reveal-2' : ''} relative overflow-hidden rounded-3xl p-8 sm:p-12 flex flex-col gap-6 ${i ? 'bg-cream border border-line' : 'bg-black text-white'}`}>
               {!i && <DotWave className="bottom-0 h-40 opacity-40" single />}
               <span className={`relative w-12 h-12 rounded-lg flex items-center justify-center ${i ? 'bg-black text-lime' : 'border border-char-3 text-lime'}`}><Icon className="w-6 h-6" /></span>
               <h2 className="relative heading-3">{title}</h2>
@@ -37,7 +37,7 @@ export default function TeamPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((m, i) => (
-              <article key={m.id} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i % 4]} lift rounded-2xl border border-line hover:border-black bg-white p-6 flex flex-col gap-6`}>
+              <article key={m.id} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i % 4]} lift rounded-2xl border border-line hover:border-black bg-cream p-6 flex flex-col gap-6`}>
                 <div className="relative h-48 rounded-xl bg-black flex items-center justify-center">
                   <span className="heading-3 text-lime">{m.initials}</span>
                   {m.graduationYear && <span className="absolute top-3 right-3 caption-3 rounded-full border border-char-3 px-3 py-1 text-soft">Class of {m.graduationYear}</span>}
