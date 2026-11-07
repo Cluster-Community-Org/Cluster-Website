@@ -37,8 +37,8 @@ export default function EventsPage() {
           From 24 hour build sprints to weekly study circles. Most of them are open to every student.
         </PageHeader>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div aria-label="When" className="inline-flex self-start rounded-full border border-line bg-white p-1">
+        {events.length > 0 && <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div aria-label="When" className="inline-flex self-start rounded-full border border-line bg-cream p-1">
             {['upcoming', 'past'].map((t) => (
               <button key={t} type="button" aria-pressed={tab === t} onClick={() => swap(() => setTab(t))} className={pill(tab === t)}>
                 {t}
@@ -52,7 +52,7 @@ export default function EventsPage() {
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
         {shown.length === 0 ? (
           <div className="rounded-3xl border border-line bg-cream px-6 py-16 flex flex-col items-center text-center gap-4">

@@ -35,6 +35,9 @@ export default function TeamPage() {
             <Eyebrow>Executive board</Eyebrow>
             <h2 id="board-heading" className="heading-2">Student officers</h2>
           </div>
+          {team.length === 0 ? (
+            <p className="reveal rounded-3xl border border-line bg-cream px-6 py-16 text-center title-2 text-graphite">The founding team is being announced soon.</p>
+          ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((m, i) => (
               <article key={m.id} className={`reveal ${['', 'reveal-2', 'reveal-3', 'reveal-3'][i % 4]} lift rounded-2xl border border-line hover:border-black bg-cream p-6 flex flex-col gap-6`}>
@@ -56,6 +59,7 @@ export default function TeamPage() {
               </article>
             ))}
           </div>
+          )}
         </section>
       </div>
     </div>
