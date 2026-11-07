@@ -59,7 +59,7 @@ export function PageHeader({ eyebrow, title, children }) {
   return (
     <header className="flex flex-col gap-6 max-w-[680px] pt-8 sm:pt-16">
       <Eyebrow className="text-graphite rise">{eyebrow}</Eyebrow>
-      <h1 className="heading-1 text-grad-light rise" style={{ animationDelay: '100ms' }}>{title}</h1>
+      <h1 className="heading-1 rise" style={{ animationDelay: '100ms' }}>{title}</h1>
       {children && <p className="title-2 text-graphite rise" style={{ animationDelay: '200ms' }}>{children}</p>}
     </header>
   )

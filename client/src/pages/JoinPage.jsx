@@ -58,7 +58,7 @@ export default function JoinPage() {
             <DotWave className="bottom-0 h-56 opacity-50" single />
             <Corners inset="top-6 left-6 right-6 bottom-6" />
             <span className="relative w-16 h-16 rounded-2xl bg-lime text-black flex items-center justify-center rise"><Check className="w-8 h-8" /></span>
-            <h2 id="sent-heading" className="relative heading-2 text-grad-dark rise" style={{ animationDelay: '100ms' }}>Application received</h2>
+            <h2 id="sent-heading" className="relative heading-2 rise" style={{ animationDelay: '100ms' }}>Application received</h2>
             <p className="relative title-2 text-soft max-w-lg rise" style={{ animationDelay: '200ms' }}>
               Thanks, {sent.fullName}. Circle leads read every application. You will hear back at {sent.email} once the round closes.
             </p>

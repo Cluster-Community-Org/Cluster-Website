@@ -101,7 +101,7 @@ export default function WhyJoinSection() {
                     <Icon className="w-6 h-6" />
                   </span>
                   <Eyebrow className={`${t.eyebrow} tabular-nums`} square={t.sq}>0{i + 1} / 04 · {label}</Eyebrow>
-                  <h3 className={`heading-2 ${tone === 'dark' ? 'text-grad-dark' : ''}`}>{title}</h3>
+                  <h3 className="heading-2">{title}</h3>
                   <p className={`title-2 max-w-md ${t.body}`}>{body}</p>
                 </div>
                 <div className="hidden lg:block" aria-hidden="true">{visual}</div>

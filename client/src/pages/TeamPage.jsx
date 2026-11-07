@@ -24,7 +24,7 @@ export default function TeamPage() {
             <article key={title} className={`reveal ${i ? 'reveal-2' : ''} relative overflow-hidden rounded-3xl p-8 sm:p-12 flex flex-col gap-6 ${i ? 'bg-white border border-line' : 'bg-black text-white'}`}>
               {!i && <DotWave className="bottom-0 h-40 opacity-40" single />}
               <span className={`relative w-12 h-12 rounded-lg flex items-center justify-center ${i ? 'bg-black text-lime' : 'border border-char-3 text-lime'}`}><Icon className="w-6 h-6" /></span>
-              <h2 className={`relative heading-3 ${i ? '' : 'text-grad-dark'}`}>{title}</h2>
+              <h2 className="relative heading-3">{title}</h2>
               <p className={`relative title-2 ${i ? 'text-graphite' : 'text-soft'}`}>{body}</p>
             </article>
           ))}
