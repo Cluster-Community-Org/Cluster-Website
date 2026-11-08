@@ -66,10 +66,10 @@ function FaqSection() {
       <div className="max-w-7xl mx-auto grid gap-12 lg:grid-cols-2 lg:gap-20">
         <div className="reveal flex flex-col gap-4 max-w-md">
           <Eyebrow>Questions</Eyebrow>
-          <h2 id="faq-heading" className="heading-2">Things people ask<br />before they apply</h2>
+          <h2 id="faq-heading" data-build className="heading-2">Things people ask<br />before they apply</h2>
           <p className="body-3 text-graphite">Still unsure? Come to the next open event. No application needed for that.</p>
         </div>
-        <div className="reveal reveal-2 border-t border-line">
+        <div data-build="fade" className="reveal reveal-2 border-t border-line">
           {FAQ.map(([q, a], i) => <FaqItem key={q} q={q} a={a} startOpen={i === 0} />)}
         </div>
       </div>
@@ -85,10 +85,10 @@ function FinalCta() {
         <DotWave className="bottom-0 h-72 opacity-60" single />
         <Corners inset="top-6 left-6 right-6 bottom-6" />
         <ClusterMark className="relative w-16 h-16 sm:w-20 sm:h-20 text-white" animated />
-        <h2 id="cta-heading" className="reveal relative heading-1 max-w-[680px]">
+        <h2 id="cta-heading" data-build className="reveal relative heading-1 max-w-[680px]">
           Good things happen<br />in clusters<FullStop />
         </h2>
-        <p className="reveal reveal-2 relative title-2 text-soft max-w-xl">
+        <p data-build className="reveal reveal-2 relative title-2 text-soft max-w-xl">
           {open
             ? "Applications for this round are open. Show us what you've built. We'll show you who to build with next."
             : 'Applications are closed for this round. Events stay open to every student.'}

@@ -21,9 +21,9 @@ export function ClusterMark({ className = 'w-9 h-9', markColor = 'currentColor',
   )
 }
 
-export function ClusterLogo({ className = '', markClass = 'w-7 h-7', textClass = 'text-base' }) {
+export function ClusterLogo({ className = '', markClass = 'w-7 h-7', textClass = 'text-base', ...rest }) {
   return (
-    <Link to="/" aria-label="Cluster home" className={`inline-flex items-center gap-2 ${className}`}>
+    <Link to="/" aria-label="Cluster home" className={`inline-flex items-center gap-2 ${className}`} {...rest}>
       <ClusterMark className={markClass} animated />
       <span className={`${textClass} font-bold tracking-[0.08em]`}>CLUSTER</span>
     </Link>
