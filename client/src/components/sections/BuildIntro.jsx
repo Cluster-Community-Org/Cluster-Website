@@ -124,7 +124,11 @@ async function build(c, layer, { el: target, phase }) {
 
 export default function BuildIntro() {
   useLayoutEffect(() => {
-    if (localStorage.getItem(KEY) || innerWidth < 768 || matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+    const forceIntro = params && (params.has('intro') || params.has('swarm') || params.has('build'))
+    const prefersReduced = !forceIntro && !import.meta.env.DEV && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (!forceIntro && (localStorage.getItem(KEY) || innerWidth < 768 || prefersReduced)) return undefined
     const targets = [...document.querySelectorAll('[data-build]')]
     const hidden = targets.filter((t) => t.dataset.build !== 'frame')
     for (const t of hidden) {
