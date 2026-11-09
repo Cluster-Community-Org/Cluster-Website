@@ -230,3 +230,24 @@
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ─── Build intro: cursor swarm on first load (BuildIntro.jsx) ─── */
+.build-layer { position: absolute; top: 0; left: 0; width: 100%; z-index: 100; pointer-events: none; overflow: hidden; }
+.build-layer::before { content: ''; position: fixed; inset: 0 0 auto 0; height: 14px; background: repeating-linear-gradient(90deg, rgba(59,139,255,.6) 0 1px, transparent 1px 10px), repeating-linear-gradient(90deg, rgba(59,139,255,.6) 0 1px, transparent 1px 100px); background-size: 100% 4px, 100% 10px; background-repeat: no-repeat; background-position: 0 10px, 0 4px; }
+.cover { position: fixed; inset: 0; background: #000; }
+.skip { position: fixed; right: 24px; bottom: 24px; pointer-events: auto; cursor: pointer; padding: 8px 12px; border-radius: 9999px; background: rgba(0,0,0,.7); color: #F8F8F5; font: 500 12px/1 'Manrope', sans-serif; backdrop-filter: blur(8px); }
+.skip kbd { margin-left: 6px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,.3); font: inherit; font-size: 10px; }
+.cur { position: absolute; left: 0; top: 0; will-change: transform; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.x { position: absolute; margin: -9px 0 0 -5px; font: 500 16px/1 'Manrope', sans-serif; }
+.caret { position: absolute; width: 2px; background: #3B8BFF; }
+.blk { position: absolute; width: 0; height: 0; border-radius: 8px; background: #3A3A3A; }
+.sel { position: absolute; border: 1px solid #3B8BFF; }
+.sel::before, .sel::after { content: ''; position: absolute; border: 0 dotted rgba(59,139,255,.5); }
+.sel::before { left: -100vw; right: -100vw; top: -1px; border-top-width: 1px; }
+.sel::after { top: -100vh; bottom: -100vh; left: -1px; border-left-width: 1px; }
+.sel i { position: absolute; width: 7px; height: 7px; margin: -4px; background: #fff; border: 1px solid #3B8BFF; }
+.sel i:nth-child(1) { left: 0; top: 0; }
+.sel i:nth-child(2) { right: 0; top: 0; }
+.sel i:nth-child(3) { left: 0; bottom: 0; }
+.sel i:nth-child(4) { right: 0; bottom: 0; }
+.sel b { position: absolute; left: 50%; top: 100%; translate: -50% 8px; padding: 3px 5px; border-radius: 3px; background: #3B8BFF; color: #fff; font: 600 10px/1 'Manrope', sans-serif; letter-spacing: .02em; white-space: nowrap; }

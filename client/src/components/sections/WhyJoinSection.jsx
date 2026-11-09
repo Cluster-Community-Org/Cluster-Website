@@ -83,8 +83,8 @@ export default function WhyJoinSection() {
       <PixelCluster className="w-24 h-24 right-32 -top-16" />
       <div className="max-w-7xl mx-auto flex flex-col gap-12 lg:gap-16">
         <div className="reveal flex flex-col items-center text-center gap-4">
-          <h2 id="why-heading" className="heading-1">Why join Cluster</h2>
-          <p className="title-2 text-graphite">Not a club you list on a résumé and forget.</p>
+          <h2 id="why-heading" data-build className="heading-1">Why join Cluster</h2>
+          <p data-build className="title-2 text-graphite">Not a club you list on a résumé and forget.</p>
         </div>
 
         <div className="flex flex-col gap-6 pb-24">

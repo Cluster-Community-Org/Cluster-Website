@@ -74,7 +74,7 @@ export default function HowItWorksSection() {
       <div className="max-w-7xl mx-auto flex flex-col gap-16">
         <div className="reveal flex flex-col gap-4 max-w-[680px]">
           <Eyebrow>How it works</Eyebrow>
-          <h2 id="how-heading" className="heading-2">From what you&apos;ve built<br />to what you build next</h2>
+          <h2 id="how-heading" data-build className="heading-2">From what you&apos;ve built<br />to what you build next</h2>
         </div>
 
         <ol className="flex flex-col gap-4 pb-16">

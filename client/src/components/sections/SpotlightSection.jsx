@@ -33,12 +33,12 @@ function Spotlight({ event }) {
         <div className="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="flex flex-col gap-4 max-w-[680px]">
             <Eyebrow>Next up</Eyebrow>
-            <h2 id="spotlight-heading" className="heading-2">The next one is<br />already on the calendar</h2>
+            <h2 id="spotlight-heading" data-build className="heading-2">The next one is<br />already on the calendar</h2>
           </div>
           <Link to="/events" className="btn btn-ghost self-start sm:self-auto">All events</Link>
         </div>
 
-        <article className="reveal grid lg:grid-cols-2 overflow-hidden rounded-3xl border border-line bg-cream">
+        <article data-build="fade" className="reveal grid lg:grid-cols-2 overflow-hidden rounded-3xl border border-line bg-cream">
           <div className="relative overflow-hidden bg-black text-white p-8 sm:p-12 flex flex-col justify-between gap-12 min-h-[420px]">
             <DotWave className="bottom-0 h-48 opacity-50" single />
             <Corners size="w-5 h-5" inset="top-6 left-6 right-6 bottom-6" className="border-white/80" />

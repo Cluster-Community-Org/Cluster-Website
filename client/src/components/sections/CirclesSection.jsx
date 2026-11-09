@@ -113,9 +113,9 @@ export default function CirclesSection() {
           <div className="reveal grid lg:grid-cols-12 lg:items-end gap-x-8 gap-y-6">
             <div className="lg:col-span-7 flex flex-col gap-4">
               <Eyebrow className="text-lime">Circles</Eyebrow>
-              <h2 id="circles-heading" className="heading-2">Three circles.<br />Pick one, or try all three.</h2>
+              <h2 id="circles-heading" data-build className="heading-2">Three circles.<br />Pick one, or try all three.</h2>
             </div>
-            <p className="lg:col-span-5 body-3 text-mute pb-2">Each circle runs its own sessions and its own projects. Switching is one message away.</p>
+            <p data-build className="lg:col-span-5 body-3 text-mute pb-2">Each circle runs its own sessions and its own projects. Switching is one message away.</p>
           </div>
 
           <div className="orbs">

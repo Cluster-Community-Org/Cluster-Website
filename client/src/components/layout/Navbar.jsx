@@ -28,11 +28,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 h-20 flex items-center justify-center px-4 pointer-events-none">
       <nav aria-label="Main" className="relative z-10 pointer-events-auto w-full md:w-auto flex items-center justify-between gap-6 rounded-full border border-black/10 bg-paper/80 backdrop-blur-lg shadow-[0_8px_32px_rgba(0,0,0,0.06)] py-2 pr-2 pl-4">
-        <ClusterLogo />
+        <ClusterLogo data-build="" />
 
         <ul className="hidden md:flex items-center gap-1">
           {LINKS.map((l) => (
-            <li key={l.to}>
+            <li key={l.to} data-build="">
               <NavLink
                 to={l.to}
                 end
@@ -47,7 +47,7 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <Link to="/join" className="btn btn-lime btn-sm" onClick={() => setOpen(false)}>
+          <Link to="/join" data-build="" className="btn btn-lime btn-sm" onClick={() => setOpen(false)}>
             <span>Apply<span className="hidden sm:inline"> to join</span></span>
             <ArrowRight className="w-4 h-4" />
           </Link>
