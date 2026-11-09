@@ -46,3 +46,6 @@ supabase/.temp/
 # 3D model temp files
 *.blend1
 *.bak
+
+# Multi-agent teamwork scratch state
+.agents/

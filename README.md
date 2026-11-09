@@ -100,6 +100,9 @@ The public site follows the CLUSTER brand board: off-white ground, inset black b
 
 ```
 Cluster/
+├── .github/
+│   └── workflows/
+│       └── supabase-keepalive.yml   # Scheduled keep-alive cron workflow (every 3 days)
 ├── client/                          # React + Vite Frontend
 │   ├── public/                      # Static brand assets & icons
 │   ├── src/
@@ -128,6 +131,9 @@ Cluster/
 │   ├── package.json
 │   └── vite.config.js
 │
+├── scripts/
+│   └── keep-alive.js                # Zero-dependency Supabase keep-alive & verification script
+│
 ├── supabase/
 │   └── schema.sql                   # Complete PostgreSQL schema & initial seed data
 │
@@ -135,6 +141,7 @@ Cluster/
 │   ├── ADMIN-CMS.md
 │   ├── ARCHITECTURE.md
 │   ├── API.md
+│   ├── KEEP-ALIVE.md                # Automated keep-alive runbook & Supabase inactivity guide
 │   └── UI-DESIGN.md
 │
 └── README.md
@@ -206,6 +213,31 @@ To sync recruitment applications automatically into a Google Sheet:
 
 ---
 
+## 🔄 Supabase Keep-Alive & Inactivity Protection
+
+To prevent the free-tier Supabase PostgreSQL database from being paused after 7 consecutive days of inactivity, this repository includes an automated keep-alive system:
+
+* **Automated Workflow**: [`.github/workflows/supabase-keepalive.yml`](.github/workflows/supabase-keepalive.yml) runs every 3 days at 04:00 UTC (`0 4 */3 * *`).
+* **Target Endpoint**: Queries `GET /rest/v1/homepage_config?select=id&limit=1`, triggering an internal PostgreSQL `SELECT` query that resets Supabase's 7-day inactivity timer.
+* **Zero Dependencies**: Powered by [`scripts/keep-alive.js`](scripts/keep-alive.js) using native Node.js `fetch`.
+* **Manual Trigger**: Supports on-demand execution via GitHub Actions `workflow_dispatch` and GitHub CLI.
+
+### Quick Verification
+
+You can verify database connectivity and keep-alive health at any time:
+
+```bash
+# From project root
+node scripts/keep-alive.js
+
+# Or from client/ directory
+npm run keep-alive:verify
+```
+
+For full operational details, GitHub Secrets configuration, and troubleshooting procedures, see the **[Supabase Keep-Alive Runbook](docs/KEEP-ALIVE.md)**.
+
+---
+
 ## 📜 Available Scripts
 
 | Command | Working Directory | Purpose |
@@ -214,6 +246,7 @@ To sync recruitment applications automatically into a Google Sheet:
 | `npm run build` | `client/` | Creates optimized production build in `client/dist/` |
 | `npm run preview` | `client/` | Previews production build locally |
 | `npm run lint` | `client/` | Runs ESLint analysis across codebase |
+| `npm run keep-alive:verify` | `client/` | Executes live Supabase keep-alive ping to verify database activity |
 
 ---
 

@@ -1,0 +1,75 @@
+name: Supabase Keep-Alive
+
+'on':
+  schedule:
+    # Runs every 3 days at 04:00 UTC (well within Supabase 7-day inactivity pause window)
+    - cron: '0 4 */3 * *'
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable verbose debug logging'
+        required: false
+        default: false
+        type: boolean
+      endpoint_override:
+        description: 'Custom PostgREST endpoint override (e.g. /rest/v1/homepage_config?select=id&limit=1)'
+        required: false
+        default: ''
+        type: string
+
+# Restrict permissions to least privilege (CIS GitHub Actions Benchmark)
+permissions:
+  contents: read
+
+# Prevent concurrent runs from overlapping
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    name: Ping Supabase Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate Secrets Pre-flight
+        shell: bash
+        run: |
+          MISSING=""
+          if [ -z "${SUPABASE_URL}" ]; then
+            MISSING="${MISSING} SUPABASE_URL"
+          fi
+          if [ -z "${SUPABASE_ANON_KEY}" ]; then
+            MISSING="${MISSING} SUPABASE_ANON_KEY"
+          fi
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing required repository secret(s):$MISSING"
+            echo "Please configure secrets in GitHub: Settings -> Secrets and variables -> Actions"
+            echo "### ❌ Supabase Keep-Alive Configuration Error" >> $GITHUB_STEP_SUMMARY
+            echo "Missing required repository secret(s): **$MISSING**" >> $GITHUB_STEP_SUMMARY
+            echo "Please navigate to **Settings -> Secrets and variables -> Actions** and add the required secrets." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Execute Keep-Alive Ping
+        run: node scripts/keep-alive.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
+          DEBUG: ${{ inputs.debug || 'false' }}
+          ENDPOINT_OVERRIDE: ${{ inputs.endpoint_override || '' }}
+

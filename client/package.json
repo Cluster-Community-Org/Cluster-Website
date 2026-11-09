@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "test": "node --test src/**/*.test.js"
+    "test": "node --test src/**/*.test.js",
+    "keep-alive:verify": "node ../scripts/keep-alive.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
