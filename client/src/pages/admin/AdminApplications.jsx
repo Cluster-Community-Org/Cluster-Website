@@ -29,6 +29,8 @@ import {
   Code,
   RefreshCw,
   Loader2,
+  Sparkles,
+  Layers,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { getSafeUrl } from '../../lib/safeUrl.js'
@@ -61,6 +63,29 @@ import { CIRCLES } from '../../components/sections/CirclesSection.jsx'
 const DOMAINS = ['All Domains', ...CIRCLES.flatMap((c) => c.tracks.map(([t]) => t))]
 
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
+
+// Helper to parse comma-separated domains/tracks into a clean array
+const parseDomains = (domainStr) => {
+  if (!domainStr) return []
+  return domainStr
+    .split(',')
+    .map((d) => d.trim())
+    .filter(Boolean)
+}
+
+// Helper to identify which circle a track belongs to
+const getCircleForTrack = (trackName) => {
+  if (!trackName) return null
+  const lower = trackName.toLowerCase()
+  for (const circle of CIRCLES) {
+    for (const [tName] of circle.tracks) {
+      if (tName.toLowerCase() === lower || lower.includes(tName.toLowerCase()) || tName.toLowerCase().includes(lower)) {
+        return circle.name
+      }
+    }
+  }
+  return null
+}
 
 const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
   try {
@@ -629,8 +654,20 @@ ${app.motivation || 'None specified'}
 
                       {/* Domain & Academic Info */}
                       <td className="py-3.5 px-4">
-                        <div className="text-white font-medium">{app.domain}</div>
-                        <div className="text-[11px] text-[#8E8E88] font-mono mt-0.5">
+                        <div className="flex flex-wrap gap-1 max-w-sm">
+                          {parseDomains(app.domain).map((track, i) => (
+                            <span
+                              key={i}
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cluster-acid/10 border border-cluster-acid/25 text-cluster-acid"
+                            >
+                              {track}
+                            </span>
+                          ))}
+                          {parseDomains(app.domain).length === 0 && (
+                            <span className="text-[#8E8E88] font-mono text-xs">{app.domain || 'N/A'}</span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-[#8E8E88] font-mono mt-1">
                           {app.course && app.branch
                             ? `${app.course} · ${app.branch} (${app.year || ''})`
                             : app.branchYear || 'N/A'}
@@ -710,7 +747,7 @@ ${app.motivation || 'None specified'}
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full max-w-3xl max-h-[92vh] overflow-hidden flex flex-col rounded-3xl bg-[#0C0D0E] border border-white/[0.12] shadow-2xl text-[#F8F7F3]">
+          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col rounded-3xl bg-[#0C0D0E] border border-white/[0.12] shadow-2xl text-[#F8F7F3]">
             {/* Modal Header */}
             <div className="p-6 sm:p-8 pb-4 border-b border-white/[0.08] bg-[#0E0F12]">
               <div className="flex items-start justify-between gap-4">
@@ -810,126 +847,163 @@ ${app.motivation || 'None specified'}
 
             {/* Scrollable Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
-              {/* Contact & Academic Information Grid */}
-              <div className="space-y-2.5">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-cluster-acid" />
-                  <span>Applicant Information &amp; Academic Profile</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {/* Email */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Email Address</div>
-                    <div className="flex items-center justify-between gap-1">
+              {/* Top Section: Responsive 2 Columns (Left: Candidate Profile | Right: Selected Domains Full View) */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+                {/* Left Column: Academic & Contact Profile (7 columns) */}
+                <div className="md:col-span-7 flex flex-col space-y-3">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-cluster-acid" />
+                    <span>Candidate &amp; Academic Profile</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Email */}
+                    <div className="p-3 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                      <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Email Address</div>
+                      <div className="flex items-center justify-between gap-1">
+                        <a
+                          href={`mailto:${selectedApp.email}`}
+                          className="text-xs font-mono text-white hover:text-cluster-acid truncate transition-colors"
+                          title={selectedApp.email}
+                        >
+                          {selectedApp.email}
+                        </a>
+                        <button
+                          onClick={() => handleCopyEmail(selectedApp.email)}
+                          className="p-1 rounded text-gray-400 hover:text-white"
+                          title="Copy Email"
+                        >
+                          {copiedEmail ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Roll Number */}
+                    <div className="p-3 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                      <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Roll / Student ID</div>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-mono font-bold text-white tracking-wide">
+                          {selectedApp.rollNumber || 'N/A'}
+                        </span>
+                        <button
+                          onClick={() => handleCopyRoll(selectedApp.rollNumber)}
+                          className="p-1 rounded text-gray-400 hover:text-white"
+                          title="Copy Roll Number"
+                        >
+                          {copiedRoll ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Degree / Course */}
+                    <div className="p-3 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                      <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Course / Degree</div>
+                      <div className="text-xs font-mono text-white font-semibold">
+                        {selectedApp.course || 'B.Tech'}
+                      </div>
+                    </div>
+
+                    {/* Academic Year */}
+                    <div className="p-3 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                      <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Academic Year</div>
+                      <div className="text-xs font-mono text-white font-semibold">
+                        {selectedApp.year || '2nd Year'}
+                      </div>
+                    </div>
+
+                    {/* Branch / Major */}
+                    <div className="sm:col-span-2 p-3 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                      <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Branch / Major</div>
+                      <div className="text-xs font-mono text-white truncate" title={selectedApp.branch || 'CSE'}>
+                        {selectedApp.branch || 'Computer Science & Engineering'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* External Profiles / Social Handles */}
+                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                    {selectedApp.github ? (
                       <a
-                        href={`mailto:${selectedApp.email}`}
-                        className="text-xs font-mono text-white hover:text-cluster-acid truncate transition-colors"
-                        title={selectedApp.email}
+                        href={getSafeUrl(selectedApp.github)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
                       >
-                        {selectedApp.email}
+                        <Github className="w-3.5 h-3.5 text-cluster-acid group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold">GitHub Profile</span>
+                        <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
                       </a>
-                      <button
-                        onClick={() => handleCopyEmail(selectedApp.email)}
-                        className="p-1 rounded text-gray-400 hover:text-white"
-                        title="Copy Email"
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] text-[11px] font-mono text-[#666]">
+                        <Github className="w-3 h-3 opacity-50" />
+                        <span>No GitHub</span>
+                      </div>
+                    )}
+
+                    {selectedApp.linkedin ? (
+                      <a
+                        href={getSafeUrl(selectedApp.linkedin)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
                       >
-                        {copiedEmail ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Roll Number */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Roll / Student ID</div>
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-mono font-bold text-white tracking-wide">
-                        {selectedApp.rollNumber || 'N/A'}
-                      </span>
-                      <button
-                        onClick={() => handleCopyRoll(selectedApp.rollNumber)}
-                        className="p-1 rounded text-gray-400 hover:text-white"
-                        title="Copy Roll Number"
-                      >
-                        {copiedRoll ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Degree / Course */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Course / Degree</div>
-                    <div className="text-xs font-mono text-white font-semibold">
-                      {selectedApp.course || 'B.Tech'}
-                    </div>
-                  </div>
-
-                  {/* Branch */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Branch / Major</div>
-                    <div className="text-xs font-mono text-white truncate" title={selectedApp.branch || 'CSE'}>
-                      {selectedApp.branch || 'Computer Science & Engineering'}
-                    </div>
-                  </div>
-
-                  {/* Year */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Academic Year</div>
-                    <div className="text-xs font-mono text-white font-semibold">
-                      {selectedApp.year || '2nd Year'}
-                    </div>
-                  </div>
-
-                  {/* Applied Domain */}
-                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
-                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Selected Domain</div>
-                    <div className="text-xs font-mono text-cluster-acid font-bold truncate">
-                      {selectedApp.domain}
-                    </div>
+                        <Linkedin className="w-3.5 h-3.5 text-cluster-acid group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold">LinkedIn Profile</span>
+                        <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
+                      </a>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] text-[11px] font-mono text-[#666]">
+                        <Linkedin className="w-3.5 h-3.5 opacity-50" />
+                        <span>No LinkedIn</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
 
-              {/* External Profiles / Social Handles */}
-              <div className="space-y-2.5">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold">
-                  External Profiles &amp; Repositories
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  {selectedApp.github ? (
-                    <a
-                      href={getSafeUrl(selectedApp.github)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
-                    >
-                      <Github className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
-                      <span className="font-semibold">GitHub Profile</span>
-                      <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
-                    </a>
-                  ) : (
-                    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-xs font-mono text-[#666]">
-                      <Github className="w-3.5 h-3.5 opacity-50" />
-                      <span>No GitHub provided</span>
+                {/* Right Column: Selected Domains & Tracks (Full View) (5 columns) */}
+                <div className="md:col-span-5 flex flex-col space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cluster-acid" />
+                      <span>Selected Domains</span>
                     </div>
-                  )}
+                    <span className="text-[10px] font-mono font-bold text-cluster-acid bg-cluster-acid/10 border border-cluster-acid/25 px-2.5 py-0.5 rounded-full">
+                      {parseDomains(selectedApp.domain).length} {parseDomains(selectedApp.domain).length === 1 ? 'Track' : 'Tracks'}
+                    </span>
+                  </div>
 
-                  {selectedApp.linkedin ? (
-                    <a
-                      href={getSafeUrl(selectedApp.linkedin)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
-                    >
-                      <Linkedin className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
-                      <span className="font-semibold">LinkedIn Profile</span>
-                      <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
-                    </a>
-                  ) : (
-                    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-xs font-mono text-[#666]">
-                      <Linkedin className="w-3.5 h-3.5 opacity-50" />
-                      <span>No LinkedIn provided</span>
-                    </div>
-                  )}
+                  <div className="p-4 rounded-2xl bg-[#141518] border border-cluster-acid/30 flex-1 flex flex-col justify-start space-y-2.5 shadow-inner">
+                    {parseDomains(selectedApp.domain).length > 0 ? (
+                      parseDomains(selectedApp.domain).map((track, idx) => {
+                        const circleName = getCircleForTrack(track)
+                        return (
+                          <div
+                            key={idx}
+                            className="p-3.5 rounded-xl bg-[#0E0F12] border border-white/[0.08] hover:border-cluster-acid/50 transition-all flex items-start justify-between gap-3 group"
+                          >
+                            <div className="space-y-1 min-w-0">
+                              <div className="text-xs sm:text-sm font-mono font-bold text-white group-hover:text-cluster-acid transition-colors leading-snug">
+                                {track}
+                              </div>
+                              {circleName && (
+                                <div className="text-[10px] font-mono text-[#8E8E88] flex items-center gap-1.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cluster-acid" />
+                                  <span>{circleName} Circle</span>
+                                </div>
+                              )}
+                            </div>
+                            <span className="shrink-0 p-1 rounded-md bg-cluster-acid/10 text-cluster-acid border border-cluster-acid/20">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
+                        )
+                      })
+                    ) : (
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] text-xs font-mono text-[#8E8E88] italic text-center">
+                        No specific domains selected.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
