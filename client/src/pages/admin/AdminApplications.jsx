@@ -60,6 +60,33 @@ const STATUS_CONFIG = {
 }
 
 import { CIRCLES } from '../../components/sections/CirclesSection.jsx'
+
+const CIRCLE_CONFIG = {
+  Compute: {
+    color: 'bg-cluster-acid/15 text-cluster-acid border-cluster-acid/30',
+    dot: 'bg-cluster-acid',
+    label: 'Compute Circle',
+  },
+  'Applied AI': {
+    color: 'bg-sky-400/15 text-sky-400 border-sky-400/30',
+    dot: 'bg-sky-400',
+    label: 'Applied AI Circle',
+  },
+  Crew: {
+    color: 'bg-purple-400/15 text-purple-400 border-purple-400/30',
+    dot: 'bg-purple-400',
+    label: 'Crew Circle',
+  },
+}
+
+const CIRCLE_FILTER_OPTIONS = [
+  { label: 'All Circles & Tracks', value: 'All' },
+  { label: '⚡ Compute Circle (GPUs, DGX, CUDA, LLMs)', value: 'Circle: Compute' },
+  { label: '👁️ Applied AI Circle (Robotics, Vision, Omniverse)', value: 'Circle: Applied AI' },
+  { label: '🚀 Crew Circle (Design, Media, Marketing, Events)', value: 'Circle: Crew' },
+  ...CIRCLES.flatMap((c) => c.tracks.map(([t]) => ({ label: `${c.name} → ${t}`, value: t }))),
+]
+
 const DOMAINS = ['All Domains', ...CIRCLES.flatMap((c) => c.tracks.map(([t]) => t))]
 
 const STATUS_TABS = ['All', 'Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected']
@@ -85,6 +112,17 @@ const getCircleForTrack = (trackName) => {
     }
   }
   return null
+}
+
+// Helper to identify all unique circles an applicant matches
+const getMatchedCircles = (domainStr) => {
+  const tracks = parseDomains(domainStr)
+  const circles = new Set()
+  tracks.forEach((t) => {
+    const c = getCircleForTrack(t)
+    if (c) circles.add(c)
+  })
+  return Array.from(circles)
 }
 
 const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
@@ -293,8 +331,19 @@ export default function AdminApplications() {
     const matchesStatus =
       selectedStatusTab === 'All' ? true : app.status === selectedStatusTab
 
-    const matchesDomain =
-      selectedDomain === 'All Domains' ? true : (app.domain || '').includes(selectedDomain)
+    const matchesDomain = (() => {
+      if (!selectedDomain || selectedDomain === 'All' || selectedDomain === 'All Domains') return true
+      if (selectedDomain === 'Circle: Compute') {
+        return getMatchedCircles(app.domain).includes('Compute')
+      }
+      if (selectedDomain === 'Circle: Applied AI') {
+        return getMatchedCircles(app.domain).includes('Applied AI')
+      }
+      if (selectedDomain === 'Circle: Crew') {
+        return getMatchedCircles(app.domain).includes('Crew')
+      }
+      return (app.domain || '').toLowerCase().includes(selectedDomain.toLowerCase())
+    })()
 
     return matchesSearch && matchesStatus && matchesDomain
   })
@@ -590,9 +639,9 @@ ${app.motivation || 'None specified'}
               onChange={(e) => setSelectedDomain(e.target.value)}
               className="px-3.5 py-2.5 rounded-xl bg-[#0F1012] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
             >
-              {DOMAINS.map((dom) => (
-                <option key={dom} value={dom} className="bg-[#141517] text-white">
-                  {dom}
+              {CIRCLE_FILTER_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-[#141517] text-white">
+                  {opt.label}
                 </option>
               ))}
             </select>
@@ -655,10 +704,23 @@ ${app.motivation || 'None specified'}
                       {/* Domain & Academic Info */}
                       <td className="py-3.5 px-4">
                         <div className="flex flex-wrap gap-1 max-w-sm">
+                          {getMatchedCircles(app.domain).map((cName) => {
+                            const conf = CIRCLE_CONFIG[cName] || CIRCLE_CONFIG.Compute
+                            return (
+                              <span
+                                key={cName}
+                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${conf.color}`}
+                                title={`Matched Circle: ${cName}`}
+                              >
+                                <span className={`w-1 h-1 rounded-full ${conf.dot}`} />
+                                <span>{cName}</span>
+                              </span>
+                            )
+                          })}
                           {parseDomains(app.domain).map((track, i) => (
                             <span
                               key={i}
-                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cluster-acid/10 border border-cluster-acid/25 text-cluster-acid"
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono text-[#D4D4CD] bg-white/[0.04] border border-white/[0.08]"
                             >
                               {track}
                             </span>
@@ -965,11 +1027,21 @@ ${app.motivation || 'None specified'}
                   <div className="flex items-center justify-between">
                     <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-cluster-acid" />
-                      <span>Selected Domains</span>
+                      <span>Selected Domains &amp; Circle Matches</span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-cluster-acid bg-cluster-acid/10 border border-cluster-acid/25 px-2.5 py-0.5 rounded-full">
-                      {parseDomains(selectedApp.domain).length} {parseDomains(selectedApp.domain).length === 1 ? 'Track' : 'Tracks'}
-                    </span>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {getMatchedCircles(selectedApp.domain).map((cName) => {
+                        const conf = CIRCLE_CONFIG[cName] || CIRCLE_CONFIG.Compute
+                        return (
+                          <span
+                            key={cName}
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${conf.color}`}
+                          >
+                            {cName}
+                          </span>
+                        )
+                      })}
+                    </div>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-[#141518] border border-cluster-acid/30 flex-1 flex flex-col justify-start space-y-2.5 shadow-inner">
