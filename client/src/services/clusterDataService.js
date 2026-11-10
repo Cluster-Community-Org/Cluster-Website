@@ -966,41 +966,74 @@ export const clusterDataService = {
   },
 
   // ── Supabase Realtime & Remote Hydration ──
-  async initSupabaseSync() {
-    if (!isSupabaseConfigured() || !supabase) return
+  async syncFromSupabase() {
+    if (!isSupabaseConfigured() || !supabase) {
+      return { success: false, error: 'Supabase is not configured' }
+    }
 
     try {
+      const results = {}
+
       // 1. Fetch remote Events
       const { data: remoteEvents, error: eventsErr } = await supabase.from('events').select('*').order('id', { ascending: true })
       if (!eventsErr && Array.isArray(remoteEvents)) {
-        const mapped = remoteEvents.map(eventFromDB)
-        localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(mapped))
-        dispatchUpdate('cluster_events_updated', mapped)
+        if (remoteEvents.length > 0) {
+          const mapped = remoteEvents.map(eventFromDB)
+          localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(mapped))
+          dispatchUpdate('cluster_events_updated', mapped)
+        }
+        results.events = remoteEvents.length
+      } else if (eventsErr) {
+        console.warn('[Supabase Sync] Events fetch error:', eventsErr.message)
       }
 
       // 2. Fetch remote Team Members
       const { data: remoteTeam, error: teamErr } = await supabase.from('team_members').select('*').order('id', { ascending: true })
       if (!teamErr && Array.isArray(remoteTeam)) {
-        const mapped = remoteTeam.map(memberFromDB)
-        localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(mapped))
-        dispatchUpdate('cluster_team_updated', mapped)
+        if (remoteTeam.length > 0) {
+          const mapped = remoteTeam.map(memberFromDB)
+          localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(mapped))
+          dispatchUpdate('cluster_team_updated', mapped)
+        }
+        results.team = remoteTeam.length
+      } else if (teamErr) {
+        console.warn('[Supabase Sync] Team fetch error:', teamErr.message)
       }
 
-      // 3. Fetch remote Applications
+      // 3. Fetch remote Applications (only update if remote returns records)
       const { data: remoteApps, error: appsErr } = await supabase.from('applications').select('*').order('submitted_at', { ascending: false })
       if (!appsErr && Array.isArray(remoteApps)) {
-        const mapped = remoteApps.map(appFromDB)
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(mapped))
-        dispatchUpdate('cluster_applications_updated', mapped)
+        if (remoteApps.length > 0) {
+          const mapped = remoteApps.map(appFromDB)
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(mapped))
+          dispatchUpdate('cluster_applications_updated', mapped)
+        }
+        results.applications = remoteApps.length
+      } else if (appsErr) {
+        console.warn('[Supabase Sync] Applications fetch error (check RLS):', appsErr.message)
       }
 
       // 4. Fetch remote Homepage Config
-      const { data: remoteConfig } = await supabase.from('homepage_config').select('*').eq('id', 1).maybeSingle()
-      if (remoteConfig) {
+      const { data: remoteConfig, error: configErr } = await supabase.from('homepage_config').select('*').eq('id', 1).maybeSingle()
+      if (!configErr && remoteConfig) {
         const mapped = configFromDB(remoteConfig)
         localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(mapped))
         dispatchUpdate('cluster_homepage_updated', mapped)
+        results.homepage = true
       }
+
+      return { success: true, results }
+    } catch (err) {
+      console.warn('[Supabase Sync Error]', err)
+      return { success: false, error: err.message }
+    }
+  },
+
+  async initSupabaseSync() {
+    if (!isSupabaseConfigured() || !supabase) return
+
+    try {
+      await this.syncFromSupabase()
 
       // 5. Subscribe to Realtime Postgres changes
       supabase

@@ -42,6 +42,8 @@ export default function AdminEvents() {
 
   // Refresh data on custom events
   useEffect(() => {
+    clusterDataService.syncFromSupabase()
+
     const handleEventsUpdate = () => {
       setEvents(clusterDataService.getEvents())
       setSpotlightEvent(clusterDataService.getSpotlightEvent())

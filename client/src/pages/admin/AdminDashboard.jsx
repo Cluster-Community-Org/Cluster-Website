@@ -60,6 +60,8 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
+    clusterDataService.syncFromSupabase()
+
     window.addEventListener('cluster_events_updated', refreshData)
     window.addEventListener('cluster_spotlight_updated', refreshData)
     window.addEventListener('cluster_team_updated', refreshData)

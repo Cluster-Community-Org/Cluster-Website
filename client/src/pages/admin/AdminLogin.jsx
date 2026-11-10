@@ -49,6 +49,13 @@ export default function AdminLogin() {
             loggedInAt: new Date().toISOString(),
           })
         )
+
+        // Immediately sync fresh data from Supabase with authenticated session
+        try {
+          await clusterDataService.syncFromSupabase()
+        } catch (syncErr) {
+          console.warn('[Admin Login] Initial Supabase sync error:', syncErr)
+        }
       } else {
         // Local Vault Mode (Development fallback)
         localStorage.setItem(

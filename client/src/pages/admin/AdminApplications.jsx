@@ -27,6 +27,8 @@ import {
   Lock,
   Unlock,
   Code,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { getSafeUrl } from '../../lib/safeUrl.js'
@@ -64,14 +66,14 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    // Auto-create header row on row 1 if sheet is empty (13 columns)
+    // Auto-create header row on row 1 if sheet is empty (14 columns)
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
-        "Timestamp", "Full Name", "Email", "Roll Number", 
-        "Course", "Branch", "Year", "Domain", 
+        "Timestamp", "Application ID", "Full Name", "Email", "Roll Number", 
+        "Course", "Branch", "Year", "Domain / Tracks", 
         "GitHub", "LinkedIn", "Projects (Built/Shipped)", "Motivation", "Status"
       ]);
-      sheet.getRange(1, 1, 1, 13).setFontWeight("bold").setBackground("#C6FF4D").setFontColor("#000000");
+      sheet.getRange(1, 1, 1, 14).setFontWeight("bold").setBackground("#C6FF4D").setFontColor("#000000");
     }
 
     var data = {};
@@ -86,7 +88,6 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
     }
 
     // ── SECURITY: OPTIONAL WEBHOOK SECRET TOKEN CHECK ──
-    // To protect status updates, set 'CLUSTER_WEBHOOK_SECRET' in Project Settings -> Script Properties
     var configuredSecret = PropertiesService.getScriptProperties().getProperty("CLUSTER_WEBHOOK_SECRET");
     if (configuredSecret && data.secret !== configuredSecret) {
       return ContentService.createTextOutput(JSON.stringify({ result: "error", error: "Unauthorized: Invalid secret token" }))
@@ -105,30 +106,33 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
 
     // ── CASE 1: UPDATE STATUS OF AN EXISTING CANDIDATE ──
     if (data.action === "UPDATE_STATUS" && data.status) {
+      var targetId = (data.id || data.applicationId || "").toString().trim().toLowerCase();
       var targetEmail = (data.email || "").toString().trim().toLowerCase();
       var targetRoll = (data.rollNumber || data.roll_number || "").toString().trim().toLowerCase();
       var lastRow = sheet.getLastRow();
 
       if (lastRow > 1) {
-        var range = sheet.getRange(2, 1, lastRow - 1, 13);
+        var numCols = Math.min(sheet.getLastColumn(), 14);
+        var range = sheet.getRange(2, 1, lastRow - 1, numCols);
         var values = range.getValues();
         var foundRow = -1;
 
         for (var i = 0; i < values.length; i++) {
-          var rowEmail = values[i][2].toString().trim().toLowerCase();
-          var rowRoll = values[i][3].toString().trim().toLowerCase();
-          if ((targetEmail && rowEmail === targetEmail) || (targetRoll && rowRoll === targetRoll)) {
+          var rowId = (values[i][1] || "").toString().trim().toLowerCase();
+          var rowEmail = (values[i][3] || values[i][2] || "").toString().trim().toLowerCase();
+          var rowRoll = (values[i][4] || values[i][3] || "").toString().trim().toLowerCase();
+          
+          if ((targetId && rowId === targetId) || (targetEmail && rowEmail === targetEmail) || (targetRoll && rowRoll === targetRoll)) {
             foundRow = i + 2;
             break;
           }
         }
 
         if (foundRow > 0) {
-          // Column 13 is 'Status'
-          var statusCell = sheet.getRange(foundRow, 13);
+          var statusCol = numCols >= 14 ? 14 : numCols;
+          var statusCell = sheet.getRange(foundRow, statusCol);
           statusCell.setValue(sanitizeCell(data.status));
           
-          // Color-code status cell in Google Sheet
           if (data.status === "Accepted") {
             statusCell.setBackground("#C6FF4D").setFontColor("#000000").setFontWeight("bold");
           } else if (data.status === "Rejected") {
@@ -147,9 +151,10 @@ const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       }
     }
 
-    // ── CASE 2: NEW APPLICATION INSERT (13 Columns) ──
+    // ── CASE 2: NEW APPLICATION INSERT (14 Columns) ──
     sheet.appendRow([
       new Date(),
+      sanitizeCell(data.id || data.applicationId || "app-" + Date.now()),
       sanitizeCell(data.fullName || data.full_name),
       sanitizeCell(data.email),
       sanitizeCell(data.rollNumber || data.roll_number),
@@ -193,11 +198,31 @@ export default function AdminApplications() {
   const [sheetUrlInput, setSheetUrlInput] = useState(() => clusterDataService.getApplicationsSheetUrl())
   const [isTestingPing, setIsTestingPing] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
+  const [copiedAppId, setCopiedAppId] = useState(false)
+  const [copiedEmail, setCopiedEmail] = useState(false)
+  const [copiedRoll, setCopiedRoll] = useState(false)
+  const [copiedDossier, setCopiedDossier] = useState(false)
 
   // Recruitment Window State (Open vs Paused/Closed)
   const [isApplicationsOpen, setIsApplicationsOpen] = useState(() => clusterDataService.isApplicationsOpen())
+  const [isSyncing, setIsSyncing] = useState(false)
+
+  const handleManualSync = async () => {
+    setIsSyncing(true)
+    const res = await clusterDataService.syncFromSupabase()
+    setIsSyncing(false)
+    if (res?.success) {
+      const count = res.results?.applications ?? 0
+      showToast(`Synced with Supabase (${count} applications retrieved)`, count > 0 ? 'success' : 'info')
+    } else {
+      showToast(`Supabase sync failed: ${res?.error || 'Unknown error'}`, 'error')
+    }
+  }
 
   useEffect(() => {
+    // Automatically trigger fresh sync from Supabase when entering page
+    clusterDataService.syncFromSupabase()
+
     const handleUpdate = () => {
       setApplications(clusterDataService.getApplications())
     }
@@ -301,6 +326,67 @@ export default function AdminApplications() {
     setTimeout(() => setIsCopied(false), 2500)
   }
 
+  const handleCopyAppId = (id) => {
+    if (!id) return
+    navigator.clipboard.writeText(id)
+    setCopiedAppId(true)
+    setTimeout(() => setCopiedAppId(false), 2000)
+    showToast('Application ID copied to clipboard')
+  }
+
+  const handleCopyEmail = (email) => {
+    if (!email) return
+    navigator.clipboard.writeText(email)
+    setCopiedEmail(true)
+    setTimeout(() => setCopiedEmail(false), 2000)
+    showToast('Candidate email copied')
+  }
+
+  const handleCopyRoll = (roll) => {
+    if (!roll) return
+    navigator.clipboard.writeText(roll)
+    setCopiedRoll(true)
+    setTimeout(() => setCopiedRoll(false), 2000)
+    showToast('Roll number copied')
+  }
+
+  const handleCopyDossier = (app) => {
+    if (!app) return
+    const markdown = `# CANDIDATE DOSSIER // CLUSTER
+- **Application ID:** \`${app.id || 'N/A'}\`
+- **Candidate Name:** ${app.fullName || 'N/A'}
+- **Current Status:** ${app.status || 'Pending'}
+- **Submitted:** ${app.submittedAt ? new Date(app.submittedAt).toLocaleString() : 'N/A'}
+- **Email:** ${app.email || 'N/A'}
+- **Roll Number:** ${app.rollNumber || 'N/A'}
+- **Course / Branch / Year:** ${app.course || 'B.Tech'} · ${app.branch || 'CSE'} · ${app.year || '2nd Year'}
+- **Domain:** ${app.domain || 'N/A'}
+- **GitHub:** ${app.github || 'N/A'}
+- **LinkedIn:** ${app.linkedin || 'N/A'}
+
+## Projects & What They've Built
+${app.projects || 'None specified'}
+
+## Motivation Statement
+${app.motivation || 'None specified'}
+`
+    navigator.clipboard.writeText(markdown)
+    setCopiedDossier(true)
+    setTimeout(() => setCopiedDossier(false), 2000)
+    showToast('Full candidate dossier copied (Markdown)')
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (selectedApp) setSelectedApp(null)
+        if (isSheetModalOpen) setIsSheetModalOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedApp, isSheetModalOpen])
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Top Header */}
@@ -319,6 +405,17 @@ export default function AdminApplications() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Manual Supabase Sync */}
+          <button
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="btn-cluster-secondary px-3.5 py-2.5 text-xs font-mono font-bold flex items-center gap-1.5 disabled:opacity-50"
+            title="Fetch latest applications directly from Supabase"
+          >
+            <RefreshCw className={`w-4 h-4 text-cluster-acid ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Syncing...' : 'Sync Supabase'}</span>
+          </button>
+
           {/* Master Recruitment Status Toggle */}
           <button
             onClick={handleToggleApplicationsOpen}
@@ -605,120 +702,293 @@ export default function AdminApplications() {
 
       {/* Candidate Detail Modal */}
       {selectedApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl bg-[#0C0D0E] border border-white/[0.1] p-6 sm:p-8 space-y-6 text-[#F8F7F3]">
-            <button
-              onClick={() => setSelectedApp(null)}
-              className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedApp(null)
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full max-w-3xl max-h-[92vh] overflow-hidden flex flex-col rounded-3xl bg-[#0C0D0E] border border-white/[0.12] shadow-2xl text-[#F8F7F3]">
+            {/* Modal Header */}
+            <div className="p-6 sm:p-8 pb-4 border-b border-white/[0.08] bg-[#0E0F12]">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-cluster-acid uppercase bg-cluster-acid/10 px-2.5 py-0.5 rounded-full border border-cluster-acid/20">
+                      CANDIDATE DOSSIER
+                    </span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold border ${STATUS_CONFIG[selectedApp.status]?.color || 'text-gray-400 bg-white/5 border-white/10'}`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                      {selectedApp.status}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-display font-black text-white tracking-tight mt-2">
+                    {selectedApp.fullName}
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#8E8E88] pt-0.5">
+                    <span>
+                      Submitted {new Date(selectedApp.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date(selectedApp.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="space-y-1">
-              <div className="text-[10px] font-mono font-bold tracking-widest text-cluster-acid uppercase">
-                APPLICANT DOSSIER // {selectedApp.id}
-              </div>
-              <h2 className="text-2xl font-display font-black text-white">
-                {selectedApp.fullName}
-              </h2>
-              <div className="text-xs font-mono text-[#8E8E88]">
-                Submitted {new Date(selectedApp.submittedAt).toLocaleString()}
-              </div>
-            </div>
-
-            {/* Quick Info Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#141517] border border-white/[0.08] text-xs font-mono">
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Email Address</div>
-                <div className="text-white mt-0.5 truncate">{selectedApp.email}</div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Roll / Student ID</div>
-                <div className="text-white mt-0.5">{selectedApp.rollNumber}</div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Course Degree</div>
-                <div className="text-white mt-0.5">{selectedApp.course || 'B.Tech'}</div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Branch / Major</div>
-                <div className="text-white mt-0.5 truncate">{selectedApp.branch || 'CSE'}</div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Academic Year</div>
-                <div className="text-white mt-0.5">{selectedApp.year || '2nd Year'}</div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[#8E8E88]">Primary Domain</div>
-                <div className="text-cluster-acid mt-0.5 truncate">{selectedApp.domain}</div>
-              </div>
-            </div>
-
-            {/* What they've built (primary selection signal) */}
-            <div className="space-y-2">
-              <div className="text-xs font-mono text-white font-bold uppercase tracking-wider">
-                What they&apos;ve built
-              </div>
-              <div className="p-4 rounded-2xl bg-[#141517] border border-cluster-acid/30 text-xs text-[#D4D4CD] font-sans leading-relaxed whitespace-pre-wrap">
-                {selectedApp.projects || 'Not provided.'}
-              </div>
-            </div>
-
-            {/* Motivation Statement */}
-            <div className="space-y-2">
-              <div className="text-xs font-mono text-white font-bold uppercase tracking-wider">
-                Motivation & Builder Goals
-              </div>
-              <div className="p-4 rounded-2xl bg-[#141517] border border-white/[0.08] text-xs text-[#D4D4CD] font-sans leading-relaxed whitespace-pre-wrap">
-                {selectedApp.motivation || 'No statement provided.'}
-              </div>
-            </div>
-
-            {/* Profiles & Links */}
-            <div className="flex items-center gap-3">
-              {getSafeUrl(selectedApp.github) && (
-                <a
-                  href={getSafeUrl(selectedApp.github)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-[#141517] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white flex items-center gap-2"
-                >
-                  <Github className="w-4 h-4 text-cluster-acid" />
-                  <span>GitHub</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </a>
-              )}
-              {getSafeUrl(selectedApp.linkedin) && (
-                <a
-                  href={getSafeUrl(selectedApp.linkedin)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-[#141517] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white flex items-center gap-2"
-                >
-                  <Linkedin className="w-4 h-4 text-cluster-acid" />
-                  <span>LinkedIn</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </a>
-              )}
-            </div>
-
-            {/* Status Pipeline Controls */}
-            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">
-              <div className="text-xs font-mono text-[#8E8E88]">Candidate Status:</div>
-              <div className="flex items-center gap-2">
-                {['Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected'].map((status) => (
+                {/* Header Actions */}
+                <div className="flex items-center gap-2">
                   <button
-                    key={status}
-                    onClick={() => handleStatusChange(selectedApp.id, status)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${selectedApp.status === status
-                        ? 'bg-cluster-acid text-black font-bold'
-                        : 'bg-white/5 text-[#8E8E88] hover:text-white'
-                      }`}
+                    onClick={() => handleCopyDossier(selectedApp)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/[0.08] text-xs font-mono text-[#D4D4CD] hover:text-white transition-colors"
+                    title="Copy Full Dossier (Markdown)"
                   >
-                    {status}
+                    {copiedDossier ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-cluster-acid" />
+                        <span className="text-cluster-acid">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Copy Dossier</span>
+                      </>
+                    )}
                   </button>
-                ))}
+
+                  <a
+                    href={`mailto:${selectedApp.email}?subject=Regarding%20your%20CLUSTER%20Application%20(${encodeURIComponent(selectedApp.fullName || '')})`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/[0.08] text-xs font-mono text-[#D4D4CD] hover:text-white transition-colors"
+                    title="Send Email to Candidate"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-cluster-acid" />
+                    <span className="hidden sm:inline">Email</span>
+                  </a>
+
+                  <button
+                    onClick={() => setSelectedApp(null)}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors ml-1"
+                    aria-label="Close"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Application ID Card */}
+              <div className="mt-4 p-3 rounded-2xl bg-[#141518] border border-white/[0.08] flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-cluster-acid/10 border border-cluster-acid/20 flex items-center justify-center shrink-0">
+                    <Hash className="w-3.5 h-3.5 text-cluster-acid" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-[#8E8E88]">
+                      Application ID (Google Sheet &amp; Supabase Ref)
+                    </div>
+                    <div className="font-mono text-xs sm:text-sm font-bold text-cluster-acid truncate select-all">
+                      {selectedApp.id}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleCopyAppId(selectedApp.id)}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-cluster-acid/15 border border-white/10 hover:border-cluster-acid/30 text-xs font-mono text-white transition-all"
+                  title="Copy Application ID"
+                >
+                  {copiedAppId ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-cluster-acid" />
+                      <span className="text-cluster-acid font-bold">Copied ID</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-gray-400" />
+                      <span>Copy ID</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+              {/* Contact & Academic Information Grid */}
+              <div className="space-y-2.5">
+                <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-cluster-acid" />
+                  <span>Applicant Information &amp; Academic Profile</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {/* Email */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Email Address</div>
+                    <div className="flex items-center justify-between gap-1">
+                      <a
+                        href={`mailto:${selectedApp.email}`}
+                        className="text-xs font-mono text-white hover:text-cluster-acid truncate transition-colors"
+                        title={selectedApp.email}
+                      >
+                        {selectedApp.email}
+                      </a>
+                      <button
+                        onClick={() => handleCopyEmail(selectedApp.email)}
+                        className="p-1 rounded text-gray-400 hover:text-white"
+                        title="Copy Email"
+                      >
+                        {copiedEmail ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Roll Number */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Roll / Student ID</div>
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs font-mono font-bold text-white tracking-wide">
+                        {selectedApp.rollNumber || 'N/A'}
+                      </span>
+                      <button
+                        onClick={() => handleCopyRoll(selectedApp.rollNumber)}
+                        className="p-1 rounded text-gray-400 hover:text-white"
+                        title="Copy Roll Number"
+                      >
+                        {copiedRoll ? <Check className="w-3 h-3 text-cluster-acid" /> : <Copy className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Degree / Course */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Course / Degree</div>
+                    <div className="text-xs font-mono text-white font-semibold">
+                      {selectedApp.course || 'B.Tech'}
+                    </div>
+                  </div>
+
+                  {/* Branch */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Branch / Major</div>
+                    <div className="text-xs font-mono text-white truncate" title={selectedApp.branch || 'CSE'}>
+                      {selectedApp.branch || 'Computer Science & Engineering'}
+                    </div>
+                  </div>
+
+                  {/* Year */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Academic Year</div>
+                    <div className="text-xs font-mono text-white font-semibold">
+                      {selectedApp.year || '2nd Year'}
+                    </div>
+                  </div>
+
+                  {/* Applied Domain */}
+                  <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/[0.06] space-y-1">
+                    <div className="text-[10px] font-mono text-[#8E8E88] uppercase">Selected Domain</div>
+                    <div className="text-xs font-mono text-cluster-acid font-bold truncate">
+                      {selectedApp.domain}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* External Profiles / Social Handles */}
+              <div className="space-y-2.5">
+                <div className="text-[11px] font-mono uppercase tracking-wider text-[#8E8E88] font-bold">
+                  External Profiles &amp; Repositories
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  {selectedApp.github ? (
+                    <a
+                      href={getSafeUrl(selectedApp.github)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
+                    >
+                      <Github className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
+                      <span className="font-semibold">GitHub Profile</span>
+                      <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
+                    </a>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-xs font-mono text-[#666]">
+                      <Github className="w-3.5 h-3.5 opacity-50" />
+                      <span>No GitHub provided</span>
+                    </div>
+                  )}
+
+                  {selectedApp.linkedin ? (
+                    <a
+                      href={getSafeUrl(selectedApp.linkedin)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-[#141518] border border-white/[0.08] hover:border-cluster-acid/50 text-xs font-mono text-white transition-colors group"
+                    >
+                      <Linkedin className="w-4 h-4 text-cluster-acid group-hover:scale-110 transition-transform" />
+                      <span className="font-semibold">LinkedIn Profile</span>
+                      <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-white" />
+                    </a>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-xs font-mono text-[#666]">
+                      <Linkedin className="w-3.5 h-3.5 opacity-50" />
+                      <span>No LinkedIn provided</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* What they've built / Projects */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-mono text-white font-bold uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cluster-acid" />
+                    <span>What They&apos;ve Built &amp; Shipped (Primary Signal)</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#8E8E88]">Portfolio / Experience</span>
+                </div>
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#141518] border border-cluster-acid/30 text-xs sm:text-sm text-[#E0E0DB] font-mono leading-relaxed whitespace-pre-wrap select-text">
+                  {selectedApp.projects ? selectedApp.projects : (
+                    <span className="italic text-[#8E8E88]">No project portfolio details submitted.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Motivation & Builder Goals */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-mono text-white font-bold uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-400" />
+                    <span>Motivation &amp; Why CLUSTER</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#8E8E88]">Statement of Purpose</span>
+                </div>
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#141518] border border-white/[0.08] text-xs sm:text-sm text-[#D4D4CD] font-sans leading-relaxed whitespace-pre-wrap select-text">
+                  {selectedApp.motivation ? selectedApp.motivation : (
+                    <span className="italic text-[#8E8E88]">No motivation statement submitted.</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Sticky Modal Footer: Status Pipeline */}
+            <div className="p-4 sm:p-6 border-t border-white/[0.08] bg-[#0E0F12] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="text-xs font-mono text-[#8E8E88] flex items-center gap-1.5">
+                <span>Update Status:</span>
+                <span className="text-white font-bold">{selectedApp.status}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {['Pending', 'Under Review', 'Accepted', 'Waitlisted', 'Rejected'].map((status) => {
+                  const isActive = selectedApp.status === status
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => handleStatusChange(selectedApp.id, status)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-mono font-medium transition-all ${
+                        isActive
+                          ? 'bg-cluster-acid text-black font-bold shadow-md shadow-cluster-acid/20 scale-105'
+                          : 'bg-white/5 hover:bg-white/10 text-[#8E8E88] hover:text-white border border-white/[0.06]'
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>

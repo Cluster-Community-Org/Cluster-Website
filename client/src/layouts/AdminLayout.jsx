@@ -54,7 +54,7 @@ export default function AdminLayout() {
       }
       if (isMounted) setAuth(localAuth)
 
-      // If Supabase is configured, verify the server-side JWT session token
+      // If Supabase is configured, verify session and trigger fresh sync
       if (isSupabaseConfigured() && supabase) {
         try {
           const { data: { session }, error } = await supabase.auth.getSession()
@@ -65,7 +65,10 @@ export default function AdminLayout() {
               setAuth(null)
               navigate('/admin/login')
             }
+            return
           }
+          // Fetch fresh remote data from Supabase with active admin credentials
+          await clusterDataService.syncFromSupabase()
         } catch {
           // If network check fails, maintain local state
         }

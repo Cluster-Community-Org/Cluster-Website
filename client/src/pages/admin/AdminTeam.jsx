@@ -19,6 +19,7 @@ export default function AdminTeam() {
   })
 
   useEffect(() => {
+    clusterDataService.syncFromSupabase()
     const handleUpdate = () => {
       setTeam(clusterDataService.getTeamMembers())
     }
