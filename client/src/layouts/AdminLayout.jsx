@@ -15,6 +15,7 @@ import {
   PanelLeft,
   Shield,
   Activity,
+  Share2,
 } from 'lucide-react'
 import { ClusterMark } from '../components/ui/Brand.jsx'
 import CommandPalette from '../components/admin/CommandPalette.jsx'
@@ -155,6 +156,7 @@ export default function AdminLayout() {
     { name: 'Team CMS', href: '/admin/team', icon: Users },
     { name: 'Applications', href: '/admin/applications', icon: UserCheck, badge: pendingApplications },
     { name: 'Homepage CMS', href: '/admin/homepage', icon: Monitor },
+    { name: 'Socials / Linktree', href: '/admin/socials', icon: Share2 },
   ]
 
   // Section title based on current route
@@ -170,6 +172,9 @@ export default function AdminLayout() {
     }
     if (location.pathname.includes('/admin/homepage')) {
       return { title: 'Homepage Configuration', subtitle: 'Hero content, alert ticker & metric cards' }
+    }
+    if (location.pathname.includes('/admin/socials')) {
+      return { title: 'Socials & Linktree Control', subtitle: 'Enable, disable, and reorder public social channels' }
     }
     return { title: 'Admin Command Center', subtitle: 'System analytics, real-time sync & operations' }
   }, [location.pathname])

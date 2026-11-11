@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Sparkles,
   Command,
+  Share2,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
@@ -79,6 +80,14 @@ export default function CommandPalette({ isOpen, onClose }) {
       category: 'Navigation',
       icon: Users,
       action: () => navigate('/admin/team'),
+    },
+    {
+      id: 'nav-socials',
+      title: 'Socials & Linktree CMS',
+      subtitle: 'Toggle, enable/disable, and reorder public social channels',
+      category: 'Navigation',
+      icon: Share2,
+      action: () => navigate('/admin/socials'),
     },
     {
       id: 'action-export-csv',

@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
   APPLICATIONS: 'cluster_cms_applications',
   HOMEPAGE: 'cluster_cms_homepage_config',
   AUDIT_LOG: 'cluster_cms_audit_log',
+  SOCIALS: 'cluster_cms_social_links',
 }
 
 // ── Default Seed Data ────────────────────────────────────────────────────────
@@ -180,6 +181,122 @@ const DEFAULT_APPLICATIONS = [
   },
 ]
 
+export const DEFAULT_SOCIAL_LINKS = [
+  {
+    id: 'website',
+    title: 'Official Website',
+    subtitle: 'Explore our DGX H200 cluster, circles & projects',
+    url: 'https://clustersociety.tech',
+    iconType: 'globe',
+    bgClass: 'bg-[#C6FF4D] text-black border-2 border-black hover:bg-[#b5f533]',
+    enabled: true,
+    isHighlighted: true,
+    category: 'Featured',
+    order: 1,
+  },
+  {
+    id: 'join',
+    title: 'Apply for Membership (Recruitment 2026)',
+    subtitle: 'Join the Compute, Applied AI, or Crew circles',
+    url: 'https://clustersociety.tech/join',
+    iconType: 'rocket',
+    bgClass: 'bg-[#76B900] text-black border-2 border-black hover:bg-[#68a500]',
+    enabled: true,
+    isHighlighted: true,
+    badge: 'Open Now',
+    category: 'Featured',
+    order: 2,
+  },
+  {
+    id: 'events',
+    title: 'Upcoming Events & Hackathons',
+    subtitle: 'Register for DGX workshops, hackathons & meetups',
+    url: 'https://clustersociety.tech/events',
+    iconType: 'calendar',
+    bgClass: 'bg-[#6366F1] text-white border-2 border-black hover:bg-[#5254d8]',
+    enabled: true,
+    category: 'Community',
+    order: 3,
+  },
+  {
+    id: 'discord',
+    title: 'Join our Discord Server',
+    subtitle: 'Chat with GPU developers, AI researchers & builders',
+    url: 'https://discord.gg/clustersociety',
+    iconType: 'discord',
+    bgClass: 'bg-[#5865F2] text-white border-2 border-black hover:bg-[#4752c4]',
+    enabled: true,
+    category: 'Community',
+    order: 4,
+  },
+  {
+    id: 'whatsapp',
+    title: 'Join our WhatsApp Community',
+    subtitle: 'Instant announcements, event updates & reminders',
+    url: 'https://chat.whatsapp.com/clustersociety',
+    iconType: 'whatsapp',
+    bgClass: 'bg-[#25D366] text-white border-2 border-black hover:bg-[#20b858]',
+    enabled: true,
+    category: 'Community',
+    order: 5,
+  },
+  {
+    id: 'linkedin',
+    title: 'Connect with us on LinkedIn',
+    subtitle: 'Industry collaborations, guest lectures & milestones',
+    url: 'https://www.linkedin.com/company/cluster-club-gu/',
+    iconType: 'linkedin',
+    bgClass: 'bg-[#0A66C2] text-white border-2 border-black hover:bg-[#084e96]',
+    enabled: true,
+    category: 'Socials',
+    order: 6,
+  },
+  {
+    id: 'instagram',
+    title: 'Follow us on Instagram',
+    subtitle: '@theclustercommunity — event recaps, reels & stories',
+    url: 'https://www.instagram.com/theclustercommunity',
+    iconType: 'instagram',
+    bgClass: 'bg-[#E4405F] text-white border-2 border-black hover:bg-[#d63251]',
+    enabled: true,
+    category: 'Socials',
+    order: 7,
+  },
+  {
+    id: 'x',
+    title: 'Follow us on X (Twitter)',
+    subtitle: '@the_clusterclub — GPU benchmarks, tech drops & news',
+    url: 'https://x.com/the_clusterclub',
+    iconType: 'x',
+    bgClass: 'bg-[#000000] text-white border-2 border-white/20 hover:bg-[#181818]',
+    enabled: true,
+    category: 'Socials',
+    order: 8,
+  },
+  {
+    id: 'github',
+    title: 'Explore GitHub Repositories',
+    subtitle: 'Cluster-Community-Org — open source projects & models',
+    url: 'https://github.com/Cluster-Community-Org',
+    iconType: 'github',
+    bgClass: 'bg-[#24292E] text-white border-2 border-black hover:bg-[#1a1e22]',
+    enabled: true,
+    category: 'Developer',
+    order: 9,
+  },
+  {
+    id: 'team',
+    title: 'Meet the Circles & Core Team',
+    subtitle: 'The student leads and mentors behind CLUSTER',
+    url: 'https://clustersociety.tech/team',
+    iconType: 'users',
+    bgClass: 'bg-[#0EA5E9] text-white border-2 border-black hover:bg-[#0284c7]',
+    enabled: true,
+    category: 'Community',
+    order: 10,
+  },
+]
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function dispatchUpdate(eventType, data) {
@@ -296,6 +413,13 @@ function configFromDB(row) {
     if (stored) localConfig = JSON.parse(stored)
   } catch {}
 
+  if (row.social_links && Array.isArray(row.social_links) && row.social_links.length > 0) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(row.social_links))
+      dispatchUpdate('cluster_socials_updated', row.social_links)
+    } catch {}
+  }
+
   return {
     bannerEnabled: Boolean(row.banner_enabled),
     bannerText: row.banner_text,
@@ -311,7 +435,13 @@ function configFromDB(row) {
 }
 
 function configToDB(c) {
-  return {
+  let socials = null
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.SOCIALS)
+    if (stored) socials = JSON.parse(stored)
+  } catch {}
+
+  const payload = {
     id: 1,
     banner_enabled: Boolean(c.bannerEnabled),
     banner_text: c.bannerText,
@@ -325,6 +455,12 @@ function configToDB(c) {
     stats: c.stats,
     updated_at: new Date().toISOString(),
   }
+
+  if (socials && Array.isArray(socials)) {
+    payload.social_links = socials
+  }
+
+  return payload
 }
 
 // ── Data API ─────────────────────────────────────────────────────────────────
@@ -919,6 +1055,7 @@ export const clusterDataService = {
       applications: this.getApplications(),
       homepage: this.getHomepageConfig(),
       auditLog: this.getAuditLog(),
+      socials: this.getSocialLinks(),
     }
 
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
@@ -958,11 +1095,95 @@ export const clusterDataService = {
         localStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(data.auditLog))
         dispatchUpdate('cluster_audit_updated', data.auditLog)
       }
+      if (data.socials && Array.isArray(data.socials)) {
+        localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(data.socials))
+        dispatchUpdate('cluster_socials_updated', data.socials)
+      }
       this.logAudit('BACKUP_RESTORED', 'Full society database snapshot restored', 'system')
       return { success: true }
     } catch (err) {
       return { success: false, error: err.message }
     }
+  },
+
+  // ── Socials & Linktree Management ──
+  getSocialLinks() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.SOCIALS)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.sort((a, b) => (a.order || 0) - (b.order || 0))
+        }
+      }
+      localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(DEFAULT_SOCIAL_LINKS))
+      return DEFAULT_SOCIAL_LINKS
+    } catch {
+      return DEFAULT_SOCIAL_LINKS
+    }
+  },
+
+  updateSocialLinks(links) {
+    localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(links))
+    this.logAudit('SOCIALS_UPDATED', `Social links updated (${links.filter((l) => l.enabled !== false).length} active)`, 'socials')
+    dispatchUpdate('cluster_socials_updated', links)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase
+        .from('homepage_config')
+        .update({ social_links: links, updated_at: new Date().toISOString() })
+        .eq('id', 1)
+        .then(({ error }) => {
+          if (error && error.code !== 'PGRST204') {
+            console.warn('[Supabase Sync Notice] social_links:', error.message)
+          }
+        })
+    }
+
+    return links
+  },
+
+  toggleSocialLink(id) {
+    const current = this.getSocialLinks()
+    const target = current.find((l) => l.id === id)
+    if (!target) return current
+    const nextState = !(target.enabled !== false)
+    const updated = current.map((l) => (l.id === id ? { ...l, enabled: nextState } : l))
+    this.updateSocialLinks(updated)
+    this.logAudit(
+      'SOCIAL_TOGGLED',
+      `"${target.title}" ${nextState ? 'enabled' : 'disabled'} on Linktree`,
+      'socials'
+    )
+    return updated
+  },
+
+  saveSocialLink(linkData) {
+    const current = this.getSocialLinks()
+    let updated
+    if (linkData.id && current.some((l) => l.id === linkData.id)) {
+      updated = current.map((l) => (l.id === linkData.id ? { ...l, ...linkData } : l))
+    } else {
+      const newLink = {
+        ...linkData,
+        id: linkData.id || `custom-${Date.now()}`,
+        enabled: linkData.enabled !== undefined ? linkData.enabled : true,
+        order: current.length + 1,
+      }
+      updated = [...current, newLink]
+    }
+    return this.updateSocialLinks(updated)
+  },
+
+  deleteSocialLink(id) {
+    const current = this.getSocialLinks()
+    const updated = current.filter((l) => l.id !== id)
+    this.logAudit('SOCIAL_DELETED', `Link ID "${id}" removed from Linktree`, 'socials')
+    return this.updateSocialLinks(updated)
+  },
+
+  resetSocialLinks() {
+    return this.updateSocialLinks(DEFAULT_SOCIAL_LINKS)
   },
 
   // ── Supabase Realtime & Remote Hydration ──

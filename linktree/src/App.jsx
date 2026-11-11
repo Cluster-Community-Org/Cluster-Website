@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Globe,
   Rocket,
@@ -12,8 +12,11 @@ import {
   Sparkles,
   Download,
   Copy,
+  Link as LinkIcon,
 } from 'lucide-react'
-import { COMMUNITY_INFO, SOCIAL_LINKS } from './data/links.js'
+import { COMMUNITY_INFO, SOCIAL_LINKS as DEFAULT_SOCIAL_LINKS } from './data/links.js'
+
+const STORAGE_KEY = 'cluster_cms_social_links'
 
 // Official Brand Icons (Discord, WhatsApp, LinkedIn, Instagram, X, GitHub)
 function BrandIcon({ type, className = 'w-6 h-6' }) {
@@ -68,8 +71,82 @@ function BrandIcon({ type, className = 'w-6 h-6' }) {
 }
 
 export default function App() {
+  const [links, setLinks] = useState(() => {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.sort((a, b) => (a.order || 0) - (b.order || 0))
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return DEFAULT_SOCIAL_LINKS
+  })
+
   const [copied, setCopied] = useState(false)
   const [isQrOpen, setIsQrOpen] = useState(false)
+
+  // Real-time synchronization: listen for admin panel updates & fetch from Supabase
+  useEffect(() => {
+    // 1. Listen for storage changes across tabs or windows
+    const handleStorageChange = (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const updated = JSON.parse(e.newValue)
+          if (Array.isArray(updated)) {
+            setLinks(updated.sort((a, b) => (a.order || 0) - (b.order || 0)))
+          }
+        } catch {}
+      }
+    }
+
+    // 2. Custom in-memory event from the same window
+    const handleCustomUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setLinks(e.detail.sort((a, b) => (a.order || 0) - (b.order || 0)))
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('cluster_socials_updated', handleCustomUpdate)
+
+    // 3. Supabase REST fetch if configured in environment
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+    if (supabaseUrl && supabaseKey) {
+      fetch(`${supabaseUrl}/rest/v1/homepage_config?id=eq.1&select=social_links`, {
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data) && data[0]?.social_links && Array.isArray(data[0].social_links)) {
+            const fetchedLinks = data[0].social_links.sort((a, b) => (a.order || 0) - (b.order || 0))
+            setLinks(fetchedLinks)
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(fetchedLinks))
+            } catch {}
+          }
+        })
+        .catch((err) => {
+          console.warn('[CLUSTER Linktree] Remote fetch notice:', err.message)
+        })
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('cluster_socials_updated', handleCustomUpdate)
+    }
+  }, [])
+
+  // Public Linktree ONLY shows links that are enabled (enabled !== false)
+  const visibleLinks = links.filter((link) => link.enabled !== false)
 
   const handleShare = () => {
     const url = window.location.href
@@ -195,50 +272,57 @@ export default function App() {
           </div>
 
           {/* Links Grid (2 Columns on Desktop, 1 Column on Mobile like gdg-socials) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 mb-8">
-            {SOCIAL_LINKS.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full h-full group focus:outline-none"
-              >
-                <div
-                  className={`${link.bgClass} rounded-2xl p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 transition-all duration-200 hover:shadow-xl hover:scale-[1.025] active:scale-[0.98] active:shadow-md shadow-md min-h-[72px] sm:min-h-[76px] relative overflow-hidden`}
+          {visibleLinks.length === 0 ? (
+            <div className="text-center py-12 px-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] mb-8">
+              <p className="text-sm font-mono text-gray-400">No active links currently published.</p>
+              <p className="text-xs text-gray-600 mt-1">Enable links from the Admin Panel to display them here.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 mb-8">
+              {visibleLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full h-full group focus:outline-none"
                 >
-                  {/* Icon Container */}
-                  <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-black/20 flex items-center justify-center transition-transform group-hover:scale-110">
-                    <BrandIcon type={link.iconType} className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
+                  <div
+                    className={`${link.bgClass || 'bg-white/10 text-white'} rounded-2xl p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 transition-all duration-200 hover:shadow-xl hover:scale-[1.025] active:scale-[0.98] active:shadow-md shadow-md min-h-[72px] sm:min-h-[76px] relative overflow-hidden`}
+                  >
+                    {/* Icon Container */}
+                    <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-black/20 flex items-center justify-center transition-transform group-hover:scale-110">
+                      <BrandIcon type={link.iconType || 'link'} className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
 
-                  {/* Title & Subtitle */}
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm sm:text-base font-bold leading-snug truncate">
-                        {link.title}
-                      </span>
-                      {link.badge && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-black text-[#C6FF4D] uppercase shrink-0">
-                          {link.badge}
+                    {/* Title & Subtitle */}
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm sm:text-base font-bold leading-snug truncate">
+                          {link.title}
                         </span>
+                        {link.badge && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-black text-[#C6FF4D] uppercase shrink-0">
+                            {link.badge}
+                          </span>
+                        )}
+                      </div>
+                      {link.subtitle && (
+                        <p className="text-[11px] sm:text-xs opacity-90 truncate font-sans mt-0.5">
+                          {link.subtitle}
+                        </p>
                       )}
                     </div>
-                    {link.subtitle && (
-                      <p className="text-[11px] sm:text-xs opacity-90 truncate font-sans mt-0.5">
-                        {link.subtitle}
-                      </p>
-                    )}
-                  </div>
 
-                  {/* External Arrow Indicator */}
-                  <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                    <ExternalLink className="w-4 h-4" />
+                    {/* External Arrow Indicator */}
+                    <div className="flex-shrink-0 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))}
-          </div>
+                </a>
+              ))}
+            </div>
+          )}
 
           {/* Circles Badges Banner */}
           <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] mb-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
