@@ -141,6 +141,23 @@ export default function AdminSocials() {
     )
   }
 
+  // Toggle feature / highlight
+  const handleToggleHighlight = (id, e) => {
+    e.stopPropagation()
+    const updated = clusterDataService.toggleHighlightSocialLink(id)
+    setLinks(updated)
+    const target = updated.find((l) => l.id === id)
+    const isNowHighlighted = Boolean(
+      target?.isHighlighted || (target?.category && target?.category.toLowerCase() === 'featured')
+    )
+    showToast(
+      isNowHighlighted
+        ? `"${target?.title}" is now FEATURED with glow on Linktree`
+        : `"${target?.title}" unfeatured`,
+      isNowHighlighted ? 'success' : 'info'
+    )
+  }
+
   // Delete link
   const handleDelete = (id, title) => {
     if (confirm(`Remove "${title}" from the Linktree socials list?`)) {
@@ -180,17 +197,24 @@ export default function AdminSocials() {
       subtitle: '',
       url: 'https://',
       iconType: 'globe',
-      category: 'Community',
+      category: 'Featured',
       bgClass: COLOR_PRESETS[0].value,
       badge: '',
       enabled: true,
+      isHighlighted: true,
     })
     setIsModalOpen(true)
   }
 
   // Open modal for editing
   const handleOpenEdit = (link) => {
-    setEditingLink({ ...link })
+    const isHigh = Boolean(
+      link.isHighlighted ||
+      (link.category && link.category.toLowerCase() === 'featured') ||
+      link.id === 'website' ||
+      link.id === 'join'
+    )
+    setEditingLink({ ...link, isHighlighted: isHigh })
     setIsModalOpen(true)
   }
 
@@ -372,12 +396,20 @@ export default function AdminSocials() {
             ) : (
               filteredLinks.map((link, idx) => {
                 const isEnabled = link.enabled !== false
+                const isLinkHighlighted = Boolean(
+                  link.isHighlighted ||
+                  (link.category && link.category.toLowerCase() === 'featured') ||
+                  link.id === 'website' ||
+                  link.id === 'join'
+                )
                 return (
                   <div
                     key={link.id}
                     className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 ${
                       isEnabled
-                        ? 'bg-[#0F1012] border-white/[0.1] hover:border-cluster-acid/40'
+                        ? isLinkHighlighted
+                          ? 'bg-[#0F1012] border-cluster-acid/50 shadow-sm shadow-cluster-acid/10 hover:border-cluster-acid'
+                          : 'bg-[#0F1012] border-white/[0.1] hover:border-cluster-acid/40'
                         : 'bg-white/[0.02] border-white/[0.05] opacity-60'
                     }`}
                   >
@@ -385,7 +417,11 @@ export default function AdminSocials() {
                     <div className="flex items-center gap-3.5 min-w-0">
                       {/* Icon preview box */}
                       <div
-                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border border-black/30 shadow-md ${link.bgClass || 'bg-black text-white'}`}
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border border-black/30 shadow-md ${
+                          isLinkHighlighted
+                            ? 'bg-cluster-acid text-black font-bold'
+                            : link.bgClass || 'bg-black text-white'
+                        }`}
                       >
                         <BrandIconPreview type={link.iconType} className="w-5 h-5" />
                       </div>
@@ -396,6 +432,12 @@ export default function AdminSocials() {
                           <span className={`text-sm font-bold truncate ${isEnabled ? 'text-white' : 'text-gray-400 line-through'}`}>
                             {link.title}
                           </span>
+                          {isLinkHighlighted && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cluster-acid/20 text-cluster-acid border border-cluster-acid/40 shadow-sm">
+                              <Sparkles className="w-2.5 h-2.5 fill-cluster-acid" />
+                              <span>FEATURED</span>
+                            </span>
+                          )}
                           {link.badge && (
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cluster-acid/20 text-cluster-acid border border-cluster-acid/30">
                               {link.badge}
@@ -425,7 +467,23 @@ export default function AdminSocials() {
                     </div>
 
                     {/* Right: Toggle Switch & Actions */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/[0.06]">
+                    <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/[0.06] flex-wrap">
+                      {/* Feature / Highlight Toggle */}
+                      <button
+                        onClick={(e) => handleToggleHighlight(link.id, e)}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                          isLinkHighlighted
+                            ? 'bg-cluster-acid/20 border border-cluster-acid/50 text-cluster-acid hover:bg-cluster-acid/30 shadow-sm shadow-cluster-acid/15'
+                            : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                        }`}
+                        title={isLinkHighlighted ? 'Featured link (Click to remove highlight)' : 'Click to Highlight & Feature on Linktree'}
+                      >
+                        <Sparkles className={`w-3.5 h-3.5 ${isLinkHighlighted ? 'fill-cluster-acid text-cluster-acid' : ''}`} />
+                        <span className="text-[11px]">
+                          {isLinkHighlighted ? 'Featured' : 'Feature'}
+                        </span>
+                      </button>
+
                       {/* Live Enable / Disable Toggle Switch (Core Feature) */}
                       <button
                         onClick={(e) => handleToggle(link.id, e)}
@@ -539,7 +597,12 @@ export default function AdminSocials() {
                   {links
                     .filter((l) => l.enabled !== false)
                     .map((l) => {
-                      const isAccent = l.isHighlighted || l.id === 'website' || l.id === 'join'
+                      const isAccent = Boolean(
+                        l.isHighlighted ||
+                        (l.category && l.category.toLowerCase() === 'featured') ||
+                        l.id === 'website' ||
+                        l.id === 'join'
+                      )
 
                       return (
                         <div
@@ -726,7 +789,14 @@ export default function AdminSocials() {
                   <label className="text-xs font-mono text-[#D4D4CD]">Category</label>
                   <select
                     value={editingLink.category}
-                    onChange={(e) => setEditingLink({ ...editingLink, category: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setEditingLink({
+                        ...editingLink,
+                        category: val,
+                        isHighlighted: val === 'Featured' ? true : editingLink.isHighlighted,
+                      })
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
                   >
                     {['Featured', 'Community', 'Socials', 'Developer'].map((cat) => (
@@ -738,32 +808,61 @@ export default function AdminSocials() {
                 </div>
               </div>
 
-              {/* Badge & Enable Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#D4D4CD]">Optional Badge</label>
-                  <input
-                    type="text"
-                    value={editingLink.badge || ''}
-                    onChange={(e) => setEditingLink({ ...editingLink, badge: e.target.value })}
-                    placeholder="e.g. Open Now, New, 2026"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
-                  />
-                </div>
+              {/* Badge */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#D4D4CD]">Optional Badge</label>
+                <input
+                  type="text"
+                  value={editingLink.badge || ''}
+                  onChange={(e) => setEditingLink({ ...editingLink, badge: e.target.value })}
+                  placeholder="e.g. Open Now, New, 2026"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#141517] border border-white/[0.08] text-white text-xs font-sans focus:border-cluster-acid focus:outline-none"
+                />
+              </div>
 
-                <div className="pt-4">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editingLink.enabled !== false}
-                      onChange={(e) => setEditingLink({ ...editingLink, enabled: e.target.checked })}
-                      className="w-4 h-4 accent-cluster-acid rounded cursor-pointer"
-                    />
-                    <span className="text-xs font-mono text-white">
-                      Visible on Linktree (Enabled)
+              {/* Feature / Highlight & Visibility Status Toggles */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(editingLink.isHighlighted || editingLink.category === 'Featured')}
+                    onChange={(e) => {
+                      const checked = e.target.checked
+                      setEditingLink({
+                        ...editingLink,
+                        isHighlighted: checked,
+                        category: checked ? 'Featured' : (editingLink.category === 'Featured' ? 'Community' : editingLink.category),
+                      })
+                    }}
+                    className="w-4 h-4 mt-0.5 accent-cluster-acid rounded cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-xs font-mono text-white font-bold flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cluster-acid fill-cluster-acid" />
+                      <span>Feature / Highlight</span>
                     </span>
-                  </label>
-                </div>
+                    <span className="text-[10px] text-gray-400 font-sans block">
+                      Acid Lime glow &amp; neon icon on Linktree
+                    </span>
+                  </div>
+                </label>
+
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingLink.enabled !== false}
+                    onChange={(e) => setEditingLink({ ...editingLink, enabled: e.target.checked })}
+                    className="w-4 h-4 mt-0.5 accent-cluster-acid rounded cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-xs font-mono text-white font-bold block">
+                      Visible on Linktree
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-sans block">
+                      Active public link
+                    </span>
+                  </div>
+                </label>
               </div>
 
               {/* Color Preset Palette */}

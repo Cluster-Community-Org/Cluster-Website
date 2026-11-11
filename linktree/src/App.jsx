@@ -24,6 +24,12 @@ const STORAGE_KEY = 'cluster_cms_social_links'
 
 // Map database row to component link format
 function mapDBLink(row) {
+  const isHighlighted = Boolean(
+    row.is_highlighted ||
+    (row.category && row.category.toLowerCase() === 'featured') ||
+    row.id === 'website' ||
+    row.id === 'join'
+  )
   return {
     id: row.id,
     title: row.title,
@@ -34,7 +40,7 @@ function mapDBLink(row) {
     badge: row.badge || '',
     category: row.category || 'General',
     enabled: row.enabled !== undefined ? Boolean(row.enabled) : true,
-    isHighlighted: Boolean(row.is_highlighted),
+    isHighlighted,
     order: row.sort_order !== undefined ? Number(row.sort_order) : 0,
   }
 }
@@ -317,7 +323,12 @@ export default function App() {
           ) : (
             enabledLinks.map((link) => {
               // Highlighting treatment
-              const isAccent = link.isHighlighted || link.id === 'website' || link.id === 'join'
+              const isAccent = Boolean(
+                link.isHighlighted ||
+                (link.category && link.category.toLowerCase() === 'featured') ||
+                link.id === 'website' ||
+                link.id === 'join'
+              )
 
               return (
                 <a

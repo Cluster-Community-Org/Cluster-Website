@@ -407,6 +407,12 @@ function memberToDB(m) {
 
 function socialLinkFromDB(row) {
   if (!row) return null
+  const isHighlighted = Boolean(
+    row.is_highlighted ||
+    (row.category && row.category.toLowerCase() === 'featured') ||
+    row.id === 'website' ||
+    row.id === 'join'
+  )
   return {
     id: row.id,
     title: row.title,
@@ -417,12 +423,18 @@ function socialLinkFromDB(row) {
     badge: row.badge || '',
     category: row.category || 'General',
     enabled: row.enabled !== undefined ? Boolean(row.enabled) : true,
-    isHighlighted: Boolean(row.is_highlighted),
+    isHighlighted: isHighlighted,
     order: row.sort_order !== undefined ? Number(row.sort_order) : 0,
   }
 }
 
 function socialLinkToDB(link, index = 0) {
+  const isHighlighted = Boolean(
+    link.isHighlighted ||
+    (link.category && link.category.toLowerCase() === 'featured') ||
+    link.id === 'website' ||
+    link.id === 'join'
+  )
   return {
     id: link.id,
     title: link.title,
@@ -433,7 +445,7 @@ function socialLinkToDB(link, index = 0) {
     badge: link.badge || '',
     category: link.category || 'General',
     enabled: link.enabled !== undefined ? Boolean(link.enabled) : true,
-    is_highlighted: Boolean(link.isHighlighted),
+    is_highlighted: isHighlighted,
     sort_order: link.order !== undefined ? Number(link.order) : index,
     updated_at: new Date().toISOString(),
   }
@@ -1253,16 +1265,68 @@ export const clusterDataService = {
     return updated
   },
 
+  toggleHighlightSocialLink(id) {
+    const current = this.getSocialLinks()
+    const target = current.find((l) => l.id === id)
+    if (!target) return current
+    const isCurrentlyHighlighted = Boolean(
+      target.isHighlighted || (target.category && target.category.toLowerCase() === 'featured')
+    )
+    const nextState = !isCurrentlyHighlighted
+    const updated = current.map((l) =>
+      l.id === id
+        ? {
+            ...l,
+            isHighlighted: nextState,
+            category: nextState ? 'Featured' : (l.category === 'Featured' ? 'Community' : l.category),
+          }
+        : l
+    )
+
+    localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(updated))
+    dispatchUpdate('cluster_socials_updated', updated)
+    this.logAudit(
+      'SOCIAL_FEATURE_TOGGLED',
+      `"${target.title}" ${nextState ? 'featured/highlighted' : 'unfeatured'} on Linktree`,
+      'socials'
+    )
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase
+        .from('social_links')
+        .update({
+          is_highlighted: nextState,
+          category: nextState ? 'Featured' : (target.category === 'Featured' ? 'Community' : target.category),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .then(({ error }) => {
+          if (error) {
+            this.updateSocialLinks(updated)
+          }
+        })
+    }
+
+    return updated
+  },
+
   saveSocialLink(linkData) {
     const current = this.getSocialLinks()
+    const isHighlighted = Boolean(
+      linkData.isHighlighted || (linkData.category && linkData.category.toLowerCase() === 'featured')
+    )
+    const sanitized = {
+      ...linkData,
+      isHighlighted,
+    }
     let updated
-    if (linkData.id && current.some((l) => l.id === linkData.id)) {
-      updated = current.map((l) => (l.id === linkData.id ? { ...l, ...linkData } : l))
+    if (sanitized.id && current.some((l) => l.id === sanitized.id)) {
+      updated = current.map((l) => (l.id === sanitized.id ? { ...l, ...sanitized } : l))
     } else {
       const newLink = {
-        ...linkData,
-        id: linkData.id || `custom-${Date.now()}`,
-        enabled: linkData.enabled !== undefined ? linkData.enabled : true,
+        ...sanitized,
+        id: sanitized.id || `custom-${Date.now()}`,
+        enabled: sanitized.enabled !== undefined ? sanitized.enabled : true,
         order: current.length + 1,
       }
       updated = [...current, newLink]
