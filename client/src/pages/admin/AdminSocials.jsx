@@ -281,15 +281,15 @@ export default function AdminSocials() {
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Open Linktree preview in browser */}
           <a
-            href="http://localhost:5174"
+            href="https://cluster-socials.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all group"
-            title="Open Live Linktree Hub"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cluster-acid/10 hover:bg-cluster-acid/20 border border-cluster-acid/30 text-xs font-mono text-cluster-acid transition-all group font-bold shadow-sm shadow-cluster-acid/10"
+            title="Open Live Linktree Hub on Vercel"
           >
             <Smartphone className="w-4 h-4 text-cluster-acid" />
             <span>Open Linktree Page</span>
-            <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" />
+            <ExternalLink className="w-3.5 h-3.5 text-cluster-acid/70 group-hover:text-cluster-acid" />
           </a>
 
           {/* Add New Link */}
@@ -691,9 +691,20 @@ export default function AdminSocials() {
               </div>
             </div>
 
-            <p className="text-[11px] font-sans text-gray-400 text-center">
-              Changes made in this admin panel reflect live on the public Linktree page.
-            </p>
+            <div className="pt-1 text-center space-y-1.5">
+              <a
+                href="https://cluster-socials.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cluster-acid/10 hover:bg-cluster-acid/20 border border-cluster-acid/30 text-[11px] font-mono font-bold text-cluster-acid transition-all"
+              >
+                <span>cluster-socials.vercel.app</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <p className="text-[10px] font-sans text-gray-500">
+                Changes saved here reflect live on the public Linktree URL.
+              </p>
+            </div>
           </div>
         </div>
       </div>

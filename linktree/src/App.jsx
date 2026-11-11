@@ -219,8 +219,18 @@ export default function App() {
     return links.filter((link) => link.enabled !== false)
   }, [links])
 
+  const getPublicLinktreeUrl = () => {
+    if (typeof window !== 'undefined') {
+      const href = window.location.href
+      if (!href.includes('localhost') && !href.includes('127.0.0.1')) {
+        return href
+      }
+    }
+    return 'https://cluster-socials.vercel.app/'
+  }
+
   const handleShare = () => {
-    const url = window.location.href
+    const url = getPublicLinktreeUrl()
     if (navigator.share) {
       navigator
         .share({
@@ -237,12 +247,13 @@ export default function App() {
   }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
+    const url = getPublicLinktreeUrl()
+    navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2200)
   }
 
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : 'https://clustersociety.tech'
+  const currentUrl = getPublicLinktreeUrl()
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(currentUrl)}&color=000000&bgcolor=C6FF4D&margin=14`
 
   return (

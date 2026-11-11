@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PublicLayout from '../layouts/PublicLayout.jsx'
 import AdminLayout from '../layouts/AdminLayout.jsx'
@@ -15,6 +16,13 @@ import AdminApplications from '../pages/admin/AdminApplications.jsx'
 import AdminHomepage from '../pages/admin/AdminHomepage.jsx'
 import AdminSocials from '../pages/admin/AdminSocials.jsx'
 
+function ExternalRedirect({ to }) {
+  useEffect(() => {
+    window.location.replace(to)
+  }, [to])
+  return null
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -27,9 +35,9 @@ export default function AppRoutes() {
         <Route path="/apply" element={<Navigate to="/join" replace />} />
       </Route>
 
-      {/* Redirects */}
-      <Route path="/socials" element={<Navigate to="/" replace />} />
-      <Route path="/links" element={<Navigate to="/" replace />} />
+      {/* Redirects to standalone Linktree site */}
+      <Route path="/socials" element={<ExternalRedirect to="https://cluster-socials.vercel.app/" />} />
+      <Route path="/links" element={<ExternalRedirect to="https://cluster-socials.vercel.app/" />} />
 
       {/* Admin Auth Route */}
       <Route path="/admin/login" element={<AdminLogin />} />
