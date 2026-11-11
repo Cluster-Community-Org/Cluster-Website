@@ -23,10 +23,12 @@ import {
   QrCode,
   Smartphone,
   Copy,
+  Zap,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
 import { getSafeUrl } from '../../lib/safeUrl.js'
+import { ClusterMark, Corners } from '../../components/ui/Brand.jsx'
 
 // Brand Icons Helper
 function BrandIconPreview({ type, className = 'w-5 h-5' }) {
@@ -487,9 +489,9 @@ export default function AdminSocials() {
           </div>
         </div>
 
-        {/* Right Column: Interactive Phone Preview Mockup (4 Columns) */}
+        {/* Right Column: Realistic Phone Preview Mockup (4 Columns) */}
         <div className="lg:col-span-4 sticky top-6">
-          <div className="p-4 sm:p-5 rounded-3xl bg-[#0F1012] border-2 border-white/[0.12] shadow-2xl space-y-4">
+          <div className="p-4 sm:p-5 rounded-3xl bg-[#0F1012] border border-white/[0.12] shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <div className="flex items-center gap-2">
                 <Smartphone className="w-4 h-4 text-cluster-acid" />
@@ -497,59 +499,146 @@ export default function AdminSocials() {
                   Live Public Preview
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded-full border border-cluster-acid/20">
+              <span className="text-[10px] font-mono text-cluster-acid bg-cluster-acid/10 px-2.5 py-0.5 rounded-full border border-cluster-acid/20 font-bold">
                 {enabledCount} Active
               </span>
             </div>
 
-            {/* Phone Screen Frame */}
-            <div className="rounded-2xl bg-[#080808] border border-white/10 p-4 max-h-[560px] overflow-y-auto space-y-3 scrollbar-none shadow-inner">
-              {/* Mini Header */}
-              <div className="text-center space-y-1 py-2">
-                <div className="w-10 h-10 rounded-xl bg-black border border-cluster-acid/50 p-1.5 mx-auto">
-                  <img src="/cluster-mark.svg" alt="Logo" className="w-full h-full object-contain" />
+            {/* Realistic Smartphone Chassis */}
+            <div className="relative rounded-[36px] bg-[#16171A] border-4 border-[#25272B] p-2.5 shadow-2xl overflow-hidden">
+              {/* Dynamic Island Speaker Notch */}
+              <div className="relative z-20 flex items-center justify-between px-4 pt-1 pb-2">
+                <span className="text-[9px] font-mono text-neutral-400 font-semibold">9:41</span>
+                <div className="w-16 h-3 bg-black rounded-full flex items-center justify-center gap-1.5 shadow-inner">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]" />
+                  <span className="w-1 h-1 rounded-full bg-blue-900/60" />
                 </div>
-                <div className="text-xs font-bold text-white font-display">CLUSTER Community</div>
-                <div className="text-[9px] font-mono text-cluster-acid">Official Social Links</div>
+                <span className="text-[9px] font-mono text-neutral-400">100%</span>
               </div>
 
-              {/* Render only ENABLED links */}
-              <div className="space-y-2">
-                {links
-                  .filter((l) => l.enabled !== false)
-                  .map((l) => (
-                    <div
-                      key={l.id}
-                      className={`${l.bgClass || 'bg-black text-white'} rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm text-left`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-black/20 flex items-center justify-center shrink-0">
-                        <BrandIconPreview type={l.iconType} className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-bold leading-tight truncate">{l.title}</div>
-                        {l.subtitle && (
-                          <div className="text-[9px] opacity-80 truncate">{l.subtitle}</div>
-                        )}
-                      </div>
-                      <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
+              {/* Inner Screen Display */}
+              <div className="relative rounded-[26px] bg-[#080808] border border-white/[0.08] p-3.5 max-h-[580px] overflow-y-auto space-y-3.5 scrollbar-none shadow-inner text-[#F8F7F3]">
+                {/* Hardware Header Card */}
+                <div className="relative p-3.5 rounded-2xl bg-[#0D0E10]/95 border border-white/[0.09] text-center space-y-2">
+                  <Corners className="border-cluster-acid/30" size="w-2.5 h-2.5" inset="top-1.5 left-1.5 right-1.5 bottom-1.5" />
+
+                  {/* Logo with animated sparks */}
+                  <div className="w-12 h-12 rounded-xl bg-black border border-white/10 p-2 mx-auto shadow-md">
+                    <ClusterMark className="w-full h-full" animated={true} />
+                  </div>
+
+                  <div>
+                    <h3 className="text-xs font-display font-extrabold text-white tracking-tight leading-snug">
+                      CLUSTER Community Society
+                    </h3>
+                    <div className="inline-flex items-center gap-1 text-[8px] font-mono font-semibold uppercase tracking-wider text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded-full border border-cluster-acid/20 mt-1">
+                      <span>Galgotias Univ</span>
+                      <span>•</span>
+                      <span>DGX H200</span>
                     </div>
-                  ))}
-              </div>
+                  </div>
 
-              {enabledCount === 0 && (
-                <div className="py-8 text-center text-xs font-mono text-gray-500 italic">
-                  All links currently disabled.
+                  <p className="text-[9px] text-[#8E8E88] font-sans leading-tight">
+                    Student Research, Supercomputing &amp; Applied AI
+                  </p>
                 </div>
-              )}
 
-              {/* Mini Footer */}
-              <div className="text-center pt-2 text-[9px] font-mono text-gray-600">
-                © {new Date().getFullYear()} CLUSTER Society
+                {/* Render only ENABLED links with exact elevated card design */}
+                <div className="space-y-2">
+                  {links
+                    .filter((l) => l.enabled !== false)
+                    .map((l) => {
+                      const isAccent = l.isHighlighted || l.id === 'website' || l.id === 'join'
+
+                      return (
+                        <div
+                          key={l.id}
+                          className={`rounded-xl p-2.5 flex items-center gap-2.5 transition-all text-left ${
+                            isAccent
+                              ? 'bg-[#121417] border border-cluster-acid/40 shadow-sm'
+                              : 'bg-[#0D0E10] border border-white/[0.08]'
+                          }`}
+                        >
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                              isAccent
+                                ? 'bg-cluster-acid text-black shadow-sm'
+                                : 'bg-white/[0.06] text-white border border-white/10'
+                            }`}
+                          >
+                            <BrandIconPreview type={l.iconType} className="w-3.5 h-3.5" />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[11px] font-bold leading-tight truncate text-white">
+                                {l.title}
+                              </span>
+                              {l.badge && (
+                                <span
+                                  className={`px-1 py-0.2 rounded text-[7px] font-mono font-bold uppercase shrink-0 ${
+                                    isAccent
+                                      ? 'bg-cluster-acid/20 text-cluster-acid border border-cluster-acid/40'
+                                      : 'bg-white/10 text-neutral-300'
+                                  }`}
+                                >
+                                  {l.badge}
+                                </span>
+                              )}
+                            </div>
+                            {l.subtitle && (
+                              <p className="text-[8.5px] text-[#8E8E88] truncate mt-0.5">
+                                {l.subtitle}
+                              </p>
+                            )}
+                          </div>
+
+                          <ExternalLink className="w-3 h-3 text-[#8E8E88] opacity-60 shrink-0" />
+                        </div>
+                      )
+                    })}
+                </div>
+
+                {enabledCount === 0 && (
+                  <div className="py-8 text-center text-xs font-mono text-gray-500 italic bg-[#0D0E10] rounded-xl border border-white/[0.06]">
+                    All links currently disabled.
+                  </div>
+                )}
+
+                {/* The Three Circles Blueprint Mini Bento */}
+                <div className="p-3 rounded-2xl bg-[#0D0E10]/90 border border-white/[0.08] space-y-2">
+                  <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+                    <span className="text-[8px] font-mono uppercase tracking-widest text-cluster-acid font-bold">
+                      THE THREE CIRCLES
+                    </span>
+                    <span className="text-[8px] font-mono text-neutral-500">Recruitment</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1 text-center">
+                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="text-[8px] font-mono font-bold text-cluster-acid">⚡ Compute</div>
+                      <div className="text-[7px] text-[#8E8E88]">DGX &amp; CUDA</div>
+                    </div>
+                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="text-[8px] font-mono font-bold text-sky-400">👁️ Applied</div>
+                      <div className="text-[7px] text-[#8E8E88]">Robotics</div>
+                    </div>
+                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="text-[8px] font-mono font-bold text-purple-400">🚀 Crew</div>
+                      <div className="text-[7px] text-[#8E8E88]">Events</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mini Editorial Footer */}
+                <div className="text-center pt-1 border-t border-white/[0.06] text-[8px] font-mono text-[#5A5C61]">
+                  © {new Date().getFullYear()} CLUSTER Society • Galgotias Univ
+                </div>
               </div>
             </div>
 
             <p className="text-[11px] font-sans text-gray-400 text-center">
-              Toggling links ON/OFF updates this live preview and the public Linktree page instantly.
+              Changes made in this admin panel reflect live on the public Linktree page.
             </p>
           </div>
         </div>
