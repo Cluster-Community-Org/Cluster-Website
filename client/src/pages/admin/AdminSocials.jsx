@@ -659,31 +659,6 @@ export default function AdminSocials() {
                   </div>
                 )}
 
-                {/* The Three Circles Blueprint Mini Bento */}
-                <div className="p-3 rounded-2xl bg-[#0D0E10]/90 border border-white/[0.08] space-y-2">
-                  <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
-                    <span className="text-[8px] font-mono uppercase tracking-widest text-cluster-acid font-bold">
-                      THE THREE CIRCLES
-                    </span>
-                    <span className="text-[8px] font-mono text-neutral-500">Recruitment</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-1 text-center">
-                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
-                      <div className="text-[8px] font-mono font-bold text-cluster-acid">⚡ Compute</div>
-                      <div className="text-[7px] text-[#8E8E88]">DGX &amp; CUDA</div>
-                    </div>
-                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
-                      <div className="text-[8px] font-mono font-bold text-sky-400">👁️ Applied</div>
-                      <div className="text-[7px] text-[#8E8E88]">Robotics</div>
-                    </div>
-                    <div className="p-1 rounded-lg bg-white/[0.02] border border-white/[0.06]">
-                      <div className="text-[8px] font-mono font-bold text-purple-400">🚀 Crew</div>
-                      <div className="text-[7px] text-[#8E8E88]">Events</div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Mini Editorial Footer */}
                 <div className="text-center pt-1 border-t border-white/[0.06] text-[8px] font-mono text-[#5A5C61]">
                   © {new Date().getFullYear()} CLUSTER Society • Galgotias Univ

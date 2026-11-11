@@ -12,9 +12,6 @@ import {
   Sparkles,
   Download,
   Copy,
-  Cpu,
-  Eye,
-  Zap,
 } from 'lucide-react'
 import { COMMUNITY_INFO, SOCIAL_LINKS as DEFAULT_SOCIAL_LINKS } from './data/links.js'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
@@ -402,62 +399,6 @@ export default function App() {
             })
           )}
         </div>
-
-        {/* The Three Circles Blueprint (Tactile Bento Grid) */}
-        <section className="p-6 rounded-3xl bg-[#0D0E10]/80 backdrop-blur-xl border border-white/[0.08] shadow-lg space-y-4">
-          <div className="flex items-center justify-between gap-2 border-b border-white/[0.08] pb-3">
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#C6FF4D] font-bold">
-                COMMUNITY STRUCTURE
-              </div>
-              <h2 className="text-sm font-display font-bold text-white">The Three Circles</h2>
-            </div>
-            <a
-              href="https://clustersociety.tech/join"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] font-mono text-[#C6FF4D] hover:underline flex items-center gap-1"
-            >
-              <span>Join a circle</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
-            {/* Compute Circle */}
-            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-[#C6FF4D]/30 transition-colors space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#C6FF4D] font-mono">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Compute</span>
-              </div>
-              <p className="text-[11px] text-[#8E8E88] leading-relaxed">
-                DGX H200, CUDA kernels, supercomputing, LLM pre-training.
-              </p>
-            </div>
-
-            {/* Applied AI Circle */}
-            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-sky-400/30 transition-colors space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-sky-400 font-mono">
-                <Eye className="w-3.5 h-3.5" />
-                <span>Applied AI</span>
-              </div>
-              <p className="text-[11px] text-[#8E8E88] leading-relaxed">
-                Autonomous robotics, computer vision, Omniverse digital twins.
-              </p>
-            </div>
-
-            {/* Crew Circle */}
-            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-purple-400/30 transition-colors space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-purple-400 font-mono">
-                <Users className="w-3.5 h-3.5" />
-                <span>Crew</span>
-              </div>
-              <p className="text-[11px] text-[#8E8E88] leading-relaxed">
-                Brand design, media, hackathons, outreach &amp; technical logistics.
-              </p>
-            </div>
-          </div>
-        </section>
 
         {/* Editorial Footer */}
         <footer className="text-center py-6 border-t border-white/[0.08] space-y-2">
