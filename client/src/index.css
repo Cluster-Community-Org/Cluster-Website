@@ -158,7 +158,88 @@
 .drift-lazy { animation: drift 46s linear infinite; }
 .marquee { animation: marquee 28s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
-.spark { transform-origin: 60% 100%; animation: pulse 3.2s cubic-bezier(.22,1,.36,1) infinite; }
+/* Spark animations for logo — Exact from Linktree */
+@keyframes spark {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.spark {
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+  animation: spark 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes clusterLoaderPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes clusterGlowSpread {
+  0%, 100% { opacity: 0.25; transform: scale(0.92); }
+  50% { opacity: 0.75; transform: scale(1.15); }
+}
+
+@keyframes loaderBar {
+  0% { left: -40%; width: 30%; }
+  50% { left: 35%; width: 45%; }
+  100% { left: 105%; width: 30%; }
+}
+
+.cluster-loader-pulse {
+  animation: clusterLoaderPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.cluster-glow-spread {
+  animation: clusterGlowSpread 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-loaderBar {
+  animation: loaderBar 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes clusterEmblemBreathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.cluster-emblem-breathe {
+  animation: clusterEmblemBreathe 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes clusterAuraBreathe {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.cluster-aura-breathe {
+  animation: clusterAuraBreathe 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Subtle Technical Dot Matrix & Grid */
+.bg-grid-cluster {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
 .sq-pulse { animation: pulse 2.6s cubic-bezier(.22,1,.36,1) infinite; }
 .blip { animation: blip 1.8s cubic-bezier(.22,1,.36,1) infinite; }
 .float { animation: float 9s cubic-bezier(.45,0,.55,1) infinite alternate; }

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Lock, ArrowRight, ShieldCheck, ArrowLeft, Loader2, Sparkles } from 'lucide-react'
+import { Lock, ArrowRight, ShieldCheck, ArrowLeft, Sparkles } from 'lucide-react'
 import { ClusterMark } from '../../components/ui/Brand.jsx'
+import { ClusterSpinner } from '../../components/ui/ClusterLoader.jsx'
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
@@ -149,7 +150,7 @@ export default function AdminLogin() {
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <ClusterSpinner className="w-4 h-4" markColor="#000000" sparkColor="#000000" />
                   <span>Authenticating...</span>
                 </>
               ) : (

@@ -10,12 +10,34 @@ const SPARKS = [
 ]
 
 // Official traced emblem (public/cluster-mark.svg). Sparks pulse in sequence when animated.
-export function ClusterMark({ className = 'w-9 h-9', markColor = 'currentColor', sparkColor = '#C6FF4D', animated = false }) {
+export function ClusterMark({
+  className = 'w-10 h-10',
+  markColor = '#141413',
+  sparkColor = '#C6FF4D',
+  animated = true,
+}) {
   return (
     <svg viewBox="0 0 701 704" className={className} aria-hidden="true">
+      {/* Main Vector Mark */}
       <path d={MARK} fill={markColor} fillRule="evenodd" />
+
+      {/* Traced Sparks with sequential rhythmic pulse identical to Linktree */}
       {SPARKS.map((d, i) => (
-        <path key={i} d={d} fill={sparkColor} className={animated ? 'spark' : undefined} style={animated ? { animationDelay: `${i * 0.12}s` } : undefined} />
+        <path
+          key={i}
+          d={d}
+          fill={sparkColor}
+          className={animated ? 'spark' : undefined}
+          style={
+            animated
+              ? {
+                  transformBox: 'view-box',
+                  transformOrigin: '200px 200px',
+                  animationDelay: `${i * 0.14}s`,
+                }
+              : undefined
+          }
+        />
       ))}
     </svg>
   )

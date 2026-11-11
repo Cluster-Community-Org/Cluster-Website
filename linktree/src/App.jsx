@@ -9,7 +9,6 @@ import {
   Check,
   QrCode,
   X,
-  Sparkles,
   Download,
   Copy,
 } from 'lucide-react'
@@ -307,12 +306,6 @@ export default function App() {
           <div className="relative mb-4 group">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-black border-2 border-white/10 group-hover:border-[#C6FF4D]/60 p-4 shadow-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105">
               <ClusterMark className="w-full h-full" animated={true} />
-            </div>
-            <div
-              className="absolute -bottom-1 -right-1 p-1 bg-[#C6FF4D] text-black rounded-full shadow-md"
-              title="Verified Society Hub"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
             </div>
           </div>
 

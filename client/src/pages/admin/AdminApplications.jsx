@@ -28,7 +28,6 @@ import {
   Unlock,
   Code,
   RefreshCw,
-  Loader2,
   Sparkles,
   Layers,
 } from 'lucide-react'
