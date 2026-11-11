@@ -15,8 +15,25 @@ import {
   Link as LinkIcon,
 } from 'lucide-react'
 import { COMMUNITY_INFO, SOCIAL_LINKS as DEFAULT_SOCIAL_LINKS } from './data/links.js'
+import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
 
 const STORAGE_KEY = 'cluster_cms_social_links'
+
+function mapDBLink(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle || '',
+    url: row.url,
+    iconType: row.icon_type || 'globe',
+    bgClass: row.bg_class || 'bg-[#C6FF4D] text-black border-2 border-black hover:bg-[#b5f533]',
+    badge: row.badge || '',
+    category: row.category || 'General',
+    enabled: row.enabled !== undefined ? Boolean(row.enabled) : true,
+    isHighlighted: Boolean(row.is_highlighted),
+    order: row.sort_order !== undefined ? Number(row.sort_order) : 0,
+  }
+}
 
 // Official Brand Icons (Discord, WhatsApp, LinkedIn, Instagram, X, GitHub)
 function BrandIcon({ type, className = 'w-6 h-6' }) {
@@ -113,47 +130,80 @@ export default function App() {
     window.addEventListener('storage', handleStorageChange)
     window.addEventListener('cluster_socials_updated', handleCustomUpdate)
 
-    // 3. Supabase REST fetch if configured in environment
+    // 3. Supabase dedicated table fetch & Realtime subscription
+    let channel = null
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
     const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
 
-    if (supabaseUrl && supabaseKey) {
-      fetch(`${supabaseUrl}/rest/v1/homepage_config?id=eq.1&select=social_links,stats`, {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data) && data[0]) {
-            let fetched = null
-            if (Array.isArray(data[0].social_links) && data[0].social_links.length > 0) {
-              fetched = data[0].social_links
-            } else if (Array.isArray(data[0].stats)) {
-              const meta = data[0].stats.find((s) => s && s.__type === 'cluster_social_links')
-              if (meta && Array.isArray(meta.links)) {
-                fetched = meta.links
-              }
-            }
-
-            if (fetched && Array.isArray(fetched)) {
-              const sorted = fetched.sort((a, b) => (a.order || 0) - (b.order || 0))
-              setLinks(sorted)
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(sorted))
-              } catch {}
-            }
+    if (isSupabaseConfigured() && supabase) {
+      // Query dedicated 'social_links' table
+      supabase
+        .from('social_links')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .then(({ data: remoteLinks, error }) => {
+          if (!error && Array.isArray(remoteLinks) && remoteLinks.length > 0) {
+            const mapped = remoteLinks.map(mapDBLink)
+            setLinks(mapped)
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped))
+            } catch {}
+          } else {
+            // Fallback: check homepage_config if social_links table not created yet
+            fetch(`${supabaseUrl}/rest/v1/homepage_config?id=eq.1&select=social_links,stats`, {
+              headers: {
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (Array.isArray(data) && data[0]) {
+                  let fetched = null
+                  if (Array.isArray(data[0].social_links) && data[0].social_links.length > 0) {
+                    fetched = data[0].social_links
+                  } else if (Array.isArray(data[0].stats)) {
+                    const meta = data[0].stats.find((s) => s && s.__type === 'cluster_social_links')
+                    if (meta && Array.isArray(meta.links)) fetched = meta.links
+                  }
+                  if (fetched && Array.isArray(fetched)) {
+                    const sorted = fetched.sort((a, b) => (a.order || 0) - (b.order || 0))
+                    setLinks(sorted)
+                    try {
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(sorted))
+                    } catch {}
+                  }
+                }
+              })
+              .catch(() => {})
           }
         })
-        .catch((err) => {
-          console.warn('[CLUSTER Linktree] Remote fetch notice:', err.message)
+
+      // Realtime listener on shared 'social_links' table
+      channel = supabase
+        .channel('linktree-socials-live')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'social_links' }, async () => {
+          const { data: updated } = await supabase
+            .from('social_links')
+            .select('*')
+            .order('sort_order', { ascending: true })
+          if (updated && Array.isArray(updated) && updated.length > 0) {
+            const mapped = updated.map(mapDBLink)
+            setLinks(mapped)
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped))
+            } catch {}
+          }
         })
+        .subscribe()
     }
 
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('cluster_socials_updated', handleCustomUpdate)
+      if (channel && supabase) {
+        supabase.removeChannel(channel)
+      }
     }
   }, [])
 

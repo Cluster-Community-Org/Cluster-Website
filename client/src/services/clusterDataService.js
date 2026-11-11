@@ -405,6 +405,40 @@ function memberToDB(m) {
   }
 }
 
+function socialLinkFromDB(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle || '',
+    url: row.url,
+    iconType: row.icon_type || 'globe',
+    bgClass: row.bg_class || 'bg-[#C6FF4D] text-black border-2 border-black hover:bg-[#b5f533]',
+    badge: row.badge || '',
+    category: row.category || 'General',
+    enabled: row.enabled !== undefined ? Boolean(row.enabled) : true,
+    isHighlighted: Boolean(row.is_highlighted),
+    order: row.sort_order !== undefined ? Number(row.sort_order) : 0,
+  }
+}
+
+function socialLinkToDB(link, index = 0) {
+  return {
+    id: link.id,
+    title: link.title,
+    subtitle: link.subtitle || '',
+    url: link.url,
+    icon_type: link.iconType || 'globe',
+    bg_class: link.bgClass || '',
+    badge: link.badge || '',
+    category: link.category || 'General',
+    enabled: link.enabled !== undefined ? Boolean(link.enabled) : true,
+    is_highlighted: Boolean(link.isHighlighted),
+    sort_order: link.order !== undefined ? Number(link.order) : index,
+    updated_at: new Date().toISOString(),
+  }
+}
+
 function configFromDB(row) {
   if (!row) return null
   let localConfig = {}
@@ -1148,14 +1182,14 @@ export const clusterDataService = {
     dispatchUpdate('cluster_socials_updated', links)
 
     if (isSupabaseConfigured() && supabase) {
-      // 1. Try to persist in dedicated column first
+      // 1. Primary communication table: dedicated 'social_links' table
+      const rows = links.map((l, idx) => socialLinkToDB(l, idx))
       supabase
-        .from('homepage_config')
-        .update({ social_links: links, updated_at: new Date().toISOString() })
-        .eq('id', 1)
+        .from('social_links')
+        .upsert(rows)
         .then(({ error }) => {
           if (error) {
-            // Column may not exist on Supabase table - fallback to storing inside stats JSONB!
+            // Fallback: If social_links table doesn't exist yet, save inside stats JSONB on homepage_config
             const currentConfig = this.getHomepageConfig()
             const rawStats = Array.isArray(currentConfig.stats) ? currentConfig.stats : []
             const cleanStats = rawStats.filter((s) => !s || s.__type !== 'cluster_social_links')
@@ -1181,12 +1215,29 @@ export const clusterDataService = {
     if (!target) return current
     const nextState = !(target.enabled !== false)
     const updated = current.map((l) => (l.id === id ? { ...l, enabled: nextState } : l))
-    this.updateSocialLinks(updated)
+    
+    localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(updated))
+    dispatchUpdate('cluster_socials_updated', updated)
     this.logAudit(
       'SOCIAL_TOGGLED',
       `"${target.title}" ${nextState ? 'enabled' : 'disabled'} on Linktree`,
       'socials'
     )
+
+    if (isSupabaseConfigured() && supabase) {
+      // Direct update to dedicated table row
+      supabase
+        .from('social_links')
+        .update({ enabled: nextState, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .then(({ error }) => {
+          if (error) {
+            // Fallback to full sync
+            this.updateSocialLinks(updated)
+          }
+        })
+    }
+
     return updated
   },
 
@@ -1210,8 +1261,23 @@ export const clusterDataService = {
   deleteSocialLink(id) {
     const current = this.getSocialLinks()
     const updated = current.filter((l) => l.id !== id)
+    localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(updated))
+    dispatchUpdate('cluster_socials_updated', updated)
     this.logAudit('SOCIAL_DELETED', `Link ID "${id}" removed from Linktree`, 'socials')
-    return this.updateSocialLinks(updated)
+
+    if (isSupabaseConfigured() && supabase) {
+      supabase
+        .from('social_links')
+        .delete()
+        .eq('id', id)
+        .then(({ error }) => {
+          if (error) {
+            this.updateSocialLinks(updated)
+          }
+        })
+    }
+
+    return updated
   },
 
   resetSocialLinks() {
@@ -1275,6 +1341,19 @@ export const clusterDataService = {
         results.homepage = true
       }
 
+      // 5. Fetch remote Social Links from dedicated 'social_links' table
+      const { data: remoteSocials, error: socialsErr } = await supabase
+        .from('social_links')
+        .select('*')
+        .order('sort_order', { ascending: true })
+
+      if (!socialsErr && Array.isArray(remoteSocials) && remoteSocials.length > 0) {
+        const mapped = remoteSocials.map(socialLinkFromDB)
+        localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(mapped))
+        dispatchUpdate('cluster_socials_updated', mapped)
+        results.socials = remoteSocials.length
+      }
+
       return { success: true, results }
     } catch (err) {
       console.warn('[Supabase Sync Error]', err)
@@ -1288,7 +1367,7 @@ export const clusterDataService = {
     try {
       await this.syncFromSupabase()
 
-      // 5. Subscribe to Realtime Postgres changes
+      // Subscribe to Realtime Postgres changes across society tables
       supabase
         .channel('cluster-cms-realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, async () => {
@@ -1313,6 +1392,14 @@ export const clusterDataService = {
             const mapped = configFromDB(data)
             localStorage.setItem(STORAGE_KEYS.HOMEPAGE, JSON.stringify(mapped))
             dispatchUpdate('cluster_homepage_updated', mapped)
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'social_links' }, async () => {
+          const { data } = await supabase.from('social_links').select('*').order('sort_order', { ascending: true })
+          if (data && Array.isArray(data) && data.length > 0) {
+            const mapped = data.map(socialLinkFromDB)
+            localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(mapped))
+            dispatchUpdate('cluster_socials_updated', mapped)
           }
         })
         .subscribe()
