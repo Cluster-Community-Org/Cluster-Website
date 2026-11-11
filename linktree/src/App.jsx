@@ -280,51 +280,36 @@ export default function App() {
       {/* Main Content Container */}
       <div className="relative z-10 w-full max-w-xl mx-auto flex flex-col gap-6">
         
-        {/* Navigation & Header Tools */}
-        <div className="flex items-center justify-between gap-3 px-1">
-          {/* Hardware Anchor Pill */}
-          <a
-            href="https://clustersociety.tech"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.09] hover:border-[#C6FF4D]/40 transition-all text-[11px] font-mono font-medium text-[#C6FF4D]"
+        {/* Header Quick Actions */}
+        <div className="flex items-center justify-end gap-2 px-1">
+          <button
+            onClick={() => setIsQrOpen(true)}
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.09] hover:border-white/20 text-xs font-mono text-[#D4D4CD] hover:text-white transition-all flex items-center gap-1.5 focus-visible:outline-none"
+            title="Show QR Code"
+            aria-label="Show QR Code modal"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C6FF4D] animate-ping" />
-            <span className="text-[#8E8E88] group-hover:text-white transition-colors">clustersociety.tech</span>
-            <ExternalLink className="w-3 h-3 text-[#8E8E88] group-hover:text-[#C6FF4D] transition-colors" />
-          </a>
+            <QrCode className="w-4 h-4 text-[#C6FF4D]" />
+            <span className="hidden sm:inline">QR Code</span>
+          </button>
 
-          {/* Quick Actions */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsQrOpen(true)}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.09] hover:border-white/20 text-xs font-mono text-[#D4D4CD] hover:text-white transition-all flex items-center gap-1.5 focus-visible:outline-none"
-              title="Show QR Code"
-              aria-label="Show QR Code modal"
-            >
-              <QrCode className="w-4 h-4 text-[#C6FF4D]" />
-              <span className="hidden sm:inline">QR Code</span>
-            </button>
-
-            <button
-              onClick={handleShare}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.09] hover:border-white/20 text-xs font-mono text-[#D4D4CD] hover:text-white transition-all flex items-center gap-1.5 focus-visible:outline-none"
-              title="Share or Copy Link"
-              aria-label="Share Linktree"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-[#C6FF4D]" />
-                  <span className="text-[#C6FF4D] font-bold">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            onClick={handleShare}
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.09] hover:border-white/20 text-xs font-mono text-[#D4D4CD] hover:text-white transition-all flex items-center gap-1.5 focus-visible:outline-none"
+            title="Share or Copy Link"
+            aria-label="Share Linktree"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 text-[#C6FF4D]" />
+                <span className="text-[#C6FF4D] font-bold">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Share</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Profile Card / Society Anchor */}

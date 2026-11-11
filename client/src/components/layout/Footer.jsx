@@ -95,7 +95,6 @@ export default function Footer() {
             <Link to="/events" className={link}>Events</Link>
             <Link to="/team" className={link}>Team</Link>
             <Link to="/join" className={link}>Apply to join</Link>
-            <Link to="/socials" className={link}>Socials Hub</Link>
           </nav>
 
           <div className="flex flex-col gap-4">

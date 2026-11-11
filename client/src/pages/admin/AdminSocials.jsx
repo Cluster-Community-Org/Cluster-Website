@@ -255,14 +255,14 @@ export default function AdminSocials() {
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Open Linktree preview in browser */}
           <a
-            href="/socials"
+            href="http://localhost:5174"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all group"
-            title="Open Live Public Socials Hub (/socials)"
+            title="Open Live Linktree Hub"
           >
             <Smartphone className="w-4 h-4 text-cluster-acid" />
-            <span>Open Public Hub (/socials)</span>
+            <span>Open Linktree Page</span>
             <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" />
           </a>
 
