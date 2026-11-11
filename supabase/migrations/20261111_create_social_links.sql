@@ -74,3 +74,4 @@ ON CONFLICT (id) DO UPDATE SET
   badge = EXCLUDED.badge,
   category = EXCLUDED.category,
   sort_order = EXCLUDED.sort_order;
+

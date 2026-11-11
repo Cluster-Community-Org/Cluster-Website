@@ -13,3 +13,4 @@ export const supabase = isSupabaseConfigured()
       auth: { persistSession: false },
     })
   : null
+
