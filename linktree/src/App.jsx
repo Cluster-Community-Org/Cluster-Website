@@ -12,7 +12,6 @@ import {
   Sparkles,
   Download,
   Copy,
-  Search,
   Cpu,
   Eye,
   Zap,
@@ -106,8 +105,6 @@ export default function App() {
     return DEFAULT_SOCIAL_LINKS
   })
 
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
   const [copied, setCopied] = useState(false)
   const [isQrOpen, setIsQrOpen] = useState(false)
 
@@ -216,30 +213,6 @@ export default function App() {
     return links.filter((link) => link.enabled !== false)
   }, [links])
 
-  // Filter categories
-  const categories = useMemo(() => {
-    const set = new Set(['All'])
-    enabledLinks.forEach((l) => {
-      if (l.category) set.add(l.category)
-    })
-    return Array.from(set)
-  }, [enabledLinks])
-
-  // Filtered links by search & category
-  const filteredLinks = useMemo(() => {
-    return enabledLinks.filter((link) => {
-      const matchesCategory =
-        activeCategory === 'All' || link.category?.toLowerCase() === activeCategory.toLowerCase()
-      const query = searchQuery.trim().toLowerCase()
-      const matchesQuery =
-        !query ||
-        link.title?.toLowerCase().includes(query) ||
-        link.subtitle?.toLowerCase().includes(query) ||
-        link.badge?.toLowerCase().includes(query)
-      return matchesCategory && matchesQuery
-    })
-  }, [enabledLinks, activeCategory, searchQuery])
-
   const handleShare = () => {
     const url = window.location.href
     if (navigator.share) {
@@ -313,11 +286,11 @@ export default function App() {
         </div>
 
         {/* Profile Card / Society Anchor */}
-        <header className="relative p-6 sm:p-8 rounded-3xl bg-[#0D0E10]/90 backdrop-blur-xl border border-white/[0.09] shadow-surface-card text-center flex flex-col items-center">
+        <header className="relative p-6 sm:p-7 rounded-3xl bg-[#0D0E10]/90 backdrop-blur-xl border border-white/[0.09] shadow-surface-card text-center flex flex-col items-center">
           <Corners className="border-[#C6FF4D]/30" size="w-3.5 h-3.5" inset="top-3 left-3 right-3 bottom-3" />
 
           {/* Traced Official Logo Emblem with Animated Sparks */}
-          <div className="relative mb-5 group">
+          <div className="relative mb-4 group">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-black border-2 border-white/10 group-hover:border-[#C6FF4D]/60 p-4 shadow-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105">
               <ClusterMark className="w-full h-full" animated={true} />
             </div>
@@ -330,89 +303,19 @@ export default function App() {
           </div>
 
           {/* Typography Hierarchy */}
-          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight leading-snug mb-1">
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight leading-snug">
             {COMMUNITY_INFO.name}
           </h1>
-
-          {/* Supercomputing Affiliation Banner */}
-          <div className="inline-flex items-center gap-2 text-[11px] font-mono font-semibold uppercase tracking-wider text-[#C6FF4D] bg-[#C6FF4D]/10 px-3 py-1 rounded-full border border-[#C6FF4D]/25 mt-2 mb-3">
-            <span>{COMMUNITY_INFO.institution}</span>
-            <span className="text-[#8E8E88]">•</span>
-            <span>NVIDIA DGX H200</span>
-          </div>
-
-          <p className="text-sm font-medium text-neutral-200 max-w-md mb-2">
-            {COMMUNITY_INFO.tagline}
-          </p>
-
-          <p className="text-xs text-[#8E8E88] max-w-md leading-relaxed font-sans">
-            {COMMUNITY_INFO.description}
-          </p>
         </header>
-
-        {/* Filter Pills & Search */}
-        <div className="space-y-3">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E88]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search channels, recruitment, Discord..."
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#0D0E10]/80 border border-white/[0.08] focus:border-[#C6FF4D]/60 focus:bg-[#141517] text-xs font-sans text-white placeholder-[#8E8E88] transition-all outline-none"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#8E8E88] hover:text-white"
-                aria-label="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Category Tabs */}
-          {categories.length > 2 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
-              {categories.map((cat) => {
-                const isActive = activeCategory === cat
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`px-3 py-1 rounded-full text-xs font-mono transition-all shrink-0 ${
-                      isActive
-                        ? 'bg-[#C6FF4D] text-black font-bold shadow-sm shadow-[#C6FF4D]/20'
-                        : 'bg-white/[0.04] text-[#8E8E88] hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-        </div>
 
         {/* Links Stack */}
         <div className="flex flex-col gap-3">
-          {filteredLinks.length === 0 ? (
+          {enabledLinks.length === 0 ? (
             <div className="text-center py-12 px-4 rounded-2xl bg-[#0D0E10]/60 border border-white/[0.08]">
-              <p className="text-sm font-mono text-neutral-400">No links found matching your search.</p>
-              <button
-                onClick={() => {
-                  setActiveCategory('All')
-                  setSearchQuery('')
-                }}
-                className="mt-3 text-xs font-mono text-[#C6FF4D] hover:underline"
-              >
-                Reset filters
-              </button>
+              <p className="text-sm font-mono text-neutral-400">No active links available.</p>
             </div>
           ) : (
-            filteredLinks.map((link) => {
+            enabledLinks.map((link) => {
               // Highlighting treatment
               const isAccent = link.isHighlighted || link.id === 'website' || link.id === 'join'
 

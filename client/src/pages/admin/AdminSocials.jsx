@@ -531,16 +531,7 @@ export default function AdminSocials() {
                     <h3 className="text-xs font-display font-extrabold text-white tracking-tight leading-snug">
                       CLUSTER Community Society
                     </h3>
-                    <div className="inline-flex items-center gap-1 text-[8px] font-mono font-semibold uppercase tracking-wider text-cluster-acid bg-cluster-acid/10 px-2 py-0.5 rounded-full border border-cluster-acid/20 mt-1">
-                      <span>Galgotias Univ</span>
-                      <span>•</span>
-                      <span>DGX H200</span>
-                    </div>
                   </div>
-
-                  <p className="text-[9px] text-[#8E8E88] font-sans leading-tight">
-                    Student Research, Supercomputing &amp; Applied AI
-                  </p>
                 </div>
 
                 {/* Render only ENABLED links with exact elevated card design */}
