@@ -45,9 +45,9 @@ export default function HeroSection() {
             <Link to="/join" className="btn btn-lime">Apply to join <ArrowRight className="w-5 h-5" /></Link>
           </div>
 
-          {config.statsEnabled && config.stats?.length > 0 && (
+          {config.statsEnabled && config.stats?.filter((s) => s && !s.__type).length > 0 && (
             <dl data-build="fade" className="flex flex-wrap gap-8 pt-6 border-t border-char-2 rise" style={{ animationDelay: '300ms' }}>
-              {config.stats.map((s) => (
+              {config.stats.filter((s) => s && !s.__type).map((s) => (
                 <div key={s.label} className="flex flex-col-reverse gap-1">
                   <dt className="caption-3 text-mute">{s.label}</dt>
                   <dd className="heading-5 tabular-nums">{s.value}</dd>

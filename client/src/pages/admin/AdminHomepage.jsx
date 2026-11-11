@@ -323,7 +323,7 @@ export default function AdminHomepage() {
                 )}
               </div>
               <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 transition-opacity ${!config.statsEnabled ? 'opacity-60' : 'opacity-100'}`}>
-                {config.stats && config.stats.map((stat, idx) => (
+                {config.stats && config.stats.filter((s) => s && !s.__type).map((stat, idx) => (
                   <div
                     key={idx}
                     className="p-3.5 rounded-xl bg-[#141517] border border-white/[0.08] space-y-2"

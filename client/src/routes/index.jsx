@@ -5,6 +5,7 @@ import HomePage from '../pages/HomePage.jsx'
 import EventsPage from '../pages/EventsPage.jsx'
 import TeamPage from '../pages/TeamPage.jsx'
 import JoinPage from '../pages/JoinPage.jsx'
+import SocialsPage from '../pages/SocialsPage.jsx'
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin.jsx'
@@ -26,6 +27,10 @@ export default function AppRoutes() {
         <Route path="/join" element={<JoinPage />} />
         <Route path="/apply" element={<Navigate to="/join" replace />} />
       </Route>
+
+      {/* Standalone Socials / Linktree Pages */}
+      <Route path="/socials" element={<SocialsPage />} />
+      <Route path="/links" element={<SocialsPage />} />
 
       {/* Admin Auth Route */}
       <Route path="/admin/login" element={<AdminLogin />} />

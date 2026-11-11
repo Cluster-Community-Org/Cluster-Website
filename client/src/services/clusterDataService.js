@@ -413,12 +413,25 @@ function configFromDB(row) {
     if (stored) localConfig = JSON.parse(stored)
   } catch {}
 
+  let dbSocials = null
   if (row.social_links && Array.isArray(row.social_links) && row.social_links.length > 0) {
+    dbSocials = row.social_links
+  } else if (Array.isArray(row.stats)) {
+    const metaItem = row.stats.find((s) => s && s.__type === 'cluster_social_links')
+    if (metaItem && Array.isArray(metaItem.links) && metaItem.links.length > 0) {
+      dbSocials = metaItem.links
+    }
+  }
+
+  if (dbSocials) {
     try {
-      localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(row.social_links))
-      dispatchUpdate('cluster_socials_updated', row.social_links)
+      localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(dbSocials))
+      dispatchUpdate('cluster_socials_updated', dbSocials)
     } catch {}
   }
+
+  const rawStats = Array.isArray(row.stats) ? row.stats : (localConfig.stats || [])
+  const cleanStats = rawStats.filter((s) => !s || s.__type !== 'cluster_social_links')
 
   return {
     bannerEnabled: Boolean(row.banner_enabled),
@@ -430,7 +443,7 @@ function configFromDB(row) {
     statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : (localConfig.statsEnabled !== undefined ? Boolean(localConfig.statsEnabled) : false),
     applicationsSheetUrl: row.applications_sheet_url !== undefined ? row.applications_sheet_url : (localConfig.applicationsSheetUrl || ''),
     applicationsOpen: row.applications_open !== undefined ? Boolean(row.applications_open) : (localConfig.applicationsOpen !== undefined ? Boolean(localConfig.applicationsOpen) : true),
-    stats: row.stats || localConfig.stats || [],
+    stats: cleanStats,
   }
 }
 
@@ -440,6 +453,12 @@ function configToDB(c) {
     const stored = localStorage.getItem(STORAGE_KEYS.SOCIALS)
     if (stored) socials = JSON.parse(stored)
   } catch {}
+
+  const rawStats = Array.isArray(c.stats) ? c.stats : []
+  const cleanStats = rawStats.filter((s) => !s || s.__type !== 'cluster_social_links')
+  if (socials && Array.isArray(socials)) {
+    cleanStats.push({ __type: 'cluster_social_links', links: socials })
+  }
 
   const payload = {
     id: 1,
@@ -452,7 +471,7 @@ function configToDB(c) {
     stats_enabled: Boolean(c.statsEnabled),
     applications_sheet_url: (c.applicationsSheetUrl || '').trim(),
     applications_open: c.applicationsOpen !== undefined ? Boolean(c.applicationsOpen) : true,
-    stats: c.stats,
+    stats: cleanStats,
     updated_at: new Date().toISOString(),
   }
 
@@ -1129,13 +1148,26 @@ export const clusterDataService = {
     dispatchUpdate('cluster_socials_updated', links)
 
     if (isSupabaseConfigured() && supabase) {
+      // 1. Try to persist in dedicated column first
       supabase
         .from('homepage_config')
         .update({ social_links: links, updated_at: new Date().toISOString() })
         .eq('id', 1)
         .then(({ error }) => {
-          if (error && error.code !== 'PGRST204') {
-            console.warn('[Supabase Sync Notice] social_links:', error.message)
+          if (error) {
+            // Column may not exist on Supabase table - fallback to storing inside stats JSONB!
+            const currentConfig = this.getHomepageConfig()
+            const rawStats = Array.isArray(currentConfig.stats) ? currentConfig.stats : []
+            const cleanStats = rawStats.filter((s) => !s || s.__type !== 'cluster_social_links')
+            cleanStats.push({ __type: 'cluster_social_links', links })
+
+            supabase
+              .from('homepage_config')
+              .update({ stats: cleanStats, updated_at: new Date().toISOString() })
+              .eq('id', 1)
+              .then(({ error: statsErr }) => {
+                if (statsErr) console.warn('[Supabase Fallback Sync Notice]:', statsErr.message)
+              })
           }
         })
     }

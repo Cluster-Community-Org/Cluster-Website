@@ -115,10 +115,10 @@ export default function App() {
 
     // 3. Supabase REST fetch if configured in environment
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
 
     if (supabaseUrl && supabaseKey) {
-      fetch(`${supabaseUrl}/rest/v1/homepage_config?id=eq.1&select=social_links`, {
+      fetch(`${supabaseUrl}/rest/v1/homepage_config?id=eq.1&select=social_links,stats`, {
         headers: {
           apikey: supabaseKey,
           Authorization: `Bearer ${supabaseKey}`,
@@ -126,12 +126,24 @@ export default function App() {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (Array.isArray(data) && data[0]?.social_links && Array.isArray(data[0].social_links)) {
-            const fetchedLinks = data[0].social_links.sort((a, b) => (a.order || 0) - (b.order || 0))
-            setLinks(fetchedLinks)
-            try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(fetchedLinks))
-            } catch {}
+          if (Array.isArray(data) && data[0]) {
+            let fetched = null
+            if (Array.isArray(data[0].social_links) && data[0].social_links.length > 0) {
+              fetched = data[0].social_links
+            } else if (Array.isArray(data[0].stats)) {
+              const meta = data[0].stats.find((s) => s && s.__type === 'cluster_social_links')
+              if (meta && Array.isArray(meta.links)) {
+                fetched = meta.links
+              }
+            }
+
+            if (fetched && Array.isArray(fetched)) {
+              const sorted = fetched.sort((a, b) => (a.order || 0) - (b.order || 0))
+              setLinks(sorted)
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(sorted))
+              } catch {}
+            }
           }
         })
         .catch((err) => {
