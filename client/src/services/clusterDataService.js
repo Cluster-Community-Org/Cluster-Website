@@ -565,22 +565,25 @@ export const clusterDataService = {
   saveEvent(eventData) {
     const current = this.getEvents()
     let updated
+    let record
     if (eventData.id) {
-      updated = current.map((e) => (e.id === eventData.id ? { ...e, ...eventData } : e))
+      record = { ...current.find((e) => e.id === eventData.id), ...eventData }
+      updated = current.map((e) => (e.id === eventData.id ? record : e))
     } else {
-      const newEvent = {
+      record = {
         ...eventData,
         id: Date.now(),
         slug: eventData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       }
-      updated = [newEvent, ...current]
+      updated = [record, ...current]
     }
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updated))
     this.logAudit(eventData.id ? 'EVENT_UPDATED' : 'EVENT_CREATED', `Event "${eventData.title}" ${eventData.id ? 'updated' : 'published'}`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
 
     if (isSupabaseConfigured() && supabase) {
-      const payload = eventToDB(eventData)
+      // Merged record keeps the original slug, so renaming an event updates its row instead of inserting a copy.
+      const payload = eventToDB(record || eventData)
       supabase.from('events').upsert(payload, { onConflict: 'slug' }).then(({ error }) => {
         if (error) console.warn('[Supabase Sync Error] events.upsert:', error.message)
       })
@@ -609,8 +612,9 @@ export const clusterDataService = {
     this.logAudit('EVENT_DELETED', `Event "${target?.title || id}" removed from schedule`, 'events')
     dispatchUpdate('cluster_events_updated', updated)
 
-    if (isSupabaseConfigured() && supabase) {
-      supabase.from('events').delete().eq('id', id).then(({ error }) => {
+    // By slug: a just-created event still has a local Date.now() id until the next Supabase refresh.
+    if (isSupabaseConfigured() && supabase && target) {
+      supabase.from('events').delete().eq('slug', target.slug).then(({ error }) => {
         if (error) console.warn('[Supabase Sync Error] events.delete:', error.message)
       })
     }
@@ -649,6 +653,14 @@ export const clusterDataService = {
     this.logAudit('SPOTLIGHT_SET', `Spotlight promoted: "${activeSpotlight?.title || id}"`, 'events')
     dispatchUpdate('cluster_spotlight_updated', activeSpotlight)
     dispatchUpdate('cluster_events_updated', updated)
+
+    if (isSupabaseConfigured() && supabase && activeSpotlight) {
+      const { slug } = activeSpotlight
+      const log = ({ error }) => error && console.warn('[Supabase Sync Error] events.spotlight:', error.message)
+      supabase.from('events').update({ is_spotlight: false }).neq('slug', slug).then(log)
+      supabase.from('events').update({ is_spotlight: true }).eq('slug', slug).then(log)
+    }
+
     return activeSpotlight
   },
 

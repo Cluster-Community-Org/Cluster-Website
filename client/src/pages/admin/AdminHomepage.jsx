@@ -101,7 +101,7 @@ export default function AdminHomepage() {
               <div>
                 <h3 className="text-base font-display font-bold text-white">Top Announcement Ticker</h3>
                 <p className="text-xs text-[#8E8E88] font-sans">
-                  Displays an alert message across the top of every public page.
+                  Auto-announces the next upcoming event. The message below only shows when no event is scheduled.
                 </p>
               </div>
             </div>
