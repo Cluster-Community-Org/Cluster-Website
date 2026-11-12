@@ -12,9 +12,11 @@ import {
   Sparkles,
   Link as LinkIcon,
   FileSpreadsheet,
+  Play,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 import { useToast } from '../../context/ToastContext.jsx'
+import { ClusterPreloader } from '../../components/ui/ClusterLoader.jsx'
 
 export default function AdminHomepage() {
   const { showToast } = useToast()
@@ -22,6 +24,7 @@ export default function AdminHomepage() {
   const [events, setEvents] = useState(() => clusterDataService.getEvents())
   const [spotlight, setSpotlight] = useState(() => clusterDataService.getSpotlightEvent())
   const [savedSuccess, setSavedSuccess] = useState(false)
+  const [previewLoader, setPreviewLoader] = useState(false)
 
   useEffect(() => {
     const handleEventsUpdate = () => {
@@ -67,6 +70,12 @@ export default function AdminHomepage() {
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
+      {previewLoader && (
+        <ClusterPreloader
+          forceShow={true}
+          onComplete={() => setPreviewLoader(false)}
+        />
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
         <div>
@@ -391,6 +400,65 @@ export default function AdminHomepage() {
             <p className="text-[11px] text-[#8E8E88] font-sans leading-relaxed">
               Tip: You can also manage and test this webhook directly from the <strong className="text-white">Admin → Applications</strong> page.
             </p>
+          </div>
+        </div>
+
+        {/* Section 5: Homepage Intro Loader Animation */}
+        <div className="rounded-2xl p-6 bg-[#0F1012] border border-white/[0.08] space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-black border border-white/10 text-cluster-acid flex items-center justify-center">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-base font-display font-bold text-white">Cinematic Intro Preloader</h3>
+                <p className="text-xs text-[#8E8E88] font-sans">
+                  Branded emblem animation with sequential neon sparks, elastic bounce, and downward exit.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 self-start sm:self-auto">
+              <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${
+                config.loaderEnabled !== false
+                  ? 'text-cluster-acid bg-cluster-acid/10 border-cluster-acid/30'
+                  : 'text-gray-400 bg-white/5 border-white/10'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${config.loaderEnabled !== false ? 'bg-cluster-acid' : 'bg-gray-500'}`} />
+                {config.loaderEnabled !== false ? 'Loader Enabled' : 'Loader Disabled'}
+              </span>
+
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={config.loaderEnabled !== false}
+                  onChange={(e) => setConfig({ ...config, loaderEnabled: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cluster-acid peer-checked:after:bg-black" />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="space-y-1">
+              <p className="text-xs text-white font-medium">
+                Visitor First-Impression Experience
+              </p>
+              <p className="text-[11px] text-[#8E8E88] font-sans leading-relaxed">
+                Controls whether visitors to the public website experience the signature Cluster logo intro sequence. When enabled, it plays on production and local environments. Admin routes (<code className="text-[#C6FF4D] text-[10px]">/admin/*</code>) and tracking redirects (<code className="text-[#C6FF4D] text-[10px]">/r/*</code>) always bypass the loader for instantaneous workflow.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setPreviewLoader(true)}
+              disabled={previewLoader}
+              className="shrink-0 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cluster-acid/40 text-xs font-mono font-medium text-white flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <Play className="w-3.5 h-3.5 text-cluster-acid" />
+              <span>{previewLoader ? 'Playing...' : 'Preview Animation'}</span>
+            </button>
           </div>
         </div>
 

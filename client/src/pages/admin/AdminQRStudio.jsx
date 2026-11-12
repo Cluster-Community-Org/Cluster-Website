@@ -345,10 +345,6 @@ export default function AdminQRStudio() {
     }
   }
 
-  const handleSimulateScan = (slug) => {
-    clusterDataService.recordQRScan(slug)
-  }
-
   // Core Render Engine: Canvas Halftone Visual QR Renderer
   useEffect(() => {
     const canvas = canvasRef.current
@@ -1189,14 +1185,6 @@ export default function AdminQRStudio() {
                       >
                         <RotateCcw className="w-3 h-3 text-[#C6FF4D]" />
                         Load
-                      </button>
-
-                      <button
-                        onClick={() => handleSimulateScan(item.slug)}
-                        className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#AAA] hover:text-[#C6FF4D] font-medium text-[11px] flex items-center gap-1 transition-all"
-                        title="Simulate scan +1"
-                      >
-                        +1 Test
                       </button>
                     </div>
 

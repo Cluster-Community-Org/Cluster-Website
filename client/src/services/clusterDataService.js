@@ -79,6 +79,7 @@ const DEFAULT_HOMEPAGE = {
   heroHeadline: 'Find your people.\nBuild together.',
   heroSubtitle: 'A student community around compute.',
   statsEnabled: false,
+  loaderEnabled: true,
   applicationsSheetUrl: '',
   applicationsOpen: true,
   stats: [
@@ -489,6 +490,7 @@ function configFromDB(row) {
     heroHeadline: row.hero_headline,
     heroSubtitle: row.hero_subtitle,
     statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : (localConfig.statsEnabled !== undefined ? Boolean(localConfig.statsEnabled) : false),
+    loaderEnabled: row.loader_enabled !== undefined ? Boolean(row.loader_enabled) : (localConfig.loaderEnabled !== undefined ? Boolean(localConfig.loaderEnabled) : true),
     applicationsSheetUrl: row.applications_sheet_url !== undefined ? row.applications_sheet_url : (localConfig.applicationsSheetUrl || ''),
     applicationsOpen: row.applications_open !== undefined ? Boolean(row.applications_open) : (localConfig.applicationsOpen !== undefined ? Boolean(localConfig.applicationsOpen) : true),
     stats: cleanStats,
@@ -517,6 +519,7 @@ function configToDB(c) {
     hero_headline: c.heroHeadline,
     hero_subtitle: c.heroSubtitle,
     stats_enabled: Boolean(c.statsEnabled),
+    loader_enabled: c.loaderEnabled !== undefined ? Boolean(c.loaderEnabled) : true,
     applications_sheet_url: (c.applicationsSheetUrl || '').trim(),
     applications_open: c.applicationsOpen !== undefined ? Boolean(c.applicationsOpen) : true,
     stats: cleanStats,
@@ -809,6 +812,7 @@ export const clusterDataService = {
             delete fallback.stats_enabled
             delete fallback.applications_sheet_url
             delete fallback.applications_open
+            delete fallback.loader_enabled
             const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback)
             if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
           }

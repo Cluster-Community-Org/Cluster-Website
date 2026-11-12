@@ -53,23 +53,14 @@ export function ClusterLoader({
  * 
  * Exclusively active on localhost / dev environment. Completely stripped on production.
  */
-export function ClusterPreloader({ forceShow = false }) {
+export function ClusterPreloader({ forceShow = false, onComplete }) {
   const isAdminPath =
     typeof window !== 'undefined' &&
     (window.location.pathname.startsWith('/admin') ||
       window.location.pathname.startsWith('/r/'))
 
-  const isLocalDev =
-    forceShow ||
-    (typeof window !== 'undefined' &&
-      (Boolean(import.meta.env.DEV) ||
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname.endsWith('.localhost') ||
-        window.location.search.includes('loader=true')))
-
-  // Hard stop: Never render outside localhost / local dev, and never on admin pages
-  if (!isLocalDev || (isAdminPath && !forceShow)) return null
+  // Hard stop: Never render on admin or redirect pages unless explicitly forceShown
+  if (isAdminPath && !forceShow) return null
 
   // Phases: 'fullscreen' -> 'shrinking' -> 'bouncing' -> 'dropping' -> 'done'
   const [phase, setPhase] = useState('fullscreen')
@@ -104,6 +95,9 @@ export function ClusterPreloader({ forceShow = false }) {
       setPhase('done')
       if (typeof window !== 'undefined') {
         window.__clusterPreloaderActive = false
+      }
+      if (typeof onComplete === 'function') {
+        onComplete()
       }
     }, 4150)
 
