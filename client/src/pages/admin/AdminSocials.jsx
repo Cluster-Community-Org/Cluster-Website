@@ -587,7 +587,7 @@ export default function AdminSocials() {
 
                   <div>
                     <h3 className="text-xs font-display font-extrabold text-white tracking-tight leading-snug">
-                      CLUSTER Community Society
+                      CLUSTER Community Links
                     </h3>
                   </div>
                 </div>

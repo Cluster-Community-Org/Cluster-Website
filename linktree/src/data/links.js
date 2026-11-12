@@ -1,5 +1,5 @@
 export const COMMUNITY_INFO = {
-  name: 'CLUSTER Community Society',
+  name: 'CLUSTER Community Links',
   institution: 'Galgotias University',
   tagline: 'The Tech Community You actually Want to Join!',
   description: 'Anchored by the NVIDIA DGX H200. Hands on GPUs, Distributed Supercomputing, Robotics, and Applied AI.',

@@ -230,7 +230,7 @@ export default function App() {
     if (navigator.share) {
       navigator
         .share({
-          title: 'CLUSTER Community Society — Official Hub',
+          title: 'CLUSTER Community Links — Official Hub',
           text: 'Hands on GPUs, the NVIDIA DGX H200, and Applied AI. Join the society.',
           url,
         })
@@ -396,7 +396,7 @@ export default function App() {
         {/* Editorial Footer */}
         <footer className="text-center py-6 border-t border-white/[0.08] space-y-2">
           <p className="text-xs font-mono text-[#8E8E88]">
-            © {new Date().getFullYear()} CLUSTER Community Society • Galgotias University
+            © {new Date().getFullYear()} CLUSTER Community Links • Galgotias University
           </p>
           <p className="text-[11px] font-mono text-[#5A5C61]">
             Anchored by the NVIDIA DGX H200 · Built by Engineers &amp; Developers
