@@ -68,6 +68,14 @@ export default function AdminHomepage() {
     setConfig({ ...config, stats: newStats })
   }
 
+  // Instant toggle for intro preloader with real-time auto-save & toast
+  const handleToggleLoader = (enabled) => {
+    const updated = { ...config, loaderEnabled: enabled }
+    setConfig(updated)
+    clusterDataService.updateHomepageConfig(updated)
+    showToast(enabled ? 'Cinematic Intro Preloader ENABLED' : 'Cinematic Intro Preloader DISABLED')
+  }
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {previewLoader && (
@@ -419,7 +427,7 @@ export default function AdminHomepage() {
             </div>
 
             <div className="flex items-center gap-3 self-start sm:self-auto">
-              <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${
+              <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border flex items-center gap-1.5 transition-colors ${
                 config.loaderEnabled !== false
                   ? 'text-cluster-acid bg-cluster-acid/10 border-cluster-acid/30'
                   : 'text-gray-400 bg-white/5 border-white/10'
@@ -428,15 +436,22 @@ export default function AdminHomepage() {
                 {config.loaderEnabled !== false ? 'Loader Enabled' : 'Loader Disabled'}
               </span>
 
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={config.loaderEnabled !== false}
-                  onChange={(e) => setConfig({ ...config, loaderEnabled: e.target.checked })}
-                  className="sr-only peer"
+              <button
+                type="button"
+                role="switch"
+                aria-checked={config.loaderEnabled !== false}
+                onClick={() => handleToggleLoader(config.loaderEnabled === false)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  config.loaderEnabled !== false ? 'bg-[#C6FF4D]' : 'bg-white/20'
+                }`}
+                title={config.loaderEnabled !== false ? 'Click to disable intro loader' : 'Click to enable intro loader'}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-black shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    config.loaderEnabled !== false ? 'translate-x-5' : 'translate-x-0'
+                  }`}
                 />
-                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cluster-acid peer-checked:after:bg-black" />
-              </label>
+              </button>
             </div>
           </div>
 

@@ -490,7 +490,7 @@ function configFromDB(row) {
     heroHeadline: row.hero_headline,
     heroSubtitle: row.hero_subtitle,
     statsEnabled: row.stats_enabled !== undefined ? Boolean(row.stats_enabled) : (localConfig.statsEnabled !== undefined ? Boolean(localConfig.statsEnabled) : false),
-    loaderEnabled: row.loader_enabled !== undefined ? Boolean(row.loader_enabled) : (localConfig.loaderEnabled !== undefined ? Boolean(localConfig.loaderEnabled) : true),
+    loaderEnabled: row.loader_enabled !== undefined && row.loader_enabled !== null ? Boolean(row.loader_enabled) : (localConfig.loaderEnabled !== undefined ? Boolean(localConfig.loaderEnabled) : true),
     applicationsSheetUrl: row.applications_sheet_url !== undefined ? row.applications_sheet_url : (localConfig.applicationsSheetUrl || ''),
     applicationsOpen: row.applications_open !== undefined ? Boolean(row.applications_open) : (localConfig.applicationsOpen !== undefined ? Boolean(localConfig.applicationsOpen) : true),
     stats: cleanStats,

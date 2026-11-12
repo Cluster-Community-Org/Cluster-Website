@@ -20,8 +20,10 @@ function AppContent() {
       setHomepageConfig(clusterDataService.getHomepageConfig())
     }
     window.addEventListener('cluster_homepage_updated', handleConfigUpdate)
+    window.addEventListener('storage', handleConfigUpdate)
     return () => {
       window.removeEventListener('cluster_homepage_updated', handleConfigUpdate)
+      window.removeEventListener('storage', handleConfigUpdate)
     }
   }, [])
 
@@ -30,7 +32,9 @@ function AppContent() {
 
   return (
     <>
-      {isLoaderActive && !isAdmin && <ClusterPreloader />}
+      {isLoaderActive && !isAdmin && (
+        <ClusterPreloader key={String(homepageConfig?.loaderEnabled)} />
+      )}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
