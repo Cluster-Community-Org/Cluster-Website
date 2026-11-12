@@ -804,20 +804,41 @@ export const clusterDataService = {
 
     if (isSupabaseConfigured() && supabase) {
       const payload = configToDB(updated)
-      supabase.from('homepage_config').upsert(payload).then(async ({ error }) => {
-        if (error) {
-          console.warn('[Supabase Sync Error] homepage_config.upsert:', error.message)
-          if (error.code === 'PGRST204' || error.message?.includes('column')) {
-            const fallback = { ...payload }
-            delete fallback.stats_enabled
-            delete fallback.applications_sheet_url
-            delete fallback.applications_open
-            delete fallback.loader_enabled
-            const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback)
-            if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
-          }
-        }
-      })
+
+      // 1. Direct RPC for loader toggle (SECURITY DEFINER bypasses RLS)
+      if (partial.loaderEnabled !== undefined) {
+        supabase
+          .rpc('set_homepage_loader_enabled', { p_enabled: Boolean(partial.loaderEnabled) })
+          .then(({ error }) => {
+            if (error) console.warn('[Supabase Sync Error] set_homepage_loader_enabled RPC:', error.message)
+          })
+      }
+
+      // 2. Direct RPC for all fields
+      supabase
+        .rpc('update_homepage_config_all', { p_payload: payload })
+        .then(({ data, error }) => {
+          if (!error && data) return
+
+          // 3. Fallback to direct table upsert
+          supabase
+            .from('homepage_config')
+            .upsert(payload, { onConflict: 'id' })
+            .then(async ({ error: upsertErr }) => {
+              if (upsertErr) {
+                console.warn('[Supabase Sync Error] homepage_config.upsert:', upsertErr.message)
+                if (upsertErr.code === 'PGRST204' || upsertErr.message?.includes('column')) {
+                  const fallback = { ...payload }
+                  delete fallback.stats_enabled
+                  delete fallback.applications_sheet_url
+                  delete fallback.applications_open
+                  delete fallback.loader_enabled
+                  const { error: retryErr } = await supabase.from('homepage_config').upsert(fallback, { onConflict: 'id' })
+                  if (retryErr) console.warn('[Supabase Sync Retry Error]', retryErr.message)
+                }
+              }
+            })
+        })
     }
 
     return updated
