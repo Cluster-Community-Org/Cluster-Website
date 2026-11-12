@@ -10,6 +10,8 @@ const STORAGE_KEYS = {
   HOMEPAGE: 'cluster_cms_homepage_config',
   AUDIT_LOG: 'cluster_cms_audit_log',
   SOCIALS: 'cluster_cms_social_links',
+  QR_CONFIG: 'cluster_cms_qr_config',
+  QR_HISTORY: 'cluster_cms_qr_history',
 }
 
 // ── Default Seed Data ────────────────────────────────────────────────────────
@@ -526,6 +528,100 @@ function configToDB(c) {
   }
 
   return payload
+}
+
+function qrCodeToDB(item) {
+  return {
+    id: item.id,
+    slug: item.slug,
+    title: item.title,
+    destination_url: item.destinationUrl,
+    tracking_url: item.trackingUrl,
+    track_scans: Boolean(item.trackScans),
+    scans: item.scans || 0,
+    last_scanned_at: item.lastScannedAt,
+    config: item.config || {},
+    created_at: item.createdAt || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+}
+
+function qrCodeFromDB(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    destinationUrl: row.destination_url,
+    trackingUrl: row.tracking_url,
+    trackScans: Boolean(row.track_scans),
+    scans: row.scans || 0,
+    lastScannedAt: row.last_scanned_at,
+    config: row.config || {},
+    createdAt: row.created_at,
+  }
+}
+
+function qrConfigToDB(c) {
+  return {
+    id: 1,
+    url: c.url,
+    title: c.title,
+    active_preset: c.activePreset,
+    enable_tracking: Boolean(c.enableTracking),
+    custom_slug: c.customSlug,
+    selected_theme_id: c.selectedThemeId,
+    custom_bg: c.customBg,
+    custom_light_dot: c.customLightDot,
+    custom_dark_dot: c.customDarkDot,
+    custom_eye_outer: c.customEyeOuter,
+    custom_eye_inner: c.customEyeInner,
+    custom_spark_color: c.customSparkColor,
+    artwork_mode: c.artworkMode,
+    artwork_scale: c.artworkScale,
+    artwork_opacity: c.artworkOpacity,
+    dot_scale: c.dotScale,
+    micro_dot_scale: c.microDotScale,
+    glow_intensity: c.glowIntensity,
+    eye_style: c.eyeStyle,
+    error_correction: c.errorCorrection,
+    config: c,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+function qrConfigFromDB(row) {
+  if (!row) return null
+  let local = {}
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.QR_CONFIG)
+    if (raw) local = JSON.parse(raw)
+  } catch {}
+
+  return {
+    ...local,
+    url: row.url ?? local.url ?? 'https://cluster-club.vercel.app/',
+    title: row.title ?? local.title ?? 'Cluster Official QR',
+    activePreset: row.active_preset ?? local.activePreset ?? 'home',
+    enableTracking: row.enable_tracking !== undefined ? Boolean(row.enable_tracking) : (local.enableTracking ?? true),
+    customSlug: row.custom_slug ?? local.customSlug ?? '',
+    selectedThemeId: row.selected_theme_id ?? local.selectedThemeId ?? 'cyber-silver',
+    customBg: row.custom_bg ?? local.customBg ?? '#ECEFF4',
+    customLightDot: row.custom_light_dot ?? local.customLightDot ?? '#C8CCD8',
+    customDarkDot: row.custom_dark_dot ?? local.customDarkDot ?? '#101014',
+    customEyeOuter: row.custom_eye_outer ?? local.customEyeOuter ?? '#ECEFF4',
+    customEyeInner: row.custom_eye_inner ?? local.customEyeInner ?? '#101014',
+    customSparkColor: row.custom_spark_color ?? local.customSparkColor ?? '#A3E635',
+    artworkMode: row.artwork_mode ?? local.artworkMode ?? 'cluster-emblem',
+    artworkScale: row.artwork_scale ?? local.artworkScale ?? 72,
+    artworkOpacity: row.artwork_opacity ?? local.artworkOpacity ?? 22,
+    dotScale: row.dot_scale ?? local.dotScale ?? 44,
+    microDotScale: row.micro_dot_scale ?? local.microDotScale ?? 12,
+    glowIntensity: row.glow_intensity ?? local.glowIntensity ?? 0,
+    eyeStyle: row.eye_style ?? local.eyeStyle ?? 'diamond',
+    errorCorrection: row.error_correction ?? local.errorCorrection ?? 'H',
+    ...(row.config && typeof row.config === 'object' ? row.config : {}),
+  }
 }
 
 // ── Data API ─────────────────────────────────────────────────────────────────
@@ -1360,6 +1456,175 @@ export const clusterDataService = {
     return this.updateSocialLinks(DEFAULT_SOCIAL_LINKS)
   },
 
+  // ── QR Studio Configuration & Scan Analytics ─────────────────────────────
+  getQRConfig() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.QR_CONFIG)
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.warn('[DataService] Failed to read QR config:', e)
+    }
+    return null
+  },
+
+  saveQRConfig(config) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.QR_CONFIG, JSON.stringify(config))
+      dispatchUpdate('cluster_qr_config_updated', config)
+
+      // Debounced background sync to Supabase qr_studio_config table
+      if (isSupabaseConfigured() && supabase) {
+        if (this._qrConfigTimer) clearTimeout(this._qrConfigTimer)
+        this._qrConfigTimer = setTimeout(() => {
+          const payload = qrConfigToDB(config)
+          supabase
+            .from('qr_studio_config')
+            .upsert(payload, { onConflict: 'id' })
+            .then(({ error }) => {
+              if (error) console.warn('[Supabase Sync Error] qr_studio_config.upsert:', error.message)
+            })
+        }, 400)
+      }
+      return true
+    } catch (e) {
+      console.warn('[DataService] Failed to save QR config:', e)
+      return false
+    }
+  },
+
+  getQRHistory() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.QR_HISTORY)
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.warn('[DataService] Failed to read QR history:', e)
+    }
+    return []
+  },
+
+  saveQRCode(qrItem) {
+    const list = this.getQRHistory()
+    const index = list.findIndex((q) => q.id === qrItem.id || q.slug === qrItem.slug)
+    let updatedList
+    if (index >= 0) {
+      updatedList = list.map((q, i) => (i === index ? { ...q, ...qrItem } : q))
+    } else {
+      updatedList = [qrItem, ...list]
+    }
+    localStorage.setItem(STORAGE_KEYS.QR_HISTORY, JSON.stringify(updatedList))
+    dispatchUpdate('cluster_qr_history_updated', updatedList)
+    this.logAudit('QR_SAVED', `QR Code "${qrItem.title || qrItem.slug}" created/updated`, 'qr')
+
+    // Cloud sync to Supabase qr_codes table
+    if (isSupabaseConfigured() && supabase) {
+      const payload = qrCodeToDB(qrItem)
+      supabase
+        .from('qr_codes')
+        .upsert(payload, { onConflict: 'id' })
+        .then(({ error }) => {
+          if (error) console.warn('[Supabase Sync Error] qr_codes.upsert:', error.message)
+        })
+    }
+
+    return qrItem
+  },
+
+  deleteQRCode(id) {
+    const list = this.getQRHistory()
+    const target = list.find((q) => q.id === id)
+    const updatedList = list.filter((q) => q.id !== id)
+    localStorage.setItem(STORAGE_KEYS.QR_HISTORY, JSON.stringify(updatedList))
+    dispatchUpdate('cluster_qr_history_updated', updatedList)
+    this.logAudit('QR_DELETED', `QR Code "${target?.title || id}" deleted`, 'qr')
+
+    // Cloud delete from Supabase qr_codes table
+    if (isSupabaseConfigured() && supabase && target) {
+      supabase
+        .from('qr_codes')
+        .delete()
+        .eq('id', id)
+        .then(({ error }) => {
+          if (error) console.warn('[Supabase Sync Error] qr_codes.delete:', error.message)
+        })
+    }
+
+    return true
+  },
+
+  recordQRScan(slug) {
+    const list = this.getQRHistory()
+    const target = list.find((q) => q.slug === slug || q.id === slug)
+    if (!target) return null
+
+    const newScans = (target.scans || 0) + 1
+    const newTimestamp = new Date().toISOString()
+
+    const updatedList = list.map((q) => {
+      if (q.id === target.id) {
+        return {
+          ...q,
+          scans: newScans,
+          lastScannedAt: newTimestamp,
+        }
+      }
+      return q
+    })
+
+    localStorage.setItem(STORAGE_KEYS.QR_HISTORY, JSON.stringify(updatedList))
+    dispatchUpdate('cluster_qr_history_updated', updatedList)
+
+    // Cloud increment in Supabase
+    if (isSupabaseConfigured() && supabase) {
+      supabase
+        .rpc('record_qr_scan', { target_slug: target.slug })
+        .then(({ error }) => {
+          if (error) {
+            // Fallback direct table update if RPC not created
+            supabase
+              .from('qr_codes')
+              .update({ scans: newScans, last_scanned_at: newTimestamp, updated_at: newTimestamp })
+              .eq('id', target.id)
+              .then(({ error: updateErr }) => {
+                if (updateErr) console.warn('[Supabase Sync Error] qr_codes.updateScan:', updateErr.message)
+              })
+          }
+        })
+    }
+
+    return target.destinationUrl
+  },
+
+  async resolveAndRecordQRScan(slug) {
+    // 1. Check local cache first for instant redirect
+    const localDest = this.recordQRScan(slug)
+    if (localDest) return localDest
+
+    // 2. Query Supabase directly (e.g. mobile scanner who hasn't opened admin panel)
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('qr_codes')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle()
+
+        if (!error && data) {
+          const item = qrCodeFromDB(data)
+          this.saveQRCode({
+            ...item,
+            scans: (item.scans || 0) + 1,
+            lastScannedAt: new Date().toISOString(),
+          })
+          return item.destinationUrl
+        }
+      } catch (err) {
+        console.warn('[DataService] resolveAndRecordQRScan error:', err)
+      }
+    }
+
+    return null
+  },
+
   // ── Supabase Realtime & Remote Hydration ──
   async syncFromSupabase() {
     if (!isSupabaseConfigured() || !supabase) {
@@ -1430,6 +1695,33 @@ export const clusterDataService = {
         results.socials = remoteSocials.length
       }
 
+      // 6. Fetch remote QR Codes
+      const { data: remoteQRs, error: qrErr } = await supabase
+        .from('qr_codes')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (!qrErr && Array.isArray(remoteQRs) && remoteQRs.length > 0) {
+        const mapped = remoteQRs.map(qrCodeFromDB)
+        localStorage.setItem(STORAGE_KEYS.QR_HISTORY, JSON.stringify(mapped))
+        dispatchUpdate('cluster_qr_history_updated', mapped)
+        results.qr_codes = remoteQRs.length
+      }
+
+      // 7. Fetch remote QR Studio Page Config
+      const { data: remoteQRConfig, error: qrConfigErr } = await supabase
+        .from('qr_studio_config')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle()
+
+      if (!qrConfigErr && remoteQRConfig) {
+        const mapped = qrConfigFromDB(remoteQRConfig)
+        localStorage.setItem(STORAGE_KEYS.QR_CONFIG, JSON.stringify(mapped))
+        dispatchUpdate('cluster_qr_config_updated', mapped)
+        results.qr_config = true
+      }
+
       return { success: true, results }
     } catch (err) {
       console.warn('[Supabase Sync Error]', err)
@@ -1476,6 +1768,22 @@ export const clusterDataService = {
             const mapped = data.map(socialLinkFromDB)
             localStorage.setItem(STORAGE_KEYS.SOCIALS, JSON.stringify(mapped))
             dispatchUpdate('cluster_socials_updated', mapped)
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'qr_codes' }, async () => {
+          const { data } = await supabase.from('qr_codes').select('*').order('created_at', { ascending: false })
+          if (data && Array.isArray(data)) {
+            const mapped = data.map(qrCodeFromDB)
+            localStorage.setItem(STORAGE_KEYS.QR_HISTORY, JSON.stringify(mapped))
+            dispatchUpdate('cluster_qr_history_updated', mapped)
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'qr_studio_config' }, async () => {
+          const { data } = await supabase.from('qr_studio_config').select('*').eq('id', 1).maybeSingle()
+          if (data) {
+            const mapped = qrConfigFromDB(data)
+            localStorage.setItem(STORAGE_KEYS.QR_CONFIG, JSON.stringify(mapped))
+            dispatchUpdate('cluster_qr_config_updated', mapped)
           }
         })
         .subscribe()

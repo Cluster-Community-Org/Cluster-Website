@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage.jsx'
 import EventsPage from '../pages/EventsPage.jsx'
 import TeamPage from '../pages/TeamPage.jsx'
 import JoinPage from '../pages/JoinPage.jsx'
+import QRRedirect from '../pages/QRRedirect.jsx'
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin.jsx'
@@ -15,6 +16,7 @@ import AdminTeam from '../pages/admin/AdminTeam.jsx'
 import AdminApplications from '../pages/admin/AdminApplications.jsx'
 import AdminHomepage from '../pages/admin/AdminHomepage.jsx'
 import AdminSocials from '../pages/admin/AdminSocials.jsx'
+import AdminQRStudio from '../pages/admin/AdminQRStudio.jsx'
 
 function ExternalRedirect({ to }) {
   useEffect(() => {
@@ -39,6 +41,9 @@ export default function AppRoutes() {
       <Route path="/socials" element={<ExternalRedirect to="https://cluster-socials.vercel.app/" />} />
       <Route path="/links" element={<ExternalRedirect to="https://cluster-socials.vercel.app/" />} />
 
+      {/* Tracked QR Redirection */}
+      <Route path="/r/:slug" element={<QRRedirect />} />
+
       {/* Admin Auth Route */}
       <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -51,6 +56,7 @@ export default function AppRoutes() {
         <Route path="applications" element={<AdminApplications />} />
         <Route path="homepage" element={<AdminHomepage />} />
         <Route path="socials" element={<AdminSocials />} />
+        <Route path="qr" element={<AdminQRStudio />} />
       </Route>
 
       {/* Catch-all fallback */}

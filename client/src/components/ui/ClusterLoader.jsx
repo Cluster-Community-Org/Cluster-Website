@@ -54,6 +54,11 @@ export function ClusterLoader({
  * Exclusively active on localhost / dev environment. Completely stripped on production.
  */
 export function ClusterPreloader({ forceShow = false }) {
+  const isAdminPath =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/admin') ||
+      window.location.pathname.startsWith('/r/'))
+
   const isLocalDev =
     forceShow ||
     (typeof window !== 'undefined' &&
@@ -63,14 +68,18 @@ export function ClusterPreloader({ forceShow = false }) {
         window.location.hostname.endsWith('.localhost') ||
         window.location.search.includes('loader=true')))
 
-  // Hard stop: Never render outside localhost / local dev environment
-  if (!isLocalDev) return null
+  // Hard stop: Never render outside localhost / local dev, and never on admin pages
+  if (!isLocalDev || (isAdminPath && !forceShow)) return null
 
   // Phases: 'fullscreen' -> 'shrinking' -> 'bouncing' -> 'dropping' -> 'done'
   const [phase, setPhase] = useState('fullscreen')
   const [iteration, setIteration] = useState(0)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.__clusterPreloaderActive = true
+    }
+
     // 1. Fullscreen spark glow sequence: 1 -> 2 -> 3 spark pulse wave (1800ms)
     const shrinkTimer = setTimeout(() => {
       setPhase('shrinking')
@@ -81,14 +90,21 @@ export function ClusterPreloader({ forceShow = false }) {
       setPhase('bouncing')
     }, 2800)
 
-    // 3. Roblox TweenService spring bounce settles, then downward drop exit
+    // 3. Roblox TweenService spring bounce settles, then downward drop exit (3450ms)
     const dropTimer = setTimeout(() => {
       setPhase('dropping')
+      if (typeof window !== 'undefined') {
+        window.__clusterPreloaderActive = false
+        window.dispatchEvent(new CustomEvent('cluster-loader-done'))
+      }
     }, 3450)
 
-    // 4. Completed downward exit, unmount
+    // 4. Completed downward exit, unmount (4150ms)
     const doneTimer = setTimeout(() => {
       setPhase('done')
+      if (typeof window !== 'undefined') {
+        window.__clusterPreloaderActive = false
+      }
     }, 4150)
 
     return () => {
@@ -96,6 +112,9 @@ export function ClusterPreloader({ forceShow = false }) {
       clearTimeout(bounceTimer)
       clearTimeout(dropTimer)
       clearTimeout(doneTimer)
+      if (typeof window !== 'undefined') {
+        window.__clusterPreloaderActive = false
+      }
     }
   }, [iteration])
 

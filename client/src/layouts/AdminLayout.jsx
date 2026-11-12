@@ -16,6 +16,7 @@ import {
   Shield,
   Activity,
   Share2,
+  QrCode,
 } from 'lucide-react'
 import { ClusterMark } from '../components/ui/Brand.jsx'
 import CommandPalette from '../components/admin/CommandPalette.jsx'
@@ -60,6 +61,9 @@ export default function AdminLayout() {
         try {
           const { data: { session }, error } = await supabase.auth.getSession()
           if (error || !session) {
+            if (Boolean(import.meta.env.DEV) && localAuth?.provider === 'local-vault') {
+              return
+            }
             console.warn('[Admin Security] Invalid or expired Supabase session. Redirecting to login.')
             localStorage.removeItem('cluster_admin_auth')
             if (isMounted) {
@@ -157,10 +161,14 @@ export default function AdminLayout() {
     { name: 'Applications', href: '/admin/applications', icon: UserCheck, badge: pendingApplications },
     { name: 'Homepage CMS', href: '/admin/homepage', icon: Monitor },
     { name: 'Socials / Linktree', href: '/admin/socials', icon: Share2 },
+    { name: 'QR Studio', href: '/admin/qr', icon: QrCode },
   ]
 
   // Section title based on current route
   const currentSection = useMemo(() => {
+    if (location.pathname.includes('/admin/qr')) {
+      return { title: 'Artistic QR Studio', subtitle: 'Halftone branded QR generator with custom links & artwork' }
+    }
     if (location.pathname.includes('/admin/events')) {
       return { title: 'Events Management', subtitle: 'Hackathons, workshops & spotlight countdown' }
     }

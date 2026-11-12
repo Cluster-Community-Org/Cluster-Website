@@ -66,7 +66,20 @@ function select(layer, r, grow) {
 
 // Type every text node inside the element, one character at a time, with a caret the cursor follows
 async function type(node, c, layer) {
-  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      const parent = n.parentElement
+      if (!parent) return NodeFilter.FILTER_REJECT
+      const tag = parent.tagName.toUpperCase()
+      if (
+        ['STYLE', 'SCRIPT', 'SVG', 'DEFS', 'PATH', 'CLIPPATH'].includes(tag) ||
+        parent.closest('svg')
+      ) {
+        return NodeFilter.FILTER_REJECT
+      }
+      return NodeFilter.FILTER_ACCEPT
+    },
+  })
   const texts = []
   for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.data.trim()) texts.push([n, n.data])
   texts.forEach(([n, full]) => { n.data = ''; typing.set(n, full) })
@@ -186,13 +199,30 @@ export default function BuildIntro() {
       await document.fonts.ready
       if (id !== runs || !alive) return // StrictMode's throwaway first mount: a later mount owns the flags now
       localStorage.setItem(KEY, '1')
+
+      // Coordinate with Brand Preloader:
+      // If the brand preloader is active, remove the black intro cover (avoiding duplicate covers)
+      // and wait for the preloader to drop before fanning out cursors.
+      if (typeof window !== 'undefined' && window.__clusterPreloaderActive) {
+        if (cover) cover.remove()
+        await new Promise((resolve) => {
+          const onDone = () => {
+            window.removeEventListener('cluster-loader-done', onDone)
+            resolve()
+          }
+          window.addEventListener('cluster-loader-done', onDone)
+        })
+      } else {
+        await wait(900)
+        fade(cover, 600)
+      }
+
+      if (!alive) return
       const fold = scrollY + innerHeight
       const first = targets.filter((t) => rect(t).top < fold)
       const later = targets.filter((t) => rect(t).top >= fold)
       const cursors = COLORS.map((col) => cursor(layer, col))
       cursors.forEach((c, i) => setTimeout(() => run(c), i * 40))
-      await wait(900)
-      fade(cover, 600)
       await pass('block', first, 130)
       await wait(300)
       await pass('fill', first.filter((t) => t.dataset.build !== 'frame'), 220)

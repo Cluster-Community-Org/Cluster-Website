@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, useLocation } from 'react-router-dom'
 import AppRoutes from './routes/index.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { ClusterPreloader } from './components/ui/ClusterLoader.jsx'
@@ -11,13 +11,28 @@ const isLocalDev =
       window.location.hostname === '127.0.0.1' ||
       window.location.hostname.endsWith('.localhost')))
 
+function AppContent() {
+  const location = useLocation()
+  const isAdmin =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/r/')
+
+  return (
+    <>
+      {isLocalDev && !isAdmin && <ClusterPreloader />}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <AppRoutes />
+    </>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        {isLocalDev && <ClusterPreloader />}
-        <a href="#main-content" className="skip-link">Skip to main content</a>
-        <AppRoutes />
+        <AppContent />
       </ToastProvider>
     </BrowserRouter>
   )

@@ -23,53 +23,6 @@ export function ClusterMark({
       aria-hidden="true"
       style={{ overflow: 'visible' }}
     >
-      <defs>
-        <style>{`
-          @keyframes sparkSequentialWave {
-            0% {
-              opacity: 0.22;
-              transform: scale(0.88);
-              filter: drop-shadow(0 0 0px transparent);
-            }
-            25% {
-              opacity: 1;
-              transform: scale(1.36);
-              filter: drop-shadow(0 0 16px #C6FF4D) drop-shadow(0 0 6px #A3E635);
-            }
-            50% {
-              opacity: 0.35;
-              transform: scale(1.0);
-              filter: drop-shadow(0 0 2px rgba(198, 255, 77, 0.3));
-            }
-            100% {
-              opacity: 0.22;
-              transform: scale(0.88);
-              filter: drop-shadow(0 0 0px transparent);
-            }
-          }
-          .spark-node-0 {
-            transform-box: fill-box !important;
-            transform-origin: center center !important;
-            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
-            animation-delay: 0s !important;
-            will-change: transform, opacity, filter;
-          }
-          .spark-node-1 {
-            transform-box: fill-box !important;
-            transform-origin: center center !important;
-            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
-            animation-delay: 0.28s !important;
-            will-change: transform, opacity, filter;
-          }
-          .spark-node-2 {
-            transform-box: fill-box !important;
-            transform-origin: center center !important;
-            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
-            animation-delay: 0.56s !important;
-            will-change: transform, opacity, filter;
-          }
-        `}</style>
-      </defs>
       {/* Main Vector Mark */}
       <path d={MARK} fill={markColor} fillRule="evenodd" />
 
