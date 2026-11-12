@@ -47,14 +47,23 @@ export function ClusterLoader({
  * ClusterPreloader — Full-screen initial page entrance preloader.
  * Clean, signature light paper background (#F3EFE4) matching the site's editorial theme.
  * Completely free of window containers, progress bars, and text.
- * Auto-dismisses smoothly after initial page mount.
+ * 
+ * Disabled in production; active only on localhost and local dev environments.
  */
 export function ClusterPreloader({ minDuration = 0, theme = 'paper', forceShow = false }) {
+  const isLocalDev =
+    forceShow ||
+    (typeof window !== 'undefined' &&
+      (Boolean(import.meta.env.DEV) ||
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.search.includes('loader=true')))
+
   const [visible, setVisible] = useState(true)
-  const [rendered, setRendered] = useState(true)
+  const [rendered, setRendered] = useState(isLocalDev)
 
   useEffect(() => {
-    if (forceShow) return
+    if (!isLocalDev || forceShow) return
 
     // Immediately trigger fadeout on initial mount with zero artificial waiting
     const timer = setTimeout(() => {
@@ -66,9 +75,9 @@ export function ClusterPreloader({ minDuration = 0, theme = 'paper', forceShow =
     }, minDuration)
 
     return () => clearTimeout(timer)
-  }, [minDuration, forceShow])
+  }, [minDuration, forceShow, isLocalDev])
 
-  if (!rendered) return null
+  if (!rendered || !isLocalDev) return null
 
   const bgClass =
     theme === 'dark' ? 'bg-[#080808]' : theme === 'white' ? 'bg-white' : 'bg-[#F3EFE4]'
