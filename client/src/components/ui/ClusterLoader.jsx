@@ -57,13 +57,17 @@ export function ClusterPreloader({ minDuration = 0, theme = 'paper', forceShow =
       (Boolean(import.meta.env.DEV) ||
         window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.endsWith('.localhost') ||
         window.location.search.includes('loader=true')))
 
+  // Hard stop: Never render outside localhost / local dev environment
+  if (!isLocalDev) return null
+
   const [visible, setVisible] = useState(true)
-  const [rendered, setRendered] = useState(isLocalDev)
+  const [rendered, setRendered] = useState(true)
 
   useEffect(() => {
-    if (!isLocalDev || forceShow) return
+    if (forceShow) return
 
     // Immediately trigger fadeout on initial mount with zero artificial waiting
     const timer = setTimeout(() => {
@@ -75,9 +79,9 @@ export function ClusterPreloader({ minDuration = 0, theme = 'paper', forceShow =
     }, minDuration)
 
     return () => clearTimeout(timer)
-  }, [minDuration, forceShow, isLocalDev])
+  }, [minDuration, forceShow])
 
-  if (!rendered || !isLocalDev) return null
+  if (!rendered) return null
 
   const bgClass =
     theme === 'dark' ? 'bg-[#080808]' : theme === 'white' ? 'bg-white' : 'bg-[#F3EFE4]'
