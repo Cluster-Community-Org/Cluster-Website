@@ -158,22 +158,76 @@
 .drift-lazy { animation: drift 46s linear infinite; }
 .marquee { animation: marquee 28s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
-/* Spark animations for logo — Exact from Linktree */
+/* Spark animations for logo — Vibrant Sequential Neon Glow */
 @keyframes spark {
   0%, 100% {
-    opacity: 0.25;
-    transform: scale(0.92);
+    opacity: 0.22;
+    transform: scale(0.88);
+    filter: drop-shadow(0 0 0px rgba(198, 255, 77, 0));
   }
-  50% {
+  45%, 55% {
     opacity: 1;
-    transform: scale(1.06);
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 10px rgba(198, 255, 77, 0.95)) drop-shadow(0 0 4px rgba(198, 255, 77, 1));
   }
 }
 
 .spark {
   transform-box: view-box;
   transform-origin: 200px 200px;
-  animation: spark 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: spark 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+/* ─── Cinematic Inward Shrink, Bounce & Downward Exit Preloader ─── */
+.preloader-curtain {
+  clip-path: inset(0px 0px 0px 0px round 0px);
+  transition: clip-path 1.0s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: clip-path;
+}
+
+.preloader-curtain-shrunk {
+  clip-path: inset(calc(50vh - 80px) calc(50vw - 80px) calc(50vh - 80px) calc(50vw - 80px) round 32px) !important;
+}
+
+@keyframes tileBounce {
+  0% {
+    transform: scale(0.84);
+  }
+  35% {
+    transform: scale(1.18);
+  }
+  62% {
+    transform: scale(0.94);
+  }
+  82% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tile-bounce {
+  animation: tileBounce 0.62s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  will-change: transform;
+}
+
+@keyframes tileDropExit {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-22px) scale(1.04) rotate(-1.5deg);
+  }
+  100% {
+    transform: translateY(125vh) scale(0.92) rotate(-6deg);
+    opacity: 0.96;
+  }
+}
+
+.tile-drop-exit {
+  animation: tileDropExit 0.65s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
   will-change: transform, opacity;
 }
 
@@ -300,10 +354,27 @@
 .btn-cluster-secondary:hover { border-color: #C6FF4D; transform: translateY(-1px); }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *:not(.preloader-curtain):not([class*="spark-node-"]):not(.tile-bounce):not(.tile-drop-exit),
+  *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* Keep brand preloader motion intact for local dev testing */
+  .preloader-curtain {
+    transition-duration: 1.0s !important;
+  }
+  .tile-bounce {
+    animation-duration: 0.62s !important;
+    animation-iteration-count: 1 !important;
+  }
+  .tile-drop-exit {
+    animation-duration: 0.65s !important;
+    animation-iteration-count: 1 !important;
+  }
+  .spark-node-0, .spark-node-1, .spark-node-2 {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
   }
   .reveal, .stack-card, .tagline, .tagline-word { animation: none !important; }
   .tagline-word { color: #000; transform: none; }

@@ -17,26 +17,69 @@ export function ClusterMark({
   animated = true,
 }) {
   return (
-    <svg viewBox="0 0 701 704" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 701 704"
+      className={className}
+      aria-hidden="true"
+      style={{ overflow: 'visible' }}
+    >
+      <defs>
+        <style>{`
+          @keyframes sparkSequentialWave {
+            0% {
+              opacity: 0.22;
+              transform: scale(0.88);
+              filter: drop-shadow(0 0 0px transparent);
+            }
+            25% {
+              opacity: 1;
+              transform: scale(1.36);
+              filter: drop-shadow(0 0 16px #C6FF4D) drop-shadow(0 0 6px #A3E635);
+            }
+            50% {
+              opacity: 0.35;
+              transform: scale(1.0);
+              filter: drop-shadow(0 0 2px rgba(198, 255, 77, 0.3));
+            }
+            100% {
+              opacity: 0.22;
+              transform: scale(0.88);
+              filter: drop-shadow(0 0 0px transparent);
+            }
+          }
+          .spark-node-0 {
+            transform-box: fill-box !important;
+            transform-origin: center center !important;
+            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+            animation-delay: 0s !important;
+            will-change: transform, opacity, filter;
+          }
+          .spark-node-1 {
+            transform-box: fill-box !important;
+            transform-origin: center center !important;
+            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+            animation-delay: 0.28s !important;
+            will-change: transform, opacity, filter;
+          }
+          .spark-node-2 {
+            transform-box: fill-box !important;
+            transform-origin: center center !important;
+            animation: sparkSequentialWave 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+            animation-delay: 0.56s !important;
+            will-change: transform, opacity, filter;
+          }
+        `}</style>
+      </defs>
       {/* Main Vector Mark */}
       <path d={MARK} fill={markColor} fillRule="evenodd" />
 
-      {/* Traced Sparks with sequential rhythmic pulse identical to Linktree */}
+      {/* Traced Sparks with sequential rhythmic pulse */}
       {SPARKS.map((d, i) => (
         <path
           key={i}
           d={d}
           fill={sparkColor}
-          className={animated ? 'spark' : undefined}
-          style={
-            animated
-              ? {
-                  transformBox: 'view-box',
-                  transformOrigin: '200px 200px',
-                  animationDelay: `${i * 0.14}s`,
-                }
-              : undefined
-          }
+          className={animated ? `spark-node-${i}` : undefined}
         />
       ))}
     </svg>
