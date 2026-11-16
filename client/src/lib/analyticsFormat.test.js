@@ -13,6 +13,7 @@ import {
   linePath,
   rateVital,
   toCsv,
+  funnelRows,
 } from './analyticsFormat.js'
 
 describe('Phase 2: Analytics Format Unit Tests', () => {
@@ -141,5 +142,23 @@ describe('Phase 2: Analytics Format Unit Tests', () => {
     assert.equal(rateVital('CLS', 0.1), 'good')
     assert.equal(rateVital('CLS', 0.15), 'needs-improvement')
     assert.equal(rateVital('CLS', 0.35), 'poor')
+  })
+})
+
+describe('Funnel CSV rows', () => {
+  test('funnelRows converts the RPC steps object into ordered rows', () => {
+    const rows = funnelRows({ view: 4, start: 3, projects: 2, submit: 1 })
+    assert.equal(rows.length, 4)
+    assert.deepEqual(rows[0], { step: 'Visited /join', count: 4, conversion: 100 })
+    assert.equal(rows[1].conversion, 75)
+    assert.equal(rows[3].count, 1)
+    assert.equal(rows[3].conversion, 50)
+  })
+
+  test('funnelRows tolerates missing or empty steps without throwing', () => {
+    assert.equal(funnelRows().length, 4)
+    assert.equal(funnelRows(null).length, 4)
+    assert.equal(funnelRows({})[2].conversion, 0)
+    assert.ok(Array.isArray(funnelRows({ view: 'x' })))
   })
 })

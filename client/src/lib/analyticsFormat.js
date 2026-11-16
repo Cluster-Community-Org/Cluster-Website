@@ -226,3 +226,22 @@ export function toCsv(rows = [], columns = []) {
 
   return [headerLine, ...bodyLines].join('\n')
 }
+
+/**
+ * Turns the funnel RPC's steps object ({ view, start, projects, submit }) into CSV rows.
+ * @param {Object} [steps]
+ * @returns {Array<{ step: string, count: number, conversion: number }>}
+ */
+export function funnelRows(steps = {}) {
+  const stages = [
+    ['view', 'Visited /join'],
+    ['start', 'Began application'],
+    ['projects', 'Reached projects field'],
+    ['submit', 'Submitted'],
+  ]
+  return stages.map(([key, label], i) => {
+    const count = Number(steps?.[key]) || 0
+    const prev = i === 0 ? count : Number(steps?.[stages[i - 1][0]]) || 0
+    return { step: label, count, conversion: prev > 0 ? Math.round((count / prev) * 100) : 0 }
+  })
+}

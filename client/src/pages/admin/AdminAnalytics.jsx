@@ -31,6 +31,7 @@ import {
   formatPct,
   rateVital,
   toCsv,
+  funnelRows,
 } from '../../lib/analyticsFormat.js'
 
 export default function AdminAnalytics() {
@@ -78,6 +79,8 @@ export default function AdminAnalytics() {
         funnelRes,
         conversionRes,
         applicantsRes,
+        healthRes,
+        auditRes,
       ] = await Promise.all([
         analyticsService.getOverview(currRange.from, currRange.to),
         analyticsService.getOverview(prevRange.from, prevRange.to),
@@ -193,7 +196,7 @@ export default function AdminAnalytics() {
       ]
       csv = toCsv(rows, cols)
     } else if (activeTab === 'funnel') {
-      const rows = funnelData?.steps || []
+      const rows = funnelRows(funnelData?.steps)
       const cols = [
         { key: 'step', label: 'Funnel Stage' },
         { key: 'count', label: 'Visitor Count' },

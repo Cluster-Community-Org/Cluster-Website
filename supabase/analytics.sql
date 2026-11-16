@@ -58,7 +58,7 @@ declare
   v_single_page_sessions bigint := 0;
   v_total_pv_sessions bigint := 0;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -130,7 +130,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare
   r jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -182,7 +182,7 @@ declare
   r jsonb;
   v_lim int := coalesce(p_limit, 10);
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -231,7 +231,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare
   r jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -305,7 +305,7 @@ declare
   v_submit bigint := 0;
   v_abandonment jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -409,7 +409,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare
   r jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -464,73 +464,26 @@ create or replace function public.analytics_applicants(p_from timestamptz, p_to 
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare
   r jsonb;
-  v_branch jsonb;
-  v_year jsonb;
-  v_domain jsonb;
-  v_status jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
-  -- By Branch
-  select coalesce(
-    jsonb_agg(
-      jsonb_build_object('label', coalesce(nullif(trim(branch), ''), 'Unknown'), 'count', count(*))
-      order by count(*) desc
-    ),
-    '[]'::jsonb
+  with a as (
+    select * from public.applications
+    where submitted_at >= p_from and submitted_at < p_to
+  ),
+  b as (select coalesce(nullif(trim(branch), ''), 'Unknown') as l, count(*) as c from a group by 1),
+  y as (select coalesce(nullif(trim(year), ''), 'Unknown') as l, count(*) as c from a group by 1),
+  d as (select coalesce(nullif(trim(domain), ''), 'Unknown') as l, count(*) as c from a group by 1),
+  s as (select coalesce(nullif(trim(status), ''), 'Pending') as l, count(*) as c from a group by 1)
+  select jsonb_build_object(
+    'by_branch', coalesce((select jsonb_agg(jsonb_build_object('label', l, 'count', c) order by c desc) from b), '[]'::jsonb),
+    'by_year',   coalesce((select jsonb_agg(jsonb_build_object('label', l, 'count', c) order by c desc) from y), '[]'::jsonb),
+    'by_domain', coalesce((select jsonb_agg(jsonb_build_object('label', l, 'count', c) order by c desc) from d), '[]'::jsonb),
+    'by_status', coalesce((select jsonb_agg(jsonb_build_object('label', l, 'count', c) order by c desc) from s), '[]'::jsonb)
   )
-  into v_branch
-  from public.applications
-  where submitted_at >= p_from and submitted_at < p_to
-  group by 1;
-
-  -- By Year
-  select coalesce(
-    jsonb_agg(
-      jsonb_build_object('label', coalesce(nullif(trim(year), ''), 'Unknown'), 'count', count(*))
-      order by count(*) desc
-    ),
-    '[]'::jsonb
-  )
-  into v_year
-  from public.applications
-  where submitted_at >= p_from and submitted_at < p_to
-  group by 1;
-
-  -- By Domain
-  select coalesce(
-    jsonb_agg(
-      jsonb_build_object('label', coalesce(nullif(trim(domain), ''), 'Unknown'), 'count', count(*))
-      order by count(*) desc
-    ),
-    '[]'::jsonb
-  )
-  into v_domain
-  from public.applications
-  where submitted_at >= p_from and submitted_at < p_to
-  group by 1;
-
-  -- By Status
-  select coalesce(
-    jsonb_agg(
-      jsonb_build_object('label', coalesce(nullif(trim(status), ''), 'Pending'), 'count', count(*))
-      order by count(*) desc
-    ),
-    '[]'::jsonb
-  )
-  into v_status
-  from public.applications
-  where submitted_at >= p_from and submitted_at < p_to
-  group by 1;
-
-  r := jsonb_build_object(
-    'by_branch', v_branch,
-    'by_year', v_year,
-    'by_domain', v_domain,
-    'by_status', v_status
-  );
+  into r;
 
   return r;
 end $$;
@@ -548,7 +501,7 @@ declare
   v_404_errors bigint := 0;
   v_top_404 jsonb := '[]'::jsonb;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -641,7 +594,7 @@ returns bigint language plpgsql security definer set search_path = public as $$
 declare
   v_deleted bigint := 0;
 begin
-  if not public.is_admin() then
+  if not coalesce(public.is_admin(), false) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 

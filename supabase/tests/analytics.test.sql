@@ -112,11 +112,13 @@ end $$;
 -- ==============================================================================
 
 -- Clear test table within transaction for clean isolation
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
 
 -- Fixtures:
 -- Fixed timestamp: 2026-11-16 12:00:00 IST
 -- Window: 2026-11-16 00:00:00+05:30 to 2026-11-16 23:59:59+05:30
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, source, device, is_bot)
 values
   -- Session s1: pageview /, pageview /join (2 pageviews)
@@ -222,12 +224,14 @@ end $$;
 -- ------------------------------------------------------------------------------
 -- T2.9: IST Day Buckets: 23:30 IST and 00:30 IST the next day land in different buckets
 -- ------------------------------------------------------------------------------
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
 
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, is_bot)
 values
-  ('2026-11-16 23:30:00+05:30', 's_ist1', 'pageview', '/', false),
-  ('2026-11-17 00:30:00+05:30', 's_ist2', 'pageview', '/', false);
+  ('2026-11-16 23:30:00+05:30', 'ist_sess_1', 'pageview', '/', false),
+  ('2026-11-17 00:30:00+05:30', 'ist_sess_2', 'pageview', '/', false);
 
 do $$
 declare
@@ -244,6 +248,7 @@ end $$;
 -- ==============================================================================
 -- PHASE 3 GATE TESTS (T3.4 - T3.6)
 -- ==============================================================================
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
 
 -- 4 Sessions Fixture:
@@ -251,15 +256,16 @@ delete from public.page_events;
 -- Session 2: impression event:kickstart
 -- Session 3: impression event:kickstart, plus DUPLICATE impression event:kickstart
 -- Session 4: impression section:hero only
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, target, is_bot, meta)
 values
-  ('2026-11-16 14:00:00+05:30', 'sess_1', 'impression', '/events', 'event:kickstart', false, '{}'),
-  ('2026-11-16 14:01:00+05:30', 'sess_1', 'click', '/events', 'registration', false, '{"slug": "kickstart"}'),
-  ('2026-11-16 14:02:00+05:30', 'sess_2', 'impression', '/events', 'event:kickstart', false, '{}'),
-  ('2026-11-16 14:03:00+05:30', 'sess_3', 'impression', '/events', 'event:kickstart', false, '{}'),
+  ('2026-11-16 14:00:00+05:30', 'session_1', 'impression', '/events', 'event:kickstart', false, '{}'),
+  ('2026-11-16 14:01:00+05:30', 'session_1', 'click', '/events', 'registration', false, '{"slug": "kickstart"}'),
+  ('2026-11-16 14:02:00+05:30', 'session_2', 'impression', '/events', 'event:kickstart', false, '{}'),
+  ('2026-11-16 14:03:00+05:30', 'session_3', 'impression', '/events', 'event:kickstart', false, '{}'),
   -- Duplicate impression from sess_3 (testing T3.6 deduplication)
-  ('2026-11-16 14:04:00+05:30', 'sess_3', 'impression', '/events', 'event:kickstart', false, '{}'),
-  ('2026-11-16 14:05:00+05:30', 'sess_4', 'impression', '/', 'section:hero', false, '{}');
+  ('2026-11-16 14:04:00+05:30', 'session_3', 'impression', '/events', 'event:kickstart', false, '{}'),
+  ('2026-11-16 14:05:00+05:30', 'session_4', 'impression', '/', 'section:hero', false, '{}');
 
 -- ------------------------------------------------------------------------------
 -- T3.4 & T3.6: analytics_interest event:kickstart impressions = 3, clicks = 1, ctr ~ 33.3%
@@ -309,7 +315,9 @@ end $$;
 -- ==============================================================================
 -- PHASE 4 GATE TESTS (T4.3 - T4.6)
 -- ==============================================================================
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.applications where id like 'test_app_%';
 
 -- 4 Sessions on /join:
@@ -317,35 +325,37 @@ delete from public.applications where id like 'test_app_%';
 -- B: view, start, field projects
 -- C: view, start, field github
 -- D: view, start, field projects, submit
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, target, source, is_bot)
 values
   -- Session A: view only
-  ('2026-11-16 15:00:00+05:30', 'sess_A', 'pageview', '/join', null, 'instagram', false),
+  ('2026-11-16 15:00:00+05:30', 'session_A', 'pageview', '/join', null, 'instagram', false),
 
   -- Session B: view, start, field projects
-  ('2026-11-16 15:10:00+05:30', 'sess_B', 'pageview', '/join', null, 'instagram', false),
-  ('2026-11-16 15:11:00+05:30', 'sess_B', 'form_step', '/join', 'join:start', 'instagram', false),
-  ('2026-11-16 15:12:00+05:30', 'sess_B', 'form_step', '/join', 'join:field:fullName', 'instagram', false),
-  ('2026-11-16 15:13:00+05:30', 'sess_B', 'form_step', '/join', 'join:field:projects', 'instagram', false),
+  ('2026-11-16 15:10:00+05:30', 'session_B', 'pageview', '/join', null, 'instagram', false),
+  ('2026-11-16 15:11:00+05:30', 'session_B', 'form_step', '/join', 'join:start', 'instagram', false),
+  ('2026-11-16 15:12:00+05:30', 'session_B', 'form_step', '/join', 'join:field:fullName', 'instagram', false),
+  ('2026-11-16 15:13:00+05:30', 'session_B', 'form_step', '/join', 'join:field:projects', 'instagram', false),
 
   -- Session C: view, start, field github
-  ('2026-11-16 15:20:00+05:30', 'sess_C', 'pageview', '/join', null, 'instagram', false),
-  ('2026-11-16 15:21:00+05:30', 'sess_C', 'form_step', '/join', 'join:start', 'instagram', false),
-  ('2026-11-16 15:22:00+05:30', 'sess_C', 'form_step', '/join', 'join:field:fullName', 'instagram', false),
-  ('2026-11-16 15:23:00+05:30', 'sess_C', 'form_step', '/join', 'join:field:github', 'instagram', false),
+  ('2026-11-16 15:20:00+05:30', 'session_C', 'pageview', '/join', null, 'instagram', false),
+  ('2026-11-16 15:21:00+05:30', 'session_C', 'form_step', '/join', 'join:start', 'instagram', false),
+  ('2026-11-16 15:22:00+05:30', 'session_C', 'form_step', '/join', 'join:field:fullName', 'instagram', false),
+  ('2026-11-16 15:23:00+05:30', 'session_C', 'form_step', '/join', 'join:field:github', 'instagram', false),
 
   -- Session D: view, start, field projects, submit
-  ('2026-11-16 15:30:00+05:30', 'sess_D', 'pageview', '/join', null, 'instagram', false),
-  ('2026-11-16 15:31:00+05:30', 'sess_D', 'form_step', '/join', 'join:start', 'instagram', false),
-  ('2026-11-16 15:32:00+05:30', 'sess_D', 'form_step', '/join', 'join:field:projects', 'instagram', false),
-  ('2026-11-16 15:33:00+05:30', 'sess_D', 'form_step', '/join', 'join:submit', 'instagram', false),
+  ('2026-11-16 15:30:00+05:30', 'session_D', 'pageview', '/join', null, 'instagram', false),
+  ('2026-11-16 15:31:00+05:30', 'session_D', 'form_step', '/join', 'join:start', 'instagram', false),
+  ('2026-11-16 15:32:00+05:30', 'session_D', 'form_step', '/join', 'join:field:projects', 'instagram', false),
+  ('2026-11-16 15:33:00+05:30', 'session_D', 'form_step', '/join', 'join:submit', 'instagram', false),
 
   -- Additional sessions to fulfill T4.4: 5 instagram sessions total, 2 qr sessions
-  ('2026-11-16 15:40:00+05:30', 'sess_E_ig', 'pageview', '/', null, 'instagram', false),
-  ('2026-11-16 15:50:00+05:30', 'sess_F_qr', 'pageview', '/', null, 'qr-canteen', false),
-  ('2026-11-16 15:51:00+05:30', 'sess_G_qr', 'pageview', '/', null, 'qr-canteen', false);
+  ('2026-11-16 15:40:00+05:30', 'session_E_ig', 'pageview', '/', null, 'instagram', false),
+  ('2026-11-16 15:50:00+05:30', 'session_F_qr', 'pageview', '/', null, 'qr-canteen', false),
+  ('2026-11-16 15:51:00+05:30', 'session_G_qr', 'pageview', '/', null, 'qr-canteen', false);
 
 -- Insert 2 applications with source = 'instagram' and 1 with source = 'qr-canteen':
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.applications (id, full_name, email, roll_number, branch_year, domain, source, submitted_at)
 values
   ('test_app_1', 'Student One', 'one@test.com', 'R01', 'CSE · 2nd Year', 'Compute', 'instagram', '2026-11-16 16:00:00+05:30'),
@@ -434,21 +444,23 @@ end $$;
 -- ==============================================================================
 -- PHASE 5 GATE TESTS (T5.4 - T5.6)
 -- ==============================================================================
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
 
 -- ------------------------------------------------------------------------------
 -- T5.4: analytics_health p75 of known vital values [1,2,3,4] and top 404 paths
 -- ------------------------------------------------------------------------------
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, target, is_bot, meta)
 values
-  (now(), 's_h1', 'vital', '/', 'lcp', false, '{"value": 1}'::jsonb),
-  (now(), 's_h2', 'vital', '/', 'lcp', false, '{"value": 2}'::jsonb),
-  (now(), 's_h3', 'vital', '/', 'lcp', false, '{"value": 3}'::jsonb),
-  (now(), 's_h4', 'vital', '/', 'lcp', false, '{"value": 4}'::jsonb),
-  (now(), 's_h5', 'error', '/', 'js', false, '{"msg": "ReferenceError: foo is not defined"}'::jsonb),
-  (now(), 's_h6', 'error', '/missing-page', '404', false, '{"path": "/missing-page"}'::jsonb),
-  (now(), 's_h7', 'error', '/missing-page', '404', false, '{"path": "/missing-page"}'::jsonb),
-  (now(), 's_h8', 'error', '/other-missing', '404', false, '{"path": "/other-missing"}'::jsonb);
+  (now(), 'health_1', 'vital', '/', 'lcp', false, '{"value": 1}'::jsonb),
+  (now(), 'health_2', 'vital', '/', 'lcp', false, '{"value": 2}'::jsonb),
+  (now(), 'health_3', 'vital', '/', 'lcp', false, '{"value": 3}'::jsonb),
+  (now(), 'health_4', 'vital', '/', 'lcp', false, '{"value": 4}'::jsonb),
+  (now(), 'health_5', 'error', '/', 'js', false, '{"msg": "ReferenceError: foo is not defined"}'::jsonb),
+  (now(), 'health_6', 'error', '/missing-page', '404', false, '{"path": "/missing-page"}'::jsonb),
+  (now(), 'health_7', 'error', '/missing-page', '404', false, '{"path": "/missing-page"}'::jsonb),
+  (now(), 'health_8', 'error', '/other-missing', '404', false, '{"path": "/other-missing"}'::jsonb);
 
 do $$
 declare
@@ -481,12 +493,14 @@ end $$;
 -- ------------------------------------------------------------------------------
 -- T5.5: analytics_purge(90) deletes only rows older than 90 days
 -- ------------------------------------------------------------------------------
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 delete from public.page_events;
 
 -- Insert 1 old row (> 90 days) and 1 recent row (< 90 days)
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.page_events (created_at, session_id, event_type, path, is_bot)
 values
-  (now() - interval '120 days', 's_old', 'pageview', '/', false),
+  (now() - interval '120 days', 'purge_old_1', 'pageview', '/', false),
   (now() - interval '30 days', 's_recent', 'pageview', '/', false);
 
 -- Non-admin execution fails
@@ -541,6 +555,7 @@ end $$;
 set local role authenticated;
 set local request.jwt.claims = '{"email":"cluster.society@gmail.com","role":"authenticated"}';
 
+reset role;  -- fixtures are written as the table owner; role-gated checks switch role again below
 insert into public.audit_logs (id, action, summary, category)
 values ('test-admin-audit', 'HOMEPAGE_SYNC', 'Admin verified homepage sync', 'homepage');
 
@@ -552,6 +567,6 @@ begin
   assert v_exists = true, 'T5.6 failed: admin should be able to insert into audit_logs';
 end $$;
 
-raise notice 'All Phase 1, Phase 2, Phase 3, Phase 4 & Phase 5 SQL Tests (T1.9 - T5.6) Passed!';
+do $$ begin raise notice 'All Phase 1, Phase 2, Phase 3, Phase 4 & Phase 5 SQL Tests (T1.9 - T5.6) Passed!'; end $$;
 
 rollback;
