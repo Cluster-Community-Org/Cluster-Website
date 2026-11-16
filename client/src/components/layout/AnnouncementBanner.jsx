@@ -32,7 +32,11 @@ export default function AnnouncementBanner() {
           <span aria-hidden="true" className="inline-block w-2 h-2 mr-2 bg-lime" />
           {text}
           {link && (
-            <Link to={link} className="ml-2 font-semibold text-lime hover:text-white">
+            <Link
+              to={link}
+              data-track="banner_cta"
+              className="ml-2 font-semibold text-lime hover:text-white"
+            >
               {linkText}
             </Link>
           )}

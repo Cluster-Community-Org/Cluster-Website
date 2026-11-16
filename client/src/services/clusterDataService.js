@@ -1,6 +1,7 @@
 // CLUSTER Society Data Service
 // Manages local state persistence, reactive event dispatching, Supabase cloud sync, and fallback mock data.
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
+import { appToDB, appFromDB, createLegacyFallbackPayload } from '../lib/applicationMapper.js'
 
 const STORAGE_KEYS = {
   EVENTS: 'cluster_cms_events',
@@ -338,47 +339,6 @@ function eventToDB(e) {
     registration_url: e.registrationUrl || 'https://github.com/Cluster-Community-Org',
     is_spotlight: Boolean(e.isSpotlight),
     featured: Boolean(e.featured),
-  }
-}
-
-function appFromDB(row) {
-  if (!row) return null
-  return {
-    id: row.id,
-    fullName: row.full_name,
-    email: row.email,
-    rollNumber: row.roll_number,
-    course: row.course || '',
-    branch: row.branch || '',
-    year: row.year || '',
-    branchYear: row.branch_year || [row.course, row.branch, row.year].filter(Boolean).join(' · '),
-    domain: row.domain,
-    github: row.github,
-    linkedin: row.linkedin,
-    projects: row.projects || '',
-    motivation: row.motivation,
-    status: row.status,
-    submittedAt: row.submitted_at,
-  }
-}
-
-function appToDB(a) {
-  const branchYear = a.branchYear || [a.course, a.branch, a.year].filter(Boolean).join(' · ')
-  return {
-    id: a.id,
-    full_name: a.fullName,
-    email: a.email,
-    roll_number: a.rollNumber,
-    course: a.course || '',
-    branch: a.branch || '',
-    year: a.year || '',
-    branch_year: branchYear,
-    domain: a.domain,
-    github: a.github || '',
-    linkedin: a.linkedin || '',
-    projects: a.projects || '',
-    motivation: a.motivation || '',
-    status: a.status || 'Pending',
   }
 }
 
@@ -952,18 +912,7 @@ export const clusterDataService = {
           // If remote schema doesn't yet have course/branch/year/projects columns, retry with legacy payload
           // (projects folded into motivation so nothing is lost)
           if (error.code === 'PGRST204' || error.message?.includes('column')) {
-            const legacyPayload = {
-              id: newApp.id,
-              full_name: newApp.fullName,
-              email: newApp.email,
-              roll_number: newApp.rollNumber,
-              branch_year: newApp.branchYear || `${newApp.course || ''} · ${newApp.branch || ''} · ${newApp.year || ''}`,
-              domain: newApp.domain,
-              github: newApp.github || '',
-              linkedin: newApp.linkedin || '',
-              motivation: [newApp.projects && `Built: ${newApp.projects}`, newApp.motivation].filter(Boolean).join('\n\n'),
-              status: newApp.status || 'Pending',
-            }
+            const legacyPayload = createLegacyFallbackPayload(newApp)
             const { error: retryErr } = await supabase.from('applications').insert(legacyPayload)
             if (retryErr) console.warn('[Supabase Fallback Insert Error]:', retryErr.message)
           }
@@ -1168,6 +1117,26 @@ export const clusterDataService = {
       const updated = [newEntry, ...logs.slice(0, 49)]
       localStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(updated))
       dispatchUpdate('cluster_audit_updated', updated)
+
+      // Persist to Supabase audit_logs best-effort, non-blocking
+      if (isSupabaseConfigured() && supabase) {
+        supabase
+          .from('audit_logs')
+          .insert({
+            id: newEntry.id,
+            action: newEntry.action,
+            summary: newEntry.summary,
+            category: newEntry.category,
+            created_at: newEntry.timestamp,
+          })
+          .then(({ error }) => {
+            if (error) {
+              console.warn('[Audit] Supabase log persist failed:', error.message)
+            }
+          })
+          .catch(() => {})
+      }
+
       return newEntry
     } catch {
       return null

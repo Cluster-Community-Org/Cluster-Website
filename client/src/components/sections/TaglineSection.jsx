@@ -5,7 +5,7 @@ const WORDS = 'Good things happen in clusters. Every project worth talking about
 // Words light up with scroll (CSS view timeline).
 export default function TaglineSection() {
   return (
-    <section aria-label="Tagline" className="relative overflow-hidden px-6 py-24 sm:py-40 flex justify-center">
+    <section aria-label="Tagline" data-section="tagline" className="relative overflow-hidden px-6 py-24 sm:py-40 flex justify-center">
       <DotWave className="bottom-0 h-full opacity-[.13]" color="#000000" single front="drift-lazy" />
 
       <p data-build className="tagline relative max-w-[980px] text-center heading-1 sm:leading-[1.15]">

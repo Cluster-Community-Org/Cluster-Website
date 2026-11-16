@@ -339,9 +339,59 @@ Admin Action → React State Update → API Call → Express → Mongoose → Mo
 ## Security Considerations
 
 1. **JWT Verification:** Every admin API call includes the JWT in the Authorization header
-2. **Server-side Role Check:** Auth middleware verifies the user's role from the JWT payload against the `adminusers` collection
-3. **JWT Secret:** Only on the server, never exposed to the client
-4. **Input Validation:** All inputs validated server-side before processing
-5. **File Type Checking:** Server verifies MIME type via multer, not just extension
-6. **Rate Limiting:** Admin endpoints rate-limited to prevent abuse
-7. **Audit Trail:** All admin changes logged with timestamp and user ID (optional)
+2. **Server-side Role Check:** Auth middleware and Supabase RLS functions (`public.is_admin()`) verify administrative privileges
+3. **Database RLS:** Direct database operations enforce Row-Level Security policies on all tables
+4. **Input Validation:** All inputs validated and sanitized before database insertion
+5. **Rate Limiting & Throttling:** Client telemetry throttles runtime errors to 5 per session and caps metadata size at 1 KB
+6. **Audit Trail:** All administrative changes logged to `public.audit_logs` with timestamp and action summary
+
+---
+
+## Admin Analytics & Telemetry
+
+CLUSTER includes a privacy-first, custom analytics engine integrated into the administrative portal (`/admin/analytics`).
+
+### Architecture & Privacy Guarantees
+
+- **Zero Cookies & Zero PII:** Does not use tracking cookies or persistent fingerprinting. Uses ephemeral `sessionStorage` session IDs (`cluster_sid`).
+- **No IP Storage:** Client IP addresses and user agents are never recorded in database tables.
+- **Admin & DNT Exclusion:** Automatically respects `navigator.doNotTrack` and skips tracking for logged-in administrators via `localStorage.cluster_no_track`.
+- **Timezone:** Standardized on Indian Standard Time (`Asia/Kolkata`, UTC+05:30) for daily aggregation buckets.
+
+### Analytics Modules
+
+1. **Traffic Tab:** High-level KPIs (Unique Visitors, Total Pageviews, Bounce Rate, Join Form Views), interactive SVG traffic line chart with audit milestone annotations (`HOMEPAGE_SYNC`, `RECRUITMENT_TOGGLED`), and top pages, sources, devices, and UTM campaigns.
+2. **Interest Tab:** Element and event impression counters, RSVP/action click tracking, and calculated Click-Through Rates (CTR).
+3. **Funnel Tab:** Multi-step induction application funnel progression (`join:view` → `join:start` → `join:field` → `join:submit`) and last-field abandonment rates.
+4. **Applicants Tab:** Breakdown of student applicants by Engineering Branch, Graduation Batch, Circle Domain, and Application Status.
+5. **Health Tab:** Core Web Vitals telemetry (LCP, INP, CLS) evaluated against web-vitals thresholds at the 75th percentile, client JS runtime errors, 404 dead link counts, content freshness timestamps, and a data retention purge tool.
+
+### Database Tables & Security
+
+- **`public.page_events`:** Append-only event store with column-level `INSERT` grants for anonymous visitors and strict read protection restricted to verified administrators via `public.is_admin()`.
+- **`public.audit_logs`:** Administrative action ledger with RLS protecting sensitive modifications.
+
+### Environment Variables
+
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Supabase project API URL |
+| `VITE_SUPABASE_ANON_KEY` | Public publishable / anon client key |
+| `VITE_ANALYTICS_DISABLED` | Optional boolean flag (`true`) to globally suppress client telemetry |
+| `VITE_ANALYTICS_DEBUG` | Optional boolean flag (`true`) to output event dispatching logs to browser console |
+| `VITE_ANALYTICS_DEMO` | Optional boolean flag (`true`) to load deterministic fixture data in Admin Analytics without a database connection |
+
+### Running Tests
+
+- **Client Unit Tests:**
+  ```bash
+  npm test --prefix client
+  ```
+  Runs all pure core unit tests across Phase 1–5 (`analyticsCore`, `analyticsFormat`, `analyticsTrack`, `applicationMapper`).
+
+- **Database SQL Tests:**
+  ```bash
+  psql -h <SUPABASE_DB_HOST> -U postgres -d postgres -f supabase/tests/analytics.test.sql
+  ```
+  Executes the idempotent test harness inside an isolated transaction with automated rollback, asserting schema security, RLS restrictions, analytical calculations, and retention purge.
+

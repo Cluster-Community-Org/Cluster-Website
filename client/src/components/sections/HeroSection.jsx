@@ -20,7 +20,7 @@ export default function HeroSection() {
   const lines = (config.heroHeadline || 'Find your people.\nBuild together.').split(/\\n|\n/) // stored copy may contain a literal "\n"
 
   return (
-    <section aria-labelledby="hero-heading" className="-mt-20 px-2 pt-2 sm:px-4 sm:pt-4">
+    <section aria-labelledby="hero-heading" data-section="hero" className="-mt-20 px-2 pt-2 sm:px-4 sm:pt-4">
       <div data-build="frame" className="relative isolate overflow-hidden rounded-3xl bg-black text-white min-h-[calc(100svh-2rem)] flex flex-col justify-end px-6 pt-32 pb-16 sm:px-12 lg:px-20 lg:pb-24">
         <div aria-hidden="true" className="hero-grad" />
         <div aria-hidden="true" className="grain" />
@@ -42,7 +42,14 @@ export default function HeroSection() {
           </p>
 
           <div data-build className="pt-2 rise" style={{ animationDelay: '200ms' }}>
-            <Link to="/join" className="btn btn-lime">Apply to join <ArrowRight className="w-5 h-5" /></Link>
+            <Link
+              to="/join"
+              data-track="apply_cta"
+              data-track-slug="hero"
+              className="btn btn-lime"
+            >
+              Apply to join <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
 
           {config.statsEnabled && config.stats?.filter((s) => s && !s.__type).length > 0 && (

@@ -22,6 +22,9 @@ import {
   FileSpreadsheet,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { analyticsService } from '../../services/analyticsService.js'
+import { rangeToDates, formatCompact } from '../../lib/analyticsFormat.js'
+import { KpiTile, LineChart, BarList } from '../../components/admin/analytics/index.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
 // Domain palette tokens for accessible, high-contrast SVG visualization
@@ -47,6 +50,40 @@ export default function AdminDashboard() {
 
   const [activeSegment, setActiveSegment] = useState(null)
   const fileInputRef = useRef(null)
+
+  // Site Traffic Telemetry State
+  const [trafficLoading, setTrafficLoading] = useState(true)
+  const [trafficOverview, setTrafficOverview] = useState(null)
+  const [trafficTimeseries, setTrafficTimeseries] = useState([])
+  const [trafficSources, setTrafficSources] = useState([])
+
+  useEffect(() => {
+    let isMounted = true
+    const loadTraffic = async () => {
+      setTrafficLoading(true)
+      const range = rangeToDates(30)
+      try {
+        const [ovRes, tsRes, srcRes] = await Promise.all([
+          analyticsService.getOverview(range.from, range.to),
+          analyticsService.getTimeseries(range.from, range.to),
+          analyticsService.getTop(range.from, range.to, 'source', 5),
+        ])
+        if (isMounted) {
+          if (ovRes?.data) setTrafficOverview(ovRes.data)
+          if (tsRes?.data) setTrafficTimeseries(tsRes.data)
+          if (srcRes?.data) setTrafficSources(srcRes.data)
+        }
+      } catch (err) {
+        console.warn('Dashboard traffic load error:', err)
+      } finally {
+        if (isMounted) setTrafficLoading(false)
+      }
+    }
+    loadTraffic()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const refreshData = () => {
     setData({
@@ -269,6 +306,78 @@ export default function AdminDashboard() {
           <div className="text-[11px] font-mono text-[#8E8E88] flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-cluster-acid" />
             <span>Active Student Officers</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Site Traffic Section (Telemetry Mockup) */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-sm bg-cluster-acid" />
+            <h2 className="text-xs font-mono uppercase tracking-widest text-[#8E8E88] font-semibold">
+              Site Traffic & Audience (Last 30 Days)
+            </h2>
+          </div>
+          <Link
+            to="/admin/analytics"
+            className="text-xs font-mono text-cluster-acid hover:underline inline-flex items-center gap-1 font-semibold group"
+          >
+            <span>Open analytics</span>
+            <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
+
+        {/* 4 Traffic Tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <KpiTile
+            title="Visitors (approx.)"
+            value={formatCompact(trafficOverview?.visitors)}
+            subtitle="Trailing 30 days"
+            loading={trafficLoading}
+            badge="IST"
+          />
+          <KpiTile
+            title="Total Pageviews"
+            value={formatCompact(trafficOverview?.pageviews)}
+            subtitle="Trailing 30 days"
+            loading={trafficLoading}
+          />
+          <KpiTile
+            title="Bounce Rate"
+            value={trafficOverview?.bounce_rate != null ? `${trafficOverview.bounce_rate}%` : '—'}
+            subtitle="Single-page sessions"
+            loading={trafficLoading}
+            invertTrend={true}
+          />
+          <KpiTile
+            title="Join Form Views"
+            value={formatCompact(trafficOverview?.join_views)}
+            subtitle="Candidate pipeline interest"
+            loading={trafficLoading}
+          />
+        </div>
+
+        {/* Traffic Chart & Sources Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8">
+            <LineChart
+              data={trafficTimeseries}
+              metricKey="visitors"
+              secondaryKey="pageviews"
+              labelKey="day"
+              loading={trafficLoading}
+              title="Daily Traffic Trend"
+            />
+          </div>
+          <div className="lg:col-span-4">
+            <BarList
+              title="Top Channels"
+              subtitle="Where visitors discover CLUSTER"
+              items={trafficSources}
+              valueKey="visitors"
+              loading={trafficLoading}
+            />
           </div>
         </div>
       </div>

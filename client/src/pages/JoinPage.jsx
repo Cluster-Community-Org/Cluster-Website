@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Check, Lock } from 'lucide-react'
 import { clusterDataService } from '../services/clusterDataService.js'
 import { useToast } from '../context/ToastContext.jsx'
 import { useLive } from '../hooks/useLive.js'
 import { getSafeUrl } from '../lib/safeUrl.js'
+import { track } from '../lib/analytics.js'
 import { Corners, DotWave, PageHeader } from '../components/ui/Brand.jsx'
 import { LiveChip } from '../components/sections/HeroSection.jsx'
 import { STEPS } from '../components/sections/HowItWorksSection.jsx'
@@ -37,8 +38,49 @@ export default function JoinPage() {
   const open = useLive('cluster_homepage_updated', () => clusterDataService.isApplicationsOpen())
   const [form, setForm] = useState(EMPTY)
   const [sent, setSent] = useState(null)
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
-  const toggle = (t) => setForm((f) => ({ ...f, tracks: f.tracks.includes(t) ? f.tracks.filter((x) => x !== t) : f.tracks.length < MAX_TRACKS ? [...f.tracks, t] : f.tracks }))
+
+  const startedRef = useRef(false)
+  const focusedFieldsRef = useRef(new Set())
+
+  // Lifecycle: track form view on mount
+  useEffect(() => {
+    track('form_step', 'join:view')
+  }, [])
+
+  const handleFormFocus = (e) => {
+    const name = e.target.name
+    if (name && !focusedFieldsRef.current.has(name)) {
+      focusedFieldsRef.current.add(name)
+      track('form_step', `join:field:${name}`)
+    }
+  }
+
+  const set = (k) => (e) => {
+    if (!startedRef.current) {
+      startedRef.current = true
+      track('form_step', 'join:start')
+    }
+    setForm({ ...form, [k]: e.target.value })
+  }
+
+  const toggle = (t) => {
+    if (!startedRef.current) {
+      startedRef.current = true
+      track('form_step', 'join:start')
+    }
+    if (!focusedFieldsRef.current.has('tracks')) {
+      focusedFieldsRef.current.add('tracks')
+      track('form_step', 'join:field:tracks')
+    }
+    setForm((f) => ({
+      ...f,
+      tracks: f.tracks.includes(t)
+        ? f.tracks.filter((x) => x !== t)
+        : f.tracks.length < MAX_TRACKS
+        ? [...f.tracks, t]
+        : f.tracks,
+    }))
+  }
 
   const submit = (e) => {
     e.preventDefault()
@@ -50,7 +92,22 @@ export default function JoinPage() {
       showToast('Pick at least one track.', 'error')
       return
     }
-    const app = clusterDataService.addApplication({ ...form, domain: form.tracks.join(', '), branchYear: `${form.course} · ${form.branch} · ${form.year}` })
+
+    let attribution = {}
+    try {
+      const raw = sessionStorage.getItem('cluster_src')
+      if (raw) attribution = JSON.parse(raw)
+    } catch {}
+
+    const app = clusterDataService.addApplication({
+      ...form,
+      domain: form.tracks.join(', '),
+      branchYear: `${form.course} · ${form.branch} · ${form.year}`,
+      source: attribution.source,
+      utmCampaign: attribution.utm_campaign,
+    })
+
+    track('form_step', 'join:submit')
     setSent(app)
     window.scrollTo({ top: 0, behavior: 'smooth' })
     showToast(`Application sent. We will email ${app.email}.`, 'success')
@@ -105,7 +162,7 @@ export default function JoinPage() {
                   <Link to="/events" className="btn btn-black">See upcoming events <ArrowRight className="w-5 h-5" /></Link>
                 </section>
               ) : (
-                <form onSubmit={submit} className="rounded-3xl border border-line bg-cream p-6 sm:p-10 flex flex-col gap-8">
+                <form onSubmit={submit} onFocus={handleFormFocus} className="rounded-3xl border border-line bg-cream p-6 sm:p-10 flex flex-col gap-8">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <h2 className="heading-5">Your application</h2>
                     <span className="bg-black rounded-full"><LiveChip open /></span>
@@ -114,14 +171,14 @@ export default function JoinPage() {
                   <fieldset className="flex flex-col gap-6">
                     <legend className="title-3 pb-4">Start with the work</legend>
                     <Field label="What have you built, broken or shipped?" hint="Links welcome. Hackathon entries, class projects you took further, scripts, bots, PRs. A line on what each one was is enough.">
-                      <textarea required rows={6} value={form.projects} onChange={set('projects')} className={`${field} resize-y`} placeholder="A Discord bot for the hostel mess menu. Broke twice, fixed both. github.com/you/mess-bot" />
+                      <textarea name="projects" required rows={6} value={form.projects} onChange={set('projects')} className={`${field} resize-y`} placeholder="A Discord bot for the hostel mess menu. Broke twice, fixed both. github.com/you/mess-bot" />
                     </Field>
                     <div className="grid gap-6 sm:grid-cols-2">
-                      <Field label="GitHub or portfolio (optional)"><input type="url" value={form.github} onChange={set('github')} className={field} placeholder="https://github.com/you" /></Field>
-                      <Field label="LinkedIn (optional)"><input type="url" value={form.linkedin} onChange={set('linkedin')} className={field} placeholder="https://linkedin.com/in/you" /></Field>
+                      <Field label="GitHub or portfolio (optional)"><input name="github" type="url" value={form.github} onChange={set('github')} className={field} placeholder="https://github.com/you" /></Field>
+                      <Field label="LinkedIn (optional)"><input name="linkedin" type="url" value={form.linkedin} onChange={set('linkedin')} className={field} placeholder="https://linkedin.com/in/you" /></Field>
                     </div>
                     <Field label="What do you want to build next? (optional)">
-                      <textarea rows={3} value={form.motivation} onChange={set('motivation')} className={`${field} resize-y`} placeholder="The thing you would start this semester if you had a team." />
+                      <textarea name="motivation" rows={3} value={form.motivation} onChange={set('motivation')} className={`${field} resize-y`} placeholder="The thing you would start this semester if you had a team." />
                     </Field>
                   </fieldset>
 
@@ -154,12 +211,12 @@ export default function JoinPage() {
                   <fieldset className="flex flex-col gap-6 pt-8 border-t border-line">
                     <legend className="title-3 pb-4">Then a bit about you</legend>
                     <div className="grid gap-6 sm:grid-cols-2">
-                      <Field label="Full name"><input required autoComplete="name" value={form.fullName} onChange={set('fullName')} className={field} placeholder="Diya Patel" /></Field>
-                      <Field label="Email"><input required type="email" autoComplete="email" value={form.email} onChange={set('email')} className={field} placeholder="diya@example.com" /></Field>
-                      <Field label="Roll or student ID"><input required value={form.rollNumber} onChange={set('rollNumber')} className={`${field} font-mono`} placeholder="23SCSE102045" /></Field>
-                      <Field label="Course"><select value={form.course} onChange={set('course')} className={field}>{COURSES.map((c) => <option key={c}>{c}</option>)}</select></Field>
-                      <Field label="Branch"><select value={form.branch} onChange={set('branch')} className={field}>{BRANCHES.map((b) => <option key={b}>{b}</option>)}</select></Field>
-                      <Field label="Year"><select value={form.year} onChange={set('year')} className={field}>{YEARS.map((y) => <option key={y}>{y}</option>)}</select></Field>
+                      <Field label="Full name"><input name="fullName" required autoComplete="name" value={form.fullName} onChange={set('fullName')} className={field} placeholder="Diya Patel" /></Field>
+                      <Field label="Email"><input name="email" required type="email" autoComplete="email" value={form.email} onChange={set('email')} className={field} placeholder="diya@example.com" /></Field>
+                      <Field label="Roll or student ID"><input name="rollNumber" required value={form.rollNumber} onChange={set('rollNumber')} className={`${field} font-mono`} placeholder="23SCSE102045" /></Field>
+                      <Field label="Course"><select name="course" value={form.course} onChange={set('course')} className={field}>{COURSES.map((c) => <option key={c}>{c}</option>)}</select></Field>
+                      <Field label="Branch"><select name="branch" value={form.branch} onChange={set('branch')} className={field}>{BRANCHES.map((b) => <option key={b}>{b}</option>)}</select></Field>
+                      <Field label="Year"><select name="year" value={form.year} onChange={set('year')} className={field}>{YEARS.map((y) => <option key={y}>{y}</option>)}</select></Field>
                     </div>
                   </fieldset>
 

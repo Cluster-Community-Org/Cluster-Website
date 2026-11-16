@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { track } from '../lib/analytics.js'
 import PublicLayout from '../layouts/PublicLayout.jsx'
 import AdminLayout from '../layouts/AdminLayout.jsx'
 import HomePage from '../pages/HomePage.jsx'
@@ -17,12 +18,21 @@ import AdminApplications from '../pages/admin/AdminApplications.jsx'
 import AdminHomepage from '../pages/admin/AdminHomepage.jsx'
 import AdminSocials from '../pages/admin/AdminSocials.jsx'
 import AdminQRStudio from '../pages/admin/AdminQRStudio.jsx'
+import AdminAnalytics from '../pages/admin/AdminAnalytics.jsx'
 
 function ExternalRedirect({ to }) {
   useEffect(() => {
     window.location.replace(to)
   }, [to])
   return null
+}
+
+function NotFoundRedirect() {
+  const location = useLocation()
+  useEffect(() => {
+    track('error', '404', { path: (location.pathname || '').slice(0, 200) })
+  }, [location.pathname])
+  return <Navigate to="/" replace />
 }
 
 export default function AppRoutes() {
@@ -57,10 +67,11 @@ export default function AppRoutes() {
         <Route path="homepage" element={<AdminHomepage />} />
         <Route path="socials" element={<AdminSocials />} />
         <Route path="qr" element={<AdminQRStudio />} />
+        <Route path="analytics" element={<AdminAnalytics />} />
       </Route>
 
       {/* Catch-all fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundRedirect />} />
     </Routes>
   )
 }
