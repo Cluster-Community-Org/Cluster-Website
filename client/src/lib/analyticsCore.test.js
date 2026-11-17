@@ -112,6 +112,8 @@ describe('Phase 1: Analytics Core Unit Tests', () => {
     assert.equal(shouldTrack({ adminFlag: '1', pathname: '/' }), false)
     assert.equal(shouldTrack({ disabled: true, pathname: '/' }), false)
     assert.equal(shouldTrack({ disabled: 'true', pathname: '/' }), false)
+    assert.equal(shouldTrack({ optOut: true, pathname: '/' }), false)
+    assert.equal(shouldTrack({ optOut: false, pathname: '/' }), true)
     assert.equal(shouldTrack({ pathname: '/events' }), true)
     assert.equal(shouldTrack({ pathname: '/' }), true)
   })

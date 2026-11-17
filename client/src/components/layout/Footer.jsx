@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Github, Instagram, Linkedin, Globe, MessageSquare } from 'lucide-react'
 import { ClusterLogo, Square } from '../ui/Brand.jsx'
 import { clusterDataService } from '../../services/clusterDataService.js'
+import { CONSENT_RESET } from './CookieBanner.jsx'
 
 // lucide has no X logo, so inline it
 const XIcon = (p) => (
@@ -112,6 +113,9 @@ export default function Footer() {
             <span className="caption-5 text-graphite/70">
               • We count visits anonymously. No cookies, no personal data.
             </span>
+            <button type="button" onClick={() => window.dispatchEvent(new Event(CONSENT_RESET))} className="caption-5 text-graphite hover:text-black underline underline-offset-2 text-left">
+              Analytics choice
+            </button>
           </div>
           <Link to="/admin/login" className="caption-5 text-graphite hover:text-black">Admin portal</Link>
         </div>

@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar.jsx'
 import Footer from '../components/layout/Footer.jsx'
 import AnnouncementBanner from '../components/layout/AnnouncementBanner.jsx'
+import CookieBanner from '../components/layout/CookieBanner.jsx'
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
@@ -18,6 +19,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieBanner />
     </div>
   )
 }

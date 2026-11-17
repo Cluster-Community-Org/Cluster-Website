@@ -13,6 +13,7 @@ import {
   buildEvent,
   createBatcher,
   createErrorThrottler,
+  CONSENT_KEY,
 } from './analyticsCore.js'
 import {
   findTrackTarget,
@@ -278,8 +279,10 @@ export function track(type, target, meta = {}, options = {}) {
   const pathname = options.path || window.location.pathname
   const dnt = navigator.doNotTrack || window.doNotTrack
   let adminFlag = '0'
+  let optOut = false
   try {
     adminFlag = localStorage.getItem('cluster_no_track')
+    optOut = localStorage.getItem(CONSENT_KEY) === 'decline'
   } catch {
     // ignore
   }
@@ -289,6 +292,7 @@ export function track(type, target, meta = {}, options = {}) {
       disabled: IS_DISABLED,
       dnt,
       adminFlag,
+      optOut,
       pathname,
     })
   ) {
