@@ -52,8 +52,32 @@ export default function TeamPage() {
                 <p className="body-6 text-graphite line-clamp-3">{m.bio}</p>
                 {(getSafeUrl(m.github) || getSafeUrl(m.linkedin)) && (
                   <div className="mt-auto pt-4 border-t border-line flex gap-2">
-                    {getSafeUrl(m.github) && <a href={getSafeUrl(m.github)} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on GitHub`} className="p-2 rounded-full hover:bg-black/5"><Github className="w-5 h-5" /></a>}
-                    {getSafeUrl(m.linkedin) && <a href={getSafeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`} className="p-2 rounded-full hover:bg-black/5"><Linkedin className="w-5 h-5" /></a>}
+                    {getSafeUrl(m.github) && (
+                      <a
+                        href={getSafeUrl(m.github)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${m.name} on GitHub`}
+                        data-track="team_github"
+                        data-track-slug={m.name?.toLowerCase().replace(/\s+/g, '-')}
+                        className="p-2 rounded-full hover:bg-black/5"
+                      >
+                        <Github className="w-5 h-5" />
+                      </a>
+                    )}
+                    {getSafeUrl(m.linkedin) && (
+                      <a
+                        href={getSafeUrl(m.linkedin)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${m.name} on LinkedIn`}
+                        data-track="team_linkedin"
+                        data-track-slug={m.name?.toLowerCase().replace(/\s+/g, '-')}
+                        className="p-2 rounded-full hover:bg-black/5"
+                      >
+                        <Linkedin className="w-5 h-5" />
+                      </a>
+                    )}
                   </div>
                 )}
               </article>

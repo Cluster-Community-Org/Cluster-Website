@@ -107,7 +107,7 @@ export default function CirclesSection() {
   const select = (i) => ({ onMouseEnter: () => setOn(i), onFocus: () => setOn(i), onClick: () => setOn(i) })
 
   return (
-    <section id="circles" aria-labelledby="circles-heading" className="px-2 sm:px-4">
+    <section id="circles" aria-labelledby="circles-heading" data-section="circles" className="px-2 sm:px-4">
       <div className="rounded-3xl bg-black text-white px-6 py-20 sm:px-12 lg:px-16 lg:py-24">
         <div className="max-w-7xl mx-auto flex flex-col gap-12 lg:gap-16">
           <div className="reveal grid lg:grid-cols-12 lg:items-end gap-x-8 gap-y-6">
@@ -149,7 +149,14 @@ export default function CirclesSection() {
                   </ul>
                 </div>
                 <div className="lg:col-span-3 lg:justify-self-end">
-                  <Link to="/join" className="btn btn-lime">Join this circle <ArrowRight className="w-5 h-5" /></Link>
+                  <Link
+                    to="/join"
+                    data-track="apply_cta"
+                    data-track-slug={'circle_' + c.name.toLowerCase()}
+                    className="btn btn-lime"
+                  >
+                    Join this circle <ArrowRight className="w-5 h-5" />
+                  </Link>
                 </div>
               </div>
             ))}

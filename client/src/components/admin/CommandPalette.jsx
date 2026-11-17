@@ -15,6 +15,7 @@ import {
   Sparkles,
   Command,
   Share2,
+  BarChart3,
 } from 'lucide-react'
 import { clusterDataService } from '../../services/clusterDataService.js'
 
@@ -48,6 +49,14 @@ export default function CommandPalette({ isOpen, onClose }) {
       category: 'Navigation',
       icon: LayoutDashboard,
       action: () => navigate('/admin/dashboard'),
+    },
+    {
+      id: 'nav-analytics',
+      title: 'Analytics & Insights',
+      subtitle: 'Audience traffic, conversion funnel, and telemetry',
+      category: 'Navigation',
+      icon: BarChart3,
+      action: () => navigate('/admin/analytics'),
     },
     {
       id: 'nav-events',

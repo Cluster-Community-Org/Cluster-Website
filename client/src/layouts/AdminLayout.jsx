@@ -17,6 +17,7 @@ import {
   Activity,
   Share2,
   QrCode,
+  BarChart3,
 } from 'lucide-react'
 import { ClusterMark } from '../components/ui/Brand.jsx'
 import CommandPalette from '../components/admin/CommandPalette.jsx'
@@ -46,6 +47,11 @@ export default function AdminLayout() {
 
   // Cryptographic Auth guard & active session verification
   useEffect(() => {
+    try {
+      localStorage.setItem('cluster_no_track', '1')
+    } catch {
+      // ignore
+    }
     let isMounted = true
 
     const verifyAuth = async () => {
@@ -156,6 +162,7 @@ export default function AdminLayout() {
 
   const navItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Events CMS', href: '/admin/events', icon: Calendar },
     { name: 'Team CMS', href: '/admin/team', icon: Users },
     { name: 'Applications', href: '/admin/applications', icon: UserCheck, badge: pendingApplications },
@@ -166,6 +173,9 @@ export default function AdminLayout() {
 
   // Section title based on current route
   const currentSection = useMemo(() => {
+    if (location.pathname.includes('/admin/analytics')) {
+      return { title: 'Analytics & Insights', subtitle: 'Privacy-first traffic, conversion & engagement metrics' }
+    }
     if (location.pathname.includes('/admin/qr')) {
       return { title: 'Artistic QR Studio', subtitle: 'Halftone branded QR generator with custom links & artwork' }
     }

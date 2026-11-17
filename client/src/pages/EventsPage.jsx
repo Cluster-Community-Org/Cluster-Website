@@ -66,7 +66,11 @@ export default function EventsPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {shown.map((e, i) => (
-              <article key={e.slug || e.id} className={`reveal ${i % 2 ? 'reveal-2' : ''} lift rounded-2xl border border-line hover:border-black bg-cream p-6 sm:p-8 flex flex-col gap-6`}>
+              <article
+                key={e.slug || e.id}
+                data-impression={'event:' + (e.slug || e.id)}
+                className={`reveal ${i % 2 ? 'reveal-2' : ''} lift rounded-2xl border border-line hover:border-black bg-cream p-6 sm:p-8 flex flex-col gap-6`}
+              >
                 <div className="flex items-center justify-between gap-4">
                   <span className="caption-3 rounded-full bg-black text-lime px-3 py-2">{e.type}</span>
                   <span className="title-4 text-graphite flex items-center gap-2"><Calendar className="w-4 h-4" />{e.date}</span>
@@ -78,10 +82,27 @@ export default function EventsPage() {
                 <div className="mt-auto pt-6 border-t border-line flex items-center justify-between gap-4">
                   <span className="title-4 text-graphite flex items-center gap-2 min-w-0"><MapPin className="w-4 h-4 shrink-0" /><span className="truncate">{e.location}</span></span>
                   {tab === 'upcoming' && e.registrationUrl && (
-                    <a href={e.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-black btn-sm shrink-0">RSVP <ArrowRight className="w-4 h-4" /></a>
+                    <a
+                      href={e.registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track="registration"
+                      data-track-slug={e.slug}
+                      className="btn btn-black btn-sm shrink-0"
+                    >
+                      RSVP <ArrowRight className="w-4 h-4" />
+                    </a>
                   )}
                   {tab === 'past' && e.gallery?.length > 0 && (
-                    <button type="button" onClick={() => setGallery(e.gallery)} className="btn btn-ghost btn-sm shrink-0"><ImageIcon className="w-4 h-4" />Photos ({e.gallery.length})</button>
+                    <button
+                      type="button"
+                      onClick={() => setGallery(e.gallery)}
+                      data-track="gallery_open"
+                      data-track-slug={e.slug}
+                      className="btn btn-ghost btn-sm shrink-0"
+                    >
+                      <ImageIcon className="w-4 h-4" />Photos ({e.gallery.length})
+                    </button>
                   )}
                 </div>
               </article>

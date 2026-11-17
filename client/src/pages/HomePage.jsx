@@ -61,7 +61,7 @@ function FaqItem({ q, a, startOpen }) {
 
 function FaqSection() {
   return (
-    <section aria-labelledby="faq-heading" className="relative px-4 sm:px-8 lg:px-20 pb-32">
+    <section aria-labelledby="faq-heading" data-section="faq" className="relative px-4 sm:px-8 lg:px-20 pb-32">
       <PixelCluster className="w-16 h-16 left-20 top-80" />
       <div className="max-w-7xl mx-auto grid gap-12 lg:grid-cols-2 lg:gap-20">
         <div className="reveal flex flex-col gap-4 max-w-md">
@@ -80,7 +80,7 @@ function FaqSection() {
 function FinalCta() {
   const open = useLive('cluster_homepage_updated', () => clusterDataService.isApplicationsOpen())
   return (
-    <section id="join" aria-labelledby="cta-heading" className="px-2 sm:px-4">
+    <section id="join" aria-labelledby="cta-heading" data-section="cta" className="px-2 sm:px-4">
       <div className="relative overflow-hidden rounded-3xl bg-black text-white px-6 py-24 sm:px-20 sm:py-32 flex flex-col items-center text-center gap-8">
         <DotWave className="bottom-0 h-72 opacity-60" single />
         <Corners inset="top-6 left-6 right-6 bottom-6" />
@@ -93,7 +93,12 @@ function FinalCta() {
             ? "Applications for this round are open. Show us what you've built. We'll show you who to build with next."
             : 'Applications are closed for this round. Events stay open to every student.'}
         </p>
-        <Link to={open ? '/join' : '/events'} className="reveal reveal-3 relative btn btn-lime min-h-12 text-lg px-6">
+        <Link
+          to={open ? '/join' : '/events'}
+          data-track="apply_cta"
+          data-track-slug="homepage_final_cta"
+          className="reveal reveal-3 relative btn btn-lime min-h-12 text-lg px-6"
+        >
           {open ? 'Apply to join Cluster' : 'See upcoming events'} <ArrowRight className="w-5 h-5" />
         </Link>
         <p className="relative caption-3 text-mute flex flex-wrap justify-center items-center gap-x-6 gap-y-2">

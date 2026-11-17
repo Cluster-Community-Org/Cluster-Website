@@ -69,7 +69,7 @@ export const STEPS = [
 
 export default function HowItWorksSection() {
   return (
-    <section aria-labelledby="how-heading" className="relative px-4 sm:px-8 lg:px-20 py-32">
+    <section aria-labelledby="how-heading" data-section="how" className="relative px-4 sm:px-8 lg:px-20 py-32">
       <PixelCluster className="w-32 h-32 right-24 top-28" float="float-slow" />
       <div className="max-w-7xl mx-auto flex flex-col gap-16">
         <div className="reveal flex flex-col gap-4 max-w-[680px]">

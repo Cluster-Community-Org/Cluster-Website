@@ -28,7 +28,7 @@ function Spotlight({ event }) {
   const day = start.toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long' })
 
   return (
-    <section id="events" aria-labelledby="spotlight-heading" className="px-4 sm:px-8 lg:px-20 pb-32">
+    <section id="events" aria-labelledby="spotlight-heading" data-section="spotlight" className="px-4 sm:px-8 lg:px-20 pb-32">
       <div className="max-w-7xl mx-auto flex flex-col gap-12">
         <div className="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="flex flex-col gap-4 max-w-[680px]">
@@ -70,7 +70,14 @@ function Spotlight({ event }) {
             </ul>
             <div className="flex flex-col items-start gap-4">
               {event.registrationUrl && (
-                <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-black">
+                <a
+                  href={event.registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-track="registration"
+                  data-track-slug={event.slug}
+                  className="btn btn-black"
+                >
                   Save your spot <ArrowRight className="w-5 h-5" />
                 </a>
               )}

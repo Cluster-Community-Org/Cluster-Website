@@ -79,7 +79,7 @@ const CARDS = [
 
 export default function WhyJoinSection() {
   return (
-    <section aria-labelledby="why-heading" className="relative px-4 sm:px-8 lg:px-20 pt-24 sm:pt-32 pb-32">
+    <section aria-labelledby="why-heading" data-section="why" className="relative px-4 sm:px-8 lg:px-20 pt-24 sm:pt-32 pb-32">
       <PixelCluster className="w-24 h-24 right-32 -top-16" />
       <div className="max-w-7xl mx-auto flex flex-col gap-12 lg:gap-16">
         <div className="reveal flex flex-col items-center text-center gap-4">

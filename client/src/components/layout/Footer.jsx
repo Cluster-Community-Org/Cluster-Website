@@ -105,9 +105,14 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t border-line">
-          <p className="caption-5 text-graphite flex items-center gap-2">
-            © {new Date().getFullYear()} Cluster. Good things happen in clusters. <Square className="w-1.5 h-1.5" />
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <p className="caption-5 text-graphite flex items-center gap-2">
+              © {new Date().getFullYear()} Cluster. Good things happen in clusters. <Square className="w-1.5 h-1.5" />
+            </p>
+            <span className="caption-5 text-graphite/70">
+              • We count visits anonymously. No cookies, no personal data.
+            </span>
+          </div>
           <Link to="/admin/login" className="caption-5 text-graphite hover:text-black">Admin portal</Link>
         </div>
       </div>

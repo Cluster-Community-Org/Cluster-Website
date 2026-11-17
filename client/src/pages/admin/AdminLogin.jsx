@@ -70,6 +70,12 @@ export default function AdminLogin() {
         )
       }
 
+      try {
+        localStorage.setItem('cluster_no_track', '1')
+      } catch {
+        // ignore
+      }
+
       showToast('Welcome to CLUSTER CMS Portal')
       navigate('/admin/dashboard')
     } catch (err) {
