@@ -3,6 +3,8 @@
 // No DOM or Supabase dependencies. 100% unit-testable in pure Node.
 // ==============================================================================
 
+export const CONSENT_KEY = 'cluster_consent' // 'accept' | 'decline'
+
 const VALID_EVENT_TYPES = new Set([
   'pageview',
   'click',
@@ -170,10 +172,13 @@ export function sanitizePath(pathname) {
 
 /**
  * Determines whether analytics collection should run.
- * @param {{ disabled?: boolean|string, dnt?: string|number, adminFlag?: boolean|string|number, pathname?: string }} ctx
+ * @param {{ disabled?: boolean|string, dnt?: string|number, adminFlag?: boolean|string|number, optOut?: boolean, pathname?: string }} ctx
  * @returns {boolean}
  */
-export function shouldTrack({ disabled, dnt, adminFlag, pathname } = {}) {
+export function shouldTrack({ disabled, dnt, adminFlag, optOut, pathname } = {}) {
+  if (optOut === true) {
+    return false
+  }
   if (disabled === true || disabled === 'true') {
     return false
   }
