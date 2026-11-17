@@ -9,6 +9,7 @@ import {
   appToDB,
   appFromDB,
   createLegacyFallbackPayload,
+  createUnattributedPayload,
 } from './applicationMapper.js'
 
 describe('Phase 4: Application Mapper Unit Tests', () => {
@@ -94,5 +95,37 @@ describe('Phase 4: Application Mapper Unit Tests', () => {
     // Confirms omitted new columns so remote schema retry succeeds
     assert.equal(fallback.source, undefined)
     assert.equal(fallback.utm_campaign, undefined)
+  })
+
+  test('createUnattributedPayload keeps course, branch, year and projects while omitting source and utm_campaign', () => {
+    const app = {
+      id: 'app-999',
+      fullName: 'Neha Patel',
+      email: 'neha@example.com',
+      rollNumber: '23EC01',
+      course: 'B.Tech',
+      branch: 'ECE',
+      year: '2nd Year',
+      domain: 'Applied AI',
+      github: 'https://github.com/neha',
+      linkedin: 'https://linkedin.com/in/neha',
+      projects: 'Jetson Nano obstacle avoidance',
+      motivation: 'Robotics team member',
+      status: 'Pending',
+      source: 'whatsapp',
+      utmCampaign: 'poster_canteen',
+    }
+
+    const unattributed = createUnattributedPayload(app)
+
+    assert.equal(unattributed.id, 'app-999')
+    assert.equal(unattributed.course, 'B.Tech')
+    assert.equal(unattributed.branch, 'ECE')
+    assert.equal(unattributed.year, '2nd Year')
+    assert.equal(unattributed.projects, 'Jetson Nano obstacle avoidance')
+    assert.equal(unattributed.domain, 'Applied AI')
+    assert.equal(unattributed.status, 'Pending')
+    assert.equal(unattributed.source, undefined)
+    assert.equal(unattributed.utm_campaign, undefined)
   })
 })

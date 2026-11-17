@@ -245,6 +245,22 @@ begin
   assert (v_res->1->>'day') = '2026-11-17' and (v_res->1->>'visitors')::int = 1, 'T2.9 failed: 00:30 IST should be in 2026-11-17';
 end $$;
 
+-- ------------------------------------------------------------------------------
+-- T2.10: Self-promoted user_metadata.role must not be treated as admin
+-- ------------------------------------------------------------------------------
+set local role authenticated;
+set local request.jwt.claims = '{"email":"intruder@external.com","role":"authenticated","user_metadata":{"role":"admin"}}';
+
+do $$
+begin
+  begin
+    perform public.analytics_overview(now() - interval '1 day', now());
+    raise exception 'T2.10 failed: self-promoted user_metadata admin was able to call analytics_overview';
+  exception when insufficient_privilege then
+    null;
+  end;
+end $$;
+
 -- ==============================================================================
 -- PHASE 3 GATE TESTS (T3.4 - T3.6)
 -- ==============================================================================
@@ -310,6 +326,29 @@ begin
   assert (v_reg->>'impressions')::int = 0, 'T3.5 failed: registration impressions should be 0';
   assert (v_reg->>'clicks')::int = 1, 'T3.5 failed: registration clicks should be 1';
   assert (v_reg->'ctr') = 'null'::jsonb, 'T3.5 failed: ctr should be null when impressions = 0';
+end $$;
+
+-- ------------------------------------------------------------------------------
+-- T3.7: gallery_open must not count toward an event's RSVP clicks / CTR
+-- ------------------------------------------------------------------------------
+reset role;
+delete from public.page_events;
+insert into public.page_events (created_at, session_id, event_type, path, target, is_bot, meta)
+values
+  ('2026-11-16 14:00:00+05:30', 'gallery_1', 'impression', '/events', 'event:kickstart', false, '{}'),
+  ('2026-11-16 14:01:00+05:30', 'gallery_1', 'click', '/events', 'gallery_open', false, '{"slug": "kickstart"}');
+
+set local role authenticated;
+set local request.jwt.claims = '{"email":"cluster.society@gmail.com","role":"authenticated"}';
+
+do $$
+declare v_row jsonb;
+begin
+  select x into v_row
+  from jsonb_array_elements(public.analytics_interest('2026-11-16 00:00:00+05:30', '2026-11-17 00:00:00+05:30')) x
+  where x->>'target' = 'event:kickstart';
+  assert (v_row->>'clicks')::int = 0, 'T3.7 failed: gallery_open counted as an RSVP click';
+  assert (v_row->>'ctr')::numeric = 0, 'T3.7 failed: ctr should be 0';
 end $$;
 
 -- ==============================================================================
@@ -567,6 +606,6 @@ begin
   assert v_exists = true, 'T5.6 failed: admin should be able to insert into audit_logs';
 end $$;
 
-do $$ begin raise notice 'All Phase 1, Phase 2, Phase 3, Phase 4 & Phase 5 SQL Tests (T1.9 - T5.6) Passed!'; end $$;
+do $$ begin raise notice 'All Phase 1 - 5 SQL Tests (T1.9 - T5.6, T2.10, T3.7) Passed!'; end $$;
 
 rollback;

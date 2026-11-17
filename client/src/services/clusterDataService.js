@@ -1,7 +1,7 @@
 // CLUSTER Society Data Service
 // Manages local state persistence, reactive event dispatching, Supabase cloud sync, and fallback mock data.
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
-import { appToDB, appFromDB, createLegacyFallbackPayload } from '../lib/applicationMapper.js'
+import { appToDB, appFromDB, createLegacyFallbackPayload, createUnattributedPayload } from '../lib/applicationMapper.js'
 
 const STORAGE_KEYS = {
   EVENTS: 'cluster_cms_events',
@@ -909,12 +909,17 @@ export const clusterDataService = {
       supabase.from('applications').insert(appToDB(newApp)).then(async ({ error }) => {
         if (error) {
           console.warn('[Supabase Sync Error] applications.insert:', error.message)
-          // If remote schema doesn't yet have course/branch/year/projects columns, retry with legacy payload
-          // (projects folded into motivation so nothing is lost)
           if (error.code === 'PGRST204' || error.message?.includes('column')) {
-            const legacyPayload = createLegacyFallbackPayload(newApp)
-            const { error: retryErr } = await supabase.from('applications').insert(legacyPayload)
-            if (retryErr) console.warn('[Supabase Fallback Insert Error]:', retryErr.message)
+            // First retry: retry without source/utm_campaign to preserve course/branch/year/projects columns
+            const unattributed = createUnattributedPayload(newApp)
+            const { error: retryErr } = await supabase.from('applications').insert(unattributed)
+            if (retryErr) {
+              console.warn('[Supabase Unattributed Insert Retry Error]:', retryErr.message)
+              // Second fallback: if schema also lacks course/branch/year, fall back to legacy payload
+              const legacyPayload = createLegacyFallbackPayload(newApp)
+              const { error: legacyErr } = await supabase.from('applications').insert(legacyPayload)
+              if (legacyErr) console.warn('[Supabase Fallback Insert Error]:', legacyErr.message)
+            }
           }
         }
       })

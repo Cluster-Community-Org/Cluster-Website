@@ -105,14 +105,15 @@ ALTER TABLE public.homepage_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if the current user has verified admin rights
--- Admins are verified via app_metadata role, user_metadata role, or verified admin email
+-- Admins are verified via app_metadata role (set server-side) or verified admin email.
+-- user_metadata is omitted intentionally because client users can self-edit it.
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
-  RETURN (
+  RETURN COALESCE(
     (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
-    OR (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
-    OR auth.jwt() ->> 'email' IN ('cluster.society@gmail.com', 'admin@cluster.org')
+    OR auth.jwt() ->> 'email' IN ('cluster.society@gmail.com', 'admin@cluster.org'),
+    false
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -45,6 +45,18 @@ grant insert (session_id, event_type, path, target, source, referrer,
 -- RPC Functions: Server-Side Aggregations (SECURITY DEFINER, public.is_admin())
 -- ==============================================================================
 
+-- Verified admin check helper (server-side app_metadata or email allowlist only)
+create or replace function public.is_admin()
+returns boolean as $$
+begin
+  return coalesce(
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    or auth.jwt() ->> 'email' in ('cluster.society@gmail.com', 'admin@cluster.org'),
+    false
+  );
+end;
+$$ language plpgsql security definer;
+
 -- 1. Analytics Overview
 create or replace function public.analytics_overview(p_from timestamptz, p_to timestamptz)
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -240,7 +252,7 @@ begin
       session_id,
       event_type,
       case
-        when event_type = 'click' and target in ('registration', 'gallery_open') and (meta->>'slug') is not null
+        when event_type = 'click' and target = 'registration' and (meta->>'slug') is not null
           then 'event:' || (meta->>'slug')
         else coalesce(target, 'unknown')
       end as canonical_target,

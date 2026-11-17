@@ -91,3 +91,17 @@ export function createLegacyFallbackPayload(newApp) {
     status: newApp.status || 'Pending',
   }
 }
+
+/**
+ * Generates payload omitting only analytics attribution columns (source, utm_campaign).
+ * Keeps separate course, branch, year, and projects columns intact if only analytics columns are missing.
+ * @param {Object} newApp
+ * @returns {Object}
+ */
+export function createUnattributedPayload(newApp) {
+  const payload = appToDB(newApp)
+  if (!payload) return null
+  delete payload.source
+  delete payload.utm_campaign
+  return payload
+}

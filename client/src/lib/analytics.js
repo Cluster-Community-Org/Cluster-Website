@@ -239,14 +239,21 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     }
   })
 
-  // Core Web Vitals: report LCP, CLS, INP once per page load
+  // Core Web Vitals: report LCP, CLS, INP once per page load, bound to the initial load route
+  const initialPagePath = typeof window !== 'undefined' ? window.location.pathname : '/'
+
   const sendVital = (metric) => {
     if (!metric || !metric.name) return
-    track('vital', metric.name, {
-      value: Math.round(metric.value * 1000) / 1000,
-      rating: metric.rating,
-      id: metric.id,
-    })
+    track(
+      'vital',
+      metric.name,
+      {
+        value: Math.round(metric.value * 1000) / 1000,
+        rating: metric.rating,
+        id: metric.id,
+      },
+      { path: initialPagePath }
+    )
   }
 
   try {
@@ -263,11 +270,12 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
  * @param {'pageview'|'click'|'impression'|'form_step'|'vital'|'error'} type
  * @param {string} [target]
  * @param {Object} [meta]
+ * @param {Object} [options]
  */
-export function track(type, target, meta = {}) {
+export function track(type, target, meta = {}, options = {}) {
   if (typeof window === 'undefined') return
 
-  const pathname = window.location.pathname
+  const pathname = options.path || window.location.pathname
   const dnt = navigator.doNotTrack || window.doNotTrack
   let adminFlag = '0'
   try {
