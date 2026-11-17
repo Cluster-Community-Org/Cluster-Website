@@ -261,6 +261,9 @@ begin
   end;
 end $$;
 
+-- Restore admin claims: T2.10 leaves the session as a non-admin, and later tests call admin-only RPCs
+set local request.jwt.claims = '{"email":"cluster.society@gmail.com","role":"authenticated"}';
+
 -- ==============================================================================
 -- PHASE 3 GATE TESTS (T3.4 - T3.6)
 -- ==============================================================================
